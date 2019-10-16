@@ -1,0 +1,14 @@
+type, Name, Cost, rent normal, rent 1ch, rent 2ch, rent 3ch, rent 4ch, rent tb, ch cost, tb cost, mortgage val, deed_R, deed_G, deed_B
+
+type key:
+0 - normal
+1 - school
+2 - station
+3 - pot luck
+4 - council chest
+5 - lost in bogside
+6 - movement (i.e. go to bogside)
+7 - payment
+8 - job centre
+9 - disabled parking
+10 - other

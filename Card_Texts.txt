@@ -1,0 +1,13 @@
+Collect £*
+Pay £*
+Collect £* from each player
+Miss * turn(s)
+Move * Spaces
+Move to * (& pass Job Centre)
+Move to * (do not pass Job Centre)
+Go to Bogside
+Map out of Bogside
+£* for each CH and £* for each TB
+Next dice roll is worth 1/*
+Pay £* for each Council House
+Pay £* for each Tower Block
