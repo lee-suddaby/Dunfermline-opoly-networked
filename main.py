@@ -63,7 +63,7 @@ class AnimatedGif:
         self.gif_y = newY
 
 #------------------------------Dice Class------------------------------
-#Images and current state data for a single die. Two instances will be used in-game
+#Images and current state data for a single die. Two instances will be used in the game
 class Die:
     def __init__(self, imgArr): #Simple constructor
         self.cur_score = 0
