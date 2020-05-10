@@ -3,64 +3,14 @@ import random #Generating pseudo-random numbers for dice rolls
 import numpy as np #For creation and use of proper arrays as python's default structures are unacceptable
 from pygame.locals import * #Another part of the pygame module - contains various constants used by pygame itself
 from enum import Enum #Used for the property type enumeration
-from textbox import TextBox #TextBox class found on GitHub (and cited in Bibliography)
 from copy import copy #Used when swapping and copy objects in arrays (e.g. the 2D array quicksort algorithm)
-from msgbox import MessageBox #MessageBox class is used for (surprisingly enough) displaying message boxes containing text to the user
 import getpass #Used for getting the user's username, needed for choosing the directory of save files
 from datetime import datetime #Getting the current date and time as understood by humans (rather than UNIX time)
 import os #Used for creating directories
 
-#------------------------------AnimatedGif Class------------------------------
-#Custom object containing data for displaying an animated GIF
-#Created as python is not very friendly when it comes to interacting with animated GIFs
-class AnimatedGif:
-    #Constructor - Should be relatively self-explanatory. new_paths is an array of file paths as strings
-    def __init__(self, new_x, new_y, new_w, new_h, new_paths):
-        self.frameCounter = 0 #Index of frame array that contains the next image to be displayed
-        self.gif_x = new_x
-        self.gif_y = new_y
-        self.gif_w = new_w
-        self.gif_h = new_h
-        self.noOfFrames = len(new_paths)
-        self.framePaths = np.array(new_paths) #Array of string, to store the file paths
-        self.frames = np.array([None] * self.noOfFrames) #Array of pygame Surface objects, to store the actual graphical frames
-        for n in range(self.noOfFrames):
-            self.frames[n] = pygame.transform.scale(pygame.image.load(new_paths[n]), [self.gif_w, self.gif_h])
-        
-    def getX(self):
-        return self.gif_x
-
-    def getY(self):
-        return self.gif_y
-
-    def getH(self):
-        return self.gif_h
-
-    def getW(self):
-        return self.gif_w
-
-    def getNoOfFrames(self):
-        return self.noOfFrames
-
-    def getFrames(self): #Returns array of pygame graphics
-        return self.frames
-
-    def getFramePaths(self): #Returns array of strings
-        return self.framePaths
-
-    #Return next frame of the GIF to be displayed
-    #Set to loop the GIF indefinitely
-    def getCurFrame(self):
-        self.frameCounter = self.frameCounter + 1
-        if self.frameCounter  >= self.noOfFrames:
-            self.frameCounter = 0 #Play GIF from beginning as frame cycle completed
-        return self.frames[self.frameCounter]
-
-    def setX(self, newX):
-        self.gif_x = newX
-
-    def setY(self, newY):
-        self.gif_y = newY
+from textbox import TextBox #TextBox class found on GitHub
+from msgbox import MessageBox #MessageBox class is used for (surprisingly enough) displaying message boxes containing text to the user
+from anigif import AnimatedGif
 
 #------------------------------Dice Class------------------------------
 #Images and current state data for a single die. Two instances will be used in the game
@@ -2495,10 +2445,10 @@ def PauseMenu(mainGame):
             gotoScreen = 0 #Goto new game screen
 
         if music_box_click: #Check box for background music
-            if mainGame.pause: #Music is currently paused
+            """ if mainGame.pause: #Music is currently paused
                 pygame.mixer.music.unpause() #Unpause music
             else: #Music is currently unpaused
-                pygame.mixer.music.pause() #Pause music
+                pygame.mixer.music.pause() #Pause music """
             mainGame.pause = not mainGame.pause #Toggle state of pause in Game class
          
         if msgBox != None: #If a MessageBox has been created
@@ -2523,8 +2473,8 @@ screen = pygame.display.set_mode([1024,768])#, pygame.FULLSCREEN) #Create screen
 pygame.display.set_caption('Dunfermline-opoly')
 screen.fill((255,255,255))
 
-pygame.mixer.music.load('music.mp3') #Load in and set background music to play endlessly
-pygame.mixer.music.play(-1)
+#pygame.mixer.music.load('music.mp3') #Load in and set background music to play endlessly
+#pygame.mixer.music.play(-1)
 
 nextScreen = 0
 mGame = None #Create blank object that will store the Game object
