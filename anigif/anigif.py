@@ -17,27 +17,6 @@ class AnimatedGif:
         self.frames = np.array([None] * self.noOfFrames) #Array of pygame Surface objects, to store the actual graphical frames
         for n in range(self.noOfFrames):
             self.frames[n] = pygame.transform.scale(pygame.image.load(new_paths[n]), [self.gif_w, self.gif_h])
-        
-    def getX(self):
-        return self.gif_x
-
-    def getY(self):
-        return self.gif_y
-
-    def getH(self):
-        return self.gif_h
-
-    def getW(self):
-        return self.gif_w
-
-    def getNoOfFrames(self):
-        return self.noOfFrames
-
-    def getFrames(self): #Returns array of pygame graphics
-        return self.frames
-
-    def getFramePaths(self): #Returns array of strings
-        return self.framePaths
 
     #Return next frame of the GIF to be displayed
     #Set to loop the GIF indefinitely
@@ -46,9 +25,3 @@ class AnimatedGif:
         if self.frameCounter  >= self.noOfFrames:
             self.frameCounter = 0 #Play GIF from beginning as frame cycle completed
         return self.frames[self.frameCounter]
-
-    def setX(self, newX):
-        self.gif_x = newX
-
-    def setY(self, newY):
-        self.gif_y = newY

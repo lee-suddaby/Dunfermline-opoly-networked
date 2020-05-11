@@ -863,8 +863,8 @@ while running:
     #Clear screen and display title, and the current frame of each GIF                
     screen.fill((0,0,0))
     screen.blit(main, [0,0])
-    screen.blit(coin1.getCurFrame(), [coin1.getX(),coin1.getY()])
-    screen.blit(coin2.getCurFrame(), [coin2.getX(),coin2.getY()])
+    screen.blit(coin1.getCurFrame(), [coin1.gif_x,coin1.gif_y])
+    screen.blit(coin2.getCurFrame(), [coin2.gif_x,coin2.gif_y])
 
     if tip_counter > 50: #50 frames = 5 seconds
         #Reset tip counter, randomly choose a new, different tip and render that in the appropriate font
