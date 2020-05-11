@@ -26,7 +26,7 @@ def getFileLines(filePath):
 #Load tips from text file and populate an array with them
 def getTipsFromFile(filePath, fileLines): #num is the number of tips in the file
     tip_arr = np.array([None] * fileLines) #Array to store the Strings that contain the tips. None means no specific length for the string
-    fh = open("Tips.txt", "r")
+    fh = open("data/Tips.txt", "r")
     for counter in range(fileLines):
         tip_arr[counter] = fh.readline()
         tip_arr[counter] = tip_arr[counter].strip() #strip() method removes quotation marks
@@ -810,8 +810,8 @@ pygame.init()
 clock = pygame.time.Clock()
 
 #Count number of tips and populate the array of tips from the external file
-tips_num = getFileLines("Tips.txt")
-tipsArr = getTipsFromFile("Tips.txt", tips_num)
+tips_num = getFileLines("data/Tips.txt")
+tipsArr = getTipsFromFile("data/Tips.txt", tips_num)
 tip_use = getNewTip("", tipsArr) #Choose a tip to display first
 
 tip_font = pygame.font.SysFont('Arial', 24) #Font used to display a tip
@@ -998,10 +998,10 @@ def NewGame():
             if valid:
                 if namesValid(box_arr): #Validate the player's username
                     players = createPlayers(pieces, box_arr, 600) #Create array of Player objects
-                    prop_arr = LoadProperties("Property Values.txt") #Create array of Property objects
-                    Pot_Luck_Deck = createDeck("Pot Luck", "PL/Pot Luck ", "Card_Texts.txt", "PL Master.txt", 16) #Create Card_Deck object
-                    Council_Chest_Deck = createDeck("Council Chest", "CC/Council Chest ", "Card_Texts.txt", "CC Master.txt", 16) #Create Card_Deck object
-                    game_board = createBoard("Board_Data.txt", prop_arr, Pot_Luck_Deck, Council_Chest_Deck, "Board.png", 600) #Create Board object
+                    prop_arr = LoadProperties("data/Property Values.txt") #Create array of Property objects
+                    Pot_Luck_Deck = createDeck("Pot Luck", "PL/Pot Luck ", "data/Card_Texts.txt", "data/PL Master.txt", 16) #Create Card_Deck object
+                    Council_Chest_Deck = createDeck("Council Chest", "CC/Council Chest ", "dataCard_Texts.txt", "data/CC Master.txt", 16) #Create Card_Deck object
+                    game_board = createBoard("data/Board_Data.txt", prop_arr, Pot_Luck_Deck, Council_Chest_Deck, "Board.png", 600) #Create Board object
 
                     mainGame = createGame(players, game_board, save_path_box.getContents(), "Dice/") #Finally create the single, cohesive Game object that is the sole purpose of this screen/part of the game
                     
@@ -1029,10 +1029,10 @@ def NewGame():
                 data_arr = np.array(data_arr)
                 
                 players = LoadPlayers(data_arr)    
-                prop_arr = LoadProperties("Property Values.txt") #Create array of Property objects
-                Pot_Luck_Deck = createDeck("Pot Luck", "PL/Pot Luck ", "Card_Texts.txt", "PL Master.txt", 16) #Create Card_Deck object
-                Council_Chest_Deck = createDeck("Council Chest", "CC/Council Chest ", "Card_Texts.txt", "CC Master.txt", 16) #Create Card_Deck object
-                game_board = createBoard("Board_Data.txt", prop_arr, Pot_Luck_Deck, Council_Chest_Deck, "Board.png", 600) #Create Board object
+                prop_arr = LoadProperties("data/Property Values.txt") #Create array of Property objects
+                Pot_Luck_Deck = createDeck("Pot Luck", "PL/Pot Luck ", "data/Card_Texts.txt", "data/PL Master.txt", 16) #Create Card_Deck object
+                Council_Chest_Deck = createDeck("Council Chest", "CC/Council Chest ", "data/Card_Texts.txt", "data/CC Master.txt", 16) #Create Card_Deck object
+                game_board = createBoard("data/Board_Data.txt", prop_arr, Pot_Luck_Deck, Council_Chest_Deck, "Board.png", 600) #Create Board object
 
                 for counter in range(int(data_arr[0][1])+1, len(data_arr)):
                     if game_board.getProp(int(data_arr[counter][0])).getType() == Prop_Type.NORMAL:
