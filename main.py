@@ -132,9 +132,9 @@ def LoadProperties(file_path):
         if propType == 0: #Most common property type
             property_arr[counter] = Normal_Property(prop_values, CreateTitleDeed(prop_values), CreateMortDeed(prop_values[0], int(prop_values[10])*1.2))
         elif propType == 1: #School (requires crest image for title deed)
-            property_arr[counter] = School_Property(prop_values, pygame.image.load("Deeds/" + str(prop_values[0]) + ".png"), CreateMortDeed(prop_values[0], int(prop_values[6])*1.2))
+            property_arr[counter] = School_Property(prop_values, pygame.image.load("img/Deeds/" + str(prop_values[0]) + ".png"), CreateMortDeed(prop_values[0], int(prop_values[6])*1.2))
         elif propType == 2: #Stations (requires crest image for title deed)
-            property_arr[counter] = Station_Property(prop_values, pygame.image.load("Deeds/" + str(prop_values[0]) + ".png"), CreateMortDeed(prop_values[0], int(prop_values[4])*1.2))
+            property_arr[counter] = Station_Property(prop_values, pygame.image.load("img/Deeds/" + str(prop_values[0]) + ".png"), CreateMortDeed(prop_values[0], int(prop_values[4])*1.2))
         elif propType == 3: #Pot Luck card spot
             property_arr[counter] = Property(prop_values[0].strip(), Prop_Type.POT_LUCK)
         elif propType == 4: #Council Chest card spot
@@ -182,7 +182,7 @@ def createGame(game_players, game_board, game_save, dice_imgs_base_paths):
 def LoadPlayers(load_arr):
     new_players = np.array([None] * int(load_arr[0][1])) #load_arr[0][1] stores the number of players
     for counter in range(len(new_players)):
-        p_piece = Player_Piece(getPieceX(int(load_arr[counter+1][2]), 600/768), getPieceY(int(load_arr[counter+1][2]), 600/768), pygame.transform.smoothscale(pygame.image.load('Pieces/' + str(int(load_arr[counter+1][3])+1) + '.png'), [32, 32]), int(load_arr[counter+1][3])) #Create piece separately. load-arr[counter+1][3] stores a number from 0-5 relating to which of the token images is used (1.png - 6.png)
+        p_piece = Player_Piece(getPieceX(int(load_arr[counter+1][2]), 600/768), getPieceY(int(load_arr[counter+1][2]), 600/768), pygame.transform.smoothscale(pygame.image.load('img/Pieces/' + str(int(load_arr[counter+1][3])+1) + '.png'), [32, 32]), int(load_arr[counter+1][3])) #Create piece separately. load-arr[counter+1][3] stores a number from 0-5 relating to which of the token images is used (1.png - 6.png)
         new_players[counter] = Player(int(load_arr[counter+1][1]), p_piece, int(load_arr[counter+1][2]), load_arr[counter+1][0], bool(int(load_arr[counter+1][8])), bool(int(load_arr[counter+1][7]))) #Second element (not [counter+1]) is related to the order in which the data was saved, which can be seen in Game.saveGame method
         new_players[counter].hasBogMap = bool(int(load_arr[counter+1][4])) #Relevant element of this array
         new_players[counter].nextRollMod = int(load_arr[counter+1][5]) #Final player attributes being restored
@@ -336,7 +336,7 @@ def CreateThumbs(board, player):
             thumbnails.blit(cur_thumb, [(groups_done-1)*(t_width+int(t_width/5)) + colour_counter*int(t_width/5), colour_counter*int(t_height/3)])
         elif board.getProp(counter).getType() == Prop_Type.SCHOOL or board.getProp(counter).getType() == Prop_Type.STATION: #School and station properties
             specials = specials + 1
-            cur_thumb = CreateThumbImg("Thumbs/" + board.getProp(counter).getTitle() + ".png", board.getProp(counter).getOwner() == player)
+            cur_thumb = CreateThumbImg("img/Thumbs/" + board.getProp(counter).getTitle() + ".png", board.getProp(counter).getOwner() == player)
             thumbnails.blit(cur_thumb, [(specials-1)*t_width + (specials-1)*int(t_width/5), 120]) #All these thumbnails are displayed in one horizontal line; therefore the same y-coordinate each time
     return thumbnails #pygame.Surface object that can be displayed on the screen as an image
             #441 x117
@@ -829,13 +829,13 @@ b_width, b_height = but_font.size("Play")
 #Create array of 12 strings, containing the paths of each of the frames of the coin animation
 imagesCA = np.array([" "*32] * 12)
 for counter in range(12):
-    imagesCA[counter] = "CA/coin_frame_" + str(counter+1) + ".png"
+    imagesCA[counter] = "img/CA/coin_frame_" + str(counter+1) + ".png"
 
 #Set width and height of the pygame screen
 height = 360
 width = 936
 
-main = pygame.transform.smoothscale(pygame.image.load("Title.png"), [width, int(height/2)]) #Dunfermline-opoly title
+main = pygame.transform.smoothscale(pygame.image.load("img/Title.png"), [width, int(height/2)]) #Dunfermline-opoly title
 coin1 = AnimatedGif(int(50*width/468),int(210*height/360),int(64*width/468),int(64*width/468),imagesCA) #Two coin animations at the bottom-left and bottom-right corners of the screen
 coin2 = AnimatedGif(int(354*width/468),int(210*height/360),int(64*width/468),int(64*width/468),imagesCA)#Coin animations are animated GIFS created using the AnimatedGif class
 Play_but = pygame.Rect((width-200)/2, (850-height)/2, 200, 80) #Rectangle used both for the main part of the play button, and for detecting when the button is clicked
@@ -890,7 +890,7 @@ def NewGame():
     mainGame = None #Create new object that will eventually become a Game object
     pieces = np.array([None] * 6) #Array to store the 6 images for the player icons that will be linked to the textboxes
     for p_counter in range(6):
-        pieces[p_counter] = pygame.transform.smoothscale(pygame.image.load("Pieces/" + str(p_counter+1) + ".png"), [50, 50]) #Load image into pygame and resize
+        pieces[p_counter] = pygame.transform.smoothscale(pygame.image.load("img/Pieces/" + str(p_counter+1) + ".png"), [50, 50]) #Load image into pygame and resize
 
     box_arr = np.array([None] * 6) #Array of 6 textboxes - one to one correspondence with the elements of the pieces array
     for b_counter in range(6):
@@ -999,11 +999,11 @@ def NewGame():
                 if namesValid(box_arr): #Validate the player's username
                     players = createPlayers(pieces, box_arr, 600) #Create array of Player objects
                     prop_arr = LoadProperties("data/Property Values.txt") #Create array of Property objects
-                    Pot_Luck_Deck = createDeck("Pot Luck", "PL/Pot Luck ", "data/Card_Texts.txt", "data/PL Master.txt", 16) #Create Card_Deck object
-                    Council_Chest_Deck = createDeck("Council Chest", "CC/Council Chest ", "dataCard_Texts.txt", "data/CC Master.txt", 16) #Create Card_Deck object
-                    game_board = createBoard("data/Board_Data.txt", prop_arr, Pot_Luck_Deck, Council_Chest_Deck, "Board.png", 600) #Create Board object
+                    Pot_Luck_Deck = createDeck("Pot Luck", "img/PL/Pot Luck ", "data/Card_Texts.txt", "data/PL Master.txt", 16) #Create Card_Deck object
+                    Council_Chest_Deck = createDeck("Council Chest", "img/CC/Council Chest ", "data/Card_Texts.txt", "data/CC Master.txt", 16) #Create Card_Deck object
+                    game_board = createBoard("data/Board_Data.txt", prop_arr, Pot_Luck_Deck, Council_Chest_Deck, "img/Board.png", 600) #Create Board object
 
-                    mainGame = createGame(players, game_board, save_path_box.getContents(), "Dice/") #Finally create the single, cohesive Game object that is the sole purpose of this screen/part of the game
+                    mainGame = createGame(players, game_board, save_path_box.getContents(), "img/Dice/") #Finally create the single, cohesive Game object that is the sole purpose of this screen/part of the game
                     
                     screen_running = False
                     gotoScreen = 1 #1=Main game screen
@@ -1030,9 +1030,9 @@ def NewGame():
                 
                 players = LoadPlayers(data_arr)    
                 prop_arr = LoadProperties("data/Property Values.txt") #Create array of Property objects
-                Pot_Luck_Deck = createDeck("Pot Luck", "PL/Pot Luck ", "data/Card_Texts.txt", "data/PL Master.txt", 16) #Create Card_Deck object
-                Council_Chest_Deck = createDeck("Council Chest", "CC/Council Chest ", "data/Card_Texts.txt", "data/CC Master.txt", 16) #Create Card_Deck object
-                game_board = createBoard("data/Board_Data.txt", prop_arr, Pot_Luck_Deck, Council_Chest_Deck, "Board.png", 600) #Create Board object
+                Pot_Luck_Deck = createDeck("Pot Luck", "img/PL/Pot Luck ", "data/Card_Texts.txt", "data/PL Master.txt", 16) #Create Card_Deck object
+                Council_Chest_Deck = createDeck("Council Chest", "img/CC/Council Chest ", "data/Card_Texts.txt", "data/CC Master.txt", 16) #Create Card_Deck object
+                game_board = createBoard("data/Board_Data.txt", prop_arr, Pot_Luck_Deck, Council_Chest_Deck, "img/Board.png", 600) #Create Board object
 
                 for counter in range(int(data_arr[0][1])+1, len(data_arr)):
                     if game_board.getProp(int(data_arr[counter][0])).getType() == Prop_Type.NORMAL:
@@ -1044,7 +1044,7 @@ def NewGame():
                         game_board.getProp(int(data_arr[counter][0])).buyProperty(int(data_arr[counter][1]))
                         game_board.getProp(int(data_arr[counter][0])).setMortgageStatus(bool(int(data_arr[counter][2])))
                     
-                mainGame = createGame(players, game_board, save_path_box.getContents(), "Dice/") #Finally create the single, cohesive Game object that is the sole purpose of this screen/part of the game
+                mainGame = createGame(players, game_board, save_path_box.getContents(), "img/Dice/") #Finally create the single, cohesive Game object that is the sole purpose of this screen/part of the game
                 mainGame.cur_player = int(data_arr[0][0]) #Positions in array as per the order of saving, which can be seen in the method within the Game class
                 mainGame.autosave = bool(int(data_arr[0][2]))
                 
@@ -1077,8 +1077,8 @@ def MainScreen(mainGame):
     details_button = pygame.Rect(900,160,100,50)
     in_jail_button = pygame.Rect(350,610,150,70)
 
-    TB_img = pygame.transform.smoothscale(pygame.image.load("Tower Block.png"), [75, 75])
-    CH_img = pygame.transform.smoothscale(pygame.image.load("Council House.png"), [75, 75])
+    TB_img = pygame.transform.smoothscale(pygame.image.load("img/Tower Block.png"), [75, 75])
+    CH_img = pygame.transform.smoothscale(pygame.image.load("img/Council House.png"), [75, 75])
     
     font_40 = pygame.font.SysFont('Arial', 40) #Font object for button captions
     font_28 = pygame.font.SysFont('Arial', 28) #font object for displaying whose turn it is (among other things)
@@ -1598,9 +1598,9 @@ def Leaderboards(mainGame):
     lead_arr = setup2DArray(mainGame)
 
     #Arrow images to be displayed on the buttons that are used by the player for choosing which column to sort on and whether to sort ascending or descending
-    arrow_both = pygame.image.load("Arrows/both.png")
-    arrow_up = pygame.image.load("Arrows/up.png")
-    arrow_down = pygame.image.load("Arrows/down.png")
+    arrow_both = pygame.image.load("img/Arrows/both.png")
+    arrow_up = pygame.image.load("img/Arrows/up.png")
+    arrow_down = pygame.image.load("img/Arrows/down.png")
     
     #Initialise button array
     sort_buts = np.array([None] * 3)
