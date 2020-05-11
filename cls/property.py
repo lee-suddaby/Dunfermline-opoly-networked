@@ -164,7 +164,7 @@ class School_Property(Property):
             return 0
         
         rent_count = 0
-        for counter in range(board.getMaxPos() + 1):
+        for counter in range(board.max_pos + 1):
             if board.getProp(counter).getType() == Prop_Type.SCHOOL:
                 if board.getProp(counter).getOwner() == playerNo:            
                     rent_count = rent_count + 1
@@ -219,7 +219,7 @@ class Station_Property(Property):
             return 0
         
         rent_count = 0
-        for counter in range(board.getMaxPos() + 1):
+        for counter in range(board.max_pos + 1):
             if board.getProp(counter).getType() == Prop_Type.STATION:
                 if board.getProp(counter).getOwner() == playerNo:            
                     rent_count = rent_count + 1

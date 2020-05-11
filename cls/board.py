@@ -16,24 +16,3 @@ class Board:
 
     def getProp(self,b_pos):
         return self.properties[b_pos]
-
-    def getPLDeck(self):
-        return self.PL_Deck
-
-    def getCCDeck(self):
-        return self.CC_Deck
-
-    def getBoardImg(self):
-        return self.board_img
-
-    def getBoardSF(self):
-        return self.board_sf
-
-    def getMaxPos(self):
-        return self.max_pos
-
-    def getJCMoney(self):
-        return self.JC_Money
-
-    def getBogsidePos(self):
-        return self.bogside_pos

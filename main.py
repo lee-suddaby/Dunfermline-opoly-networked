@@ -319,7 +319,7 @@ def CreateThumbs(board, player):
     thumbnails = pygame.Surface((450,200)) #Create new surface on which to blit title deed thumbnails as they are generated
     thumbnails.fill((255,255,255)) #Screen starts white
     
-    for counter in range(board.getMaxPos()+1): #For each property
+    for counter in range(board.max_pos+1): #For each property
         if board.getProp(counter).getType() == Prop_Type.NORMAL: #Most common property, so one with a 'normal' title deed
             if board.getProp(counter).getGroupCol() != colour_on: #If we have reached a new group, reset the counter and note the new current group colour
                 colour_on = board.getProp(counter).getGroupCol() #Set new current group colour
@@ -520,7 +520,7 @@ def wholeGroupOwned(board, player_num, prop_num):
     if board.getProp(prop_num).getType() != Prop_Type.NORMAL:
         return False
     find_col = board.getProp(prop_num).getGroupCol() #Colour of the group whose coalescence of ownership is being investigated
-    for counter in range(board.getMaxPos() + 1):
+    for counter in range(board.max_pos + 1):
         if board.getProp(counter).getType() == Prop_Type.NORMAL: #Prevents errors as no other types have a Group Colour
             if board.getProp(counter).getGroupCol() == find_col and board.getProp(counter).getOwner() != player_num:
                 #This property is the same colour as the one that is being examined, however, the owner is different so this player cannot own the entire group
@@ -533,7 +533,7 @@ def countGroupSize(board, player_num, prop_num):
         return 0
     group_count = 0
     find_col = board.getProp(prop_num).getGroupCol() #Colour of the group which we are concerned with
-    for counter in range(board.getMaxPos() + 1):
+    for counter in range(board.max_pos + 1):
         if board.getProp(counter).getType() == Prop_Type.NORMAL: #Prevents errors as no other types have a Group Colour
             if board.getProp(counter).getGroupCol() == find_col and board.getProp(counter).getOwner() == player_num:
                 group_count += 1
@@ -543,7 +543,7 @@ def countGroupSize(board, player_num, prop_num):
 def buyCHGroup(board, player_num, prop_num):
     if board.getProp(prop_num).getType() == Prop_Type.NORMAL:
         find_col = board.getProp(prop_num).getGroupCol() #Colour of the group which we are concerned with
-        for counter in range(board.getMaxPos() + 1):
+        for counter in range(board.max_pos + 1):
             if board.getProp(counter).getType() == Prop_Type.NORMAL: #Prevents errors as no other types have a Group Colour
                 if board.getProp(counter).getGroupCol() == find_col and board.getProp(counter).getOwner() == player_num:
                     board.getProp(counter).buyCH()
@@ -552,7 +552,7 @@ def buyCHGroup(board, player_num, prop_num):
 def buyTBGroup(board, player_num, prop_num):
     if board.getProp(prop_num).getType() == Prop_Type.NORMAL:
         find_col = board.getProp(prop_num).getGroupCol() #Colour of the group which we are concerned with
-        for counter in range(board.getMaxPos() + 1):
+        for counter in range(board.max_pos + 1):
             if board.getProp(counter).getType() == Prop_Type.NORMAL: #Prevents errors as no other types have a Group Colour
                 if board.getProp(counter).getGroupCol() == find_col and board.getProp(counter).getOwner() == player_num:
                     board.getProp(counter).buyTB()
@@ -561,7 +561,7 @@ def buyTBGroup(board, player_num, prop_num):
 def sellCHGroup(board, player_num, prop_num):
     if board.getProp(prop_num).getType() == Prop_Type.NORMAL:
         find_col = board.getProp(prop_num).getGroupCol() #Colour of the group which we are concerned with
-        for counter in range(board.getMaxPos() + 1):
+        for counter in range(board.max_pos + 1):
             if board.getProp(counter).getType() == Prop_Type.NORMAL: #Prevents errors as no other types have a Group Colour
                 if board.getProp(counter).getGroupCol() == find_col and board.getProp(counter).getOwner() == player_num:
                     board.getProp(counter).sellCH()
@@ -570,7 +570,7 @@ def sellCHGroup(board, player_num, prop_num):
 def sellTBGroup(board, player_num, prop_num):
     if board.getProp(prop_num).getType() == Prop_Type.NORMAL:
         find_col = board.getProp(prop_num).getGroupCol() #Colour of the group which we are concerned with
-        for counter in range(board.getMaxPos() + 1):
+        for counter in range(board.max_pos + 1):
             if board.getProp(counter).getType() == Prop_Type.NORMAL: #Prevents errors as no other types have a Group Colour
                 if board.getProp(counter).getGroupCol() == find_col and board.getProp(counter).getOwner() == player_num:
                     board.getProp(counter).sellTB()
@@ -592,9 +592,9 @@ def determineRent(gameObj):
     return ret_rent
 
 def sendCurPlayerToBog(gameObj):
-    gameObj.getCurPlayer().setPos(gameObj.getBoard().getBogsidePos()) #Move the player
-    gameObj.getCurPlayer().getPiece().setX(getPieceX(gameObj.getCurPlayer().getPos(), gameObj.getBoard().getBoardSF())) #Update piece co-ordinates as well
-    gameObj.getCurPlayer().getPiece().setY(getPieceY(gameObj.getCurPlayer().getPos(), gameObj.getBoard().getBoardSF()))
+    gameObj.getCurPlayer().setPos(gameObj.getBoard().bogside_pos) #Move the player
+    gameObj.getCurPlayer().getPiece().setX(getPieceX(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf)) #Update piece co-ordinates as well
+    gameObj.getCurPlayer().getPiece().setY(getPieceY(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf))
     gameObj.getCurPlayer().enterJail()
 
 #Apply the effects of a certain card
@@ -617,8 +617,8 @@ def applyCardEffects(gameObj, card_effects):
         gameObj.getCurPlayer().setMissTurns(card_effects[3])
     if card_effects[4] != -1: #Move a number of spaces
         gameObj.getCurPlayer().movePlayer(card_effects[4], gameObj.getBoard())
-        gameObj.getCurPlayer().getPiece().setX(getPieceX(gameObj.getCurPlayer().getPos(), gameObj.getBoard().getBoardSF())) #Update piece co-ordinates as well
-        gameObj.getCurPlayer().getPiece().setY(getPieceY(gameObj.getCurPlayer().getPos(), gameObj.getBoard().getBoardSF()))
+        gameObj.getCurPlayer().getPiece().setX(getPieceX(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf)) #Update piece co-ordinates as well
+        gameObj.getCurPlayer().getPiece().setY(getPieceY(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf))
 
         #Determine rent if applicable
         gameObj.getController().turn_rent = determineRent(gameObj)
@@ -630,10 +630,10 @@ def applyCardEffects(gameObj, card_effects):
     if card_effects[5] != -1: #Move to a certain spot (and collect money if passing Job Centre)
         orig_pos = gameObj.getCurPlayer().getPos()
         gameObj.getCurPlayer().setPos(card_effects[5])
-        gameObj.getCurPlayer().getPiece().setX(getPieceX(gameObj.getCurPlayer().getPos(), gameObj.getBoard().getBoardSF())) #Update piece co-ordinates as well
-        gameObj.getCurPlayer().getPiece().setY(getPieceY(gameObj.getCurPlayer().getPos(), gameObj.getBoard().getBoardSF()))
+        gameObj.getCurPlayer().getPiece().setX(getPieceX(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf)) #Update piece co-ordinates as well
+        gameObj.getCurPlayer().getPiece().setY(getPieceY(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf))
         if gameObj.getCurPlayer().getPos() < orig_pos: #Means player must have 'passed' the Job Centre
-            gameObj.getCurPlayer().addMoney(gameObj.getBoard().getJCMoney())
+            gameObj.getCurPlayer().addMoney(gameObj.getBoard().JC_money)
 
         #Determine rent if applicable
         gameObj.getController().turn_rent = determineRent(gameObj)
@@ -644,8 +644,8 @@ def applyCardEffects(gameObj, card_effects):
                 gameObj.getPlayer(gameObj.getBoard().getProp(gameObj.getCurPlayer().getPos()).getOwner()).addMoney(gameObj.getController().turn_rent)
     if card_effects[6] != -1: #Move to a certain spot (but do not collect money if passing Job Centre)
         gameObj.getCurPlayer().setPos(card_effects[6])
-        gameObj.getCurPlayer().getPiece().setX(getPieceX(gameObj.getCurPlayer().getPos(), gameObj.getBoard().getBoardSF())) #Update piece co-ordinates as well
-        gameObj.getCurPlayer().getPiece().setY(getPieceY(gameObj.getCurPlayer().getPos(), gameObj.getBoard().getBoardSF()))
+        gameObj.getCurPlayer().getPiece().setX(getPieceX(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf)) #Update piece co-ordinates as well
+        gameObj.getCurPlayer().getPiece().setY(getPieceY(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf))
 
         #Determine rent if applicable
         gameObj.getController().turn_rent = determineRent(gameObj)
@@ -660,7 +660,7 @@ def applyCardEffects(gameObj, card_effects):
         gameObj.getCurPlayer().giveBogMap()
     if card_effects[9] != -1: #Pay a certain amount of money for each Council House and Tower Block
         to_pay = 0
-        for counter in range(gameObj.getBoard().getMaxPos()+1):
+        for counter in range(gameObj.getBoard().max_pos+1):
             if gameObj.getBoard().getProp(counter).getType() == Prop_Type.NORMAL: #Only NORMAL properties acutually possess these upgrades
                 if gameObj.getBoard().getProp(counter).getOwner() == gameObj.getCurPlayerNum(): #The current property is owned by this player
                     to_pay += card_effects[9] * (gameObj.getBoard().getProp(counter).getCH() + gameObj.getBoard().getProp(counter).getTB()) #Sum the number of CH and TB
@@ -669,14 +669,14 @@ def applyCardEffects(gameObj, card_effects):
         gameObj.getCurPlayer().setRollMod(card_effects[10])
     if card_effects[11] != -1: #Pay a certain amount of money for each Council House only
         to_pay = 0
-        for counter in range(gameObj.getBoard().getMaxPos()+1):
+        for counter in range(gameObj.getBoard().max_pos+1):
             if gameObj.getBoard().getProp(counter).getType() == Prop_Type.NORMAL: #Only NORMAL properties acutually possess these upgrades
                 if gameObj.getBoard().getProp(counter).getOwner() == gameObj.getCurPlayerNum(): #The current property is owned by this player
                     to_pay += card_effects[11] * gameObj.getBoard().getProp(counter).getCH() #Sum the number of CH
         gameObj.getCurPlayer().spendMoney(to_pay)
     if card_effects[12] != -1: #Pay a certain amount of money for each Tower Block only
         to_pay = 0
-        for counter in range(gameObj.getBoard().getMaxPos()+1):
+        for counter in range(gameObj.getBoard().max_pos+1):
             if gameObj.getBoard().getProp(counter).getType() == Prop_Type.NORMAL: #Only NORMAL properties acutually possess these upgrades
                 if gameObj.getBoard().getProp(counter).getOwner() == gameObj.getCurPlayerNum(): #The current property is owned by this player
                     to_pay += card_effects[12] * gameObj.getBoard().getProp(counter).getTB() #Sum the number of TB
@@ -686,7 +686,7 @@ def applyCardEffects(gameObj, card_effects):
 #Return an integer representing the number of ownable properties on the board that are actually owned by the current player
 def countPropsOwned(board, player_num):
     prop_count = 0
-    for counter in range(board.getMaxPos() + 1): #Loop through entire board
+    for counter in range(board.max_pos + 1): #Loop through entire board
         if board.getProp(counter).getType() == Prop_Type.NORMAL or board.getProp(counter).getType() == Prop_Type.SCHOOL or board.getProp(counter).getType() == Prop_Type.STATION:
             if board.getProp(counter).getOwner() == player_num: #If ownable and owner then increment counter
                 prop_count += 1
@@ -696,14 +696,14 @@ def countPropsOwned(board, player_num):
 def setupBoardPoses(board, player_num, num_owned):
     ret_arr = np.array([0] * num_owned) #Initialise integer array
     pos_counter = 0
-    for counter in range(board.getMaxPos() + 1): #Loop through entire board
+    for counter in range(board.max_pos + 1): #Loop through entire board
         if board.getProp(counter).getType() == Prop_Type.NORMAL:
             if board.getProp(counter).getOwner() == player_num:
                 ret_arr[pos_counter] = counter #Set next empty array element to this property's position on the board
                 pos_counter += 1
 
     #SCHOOL and STATION properties are displayed after all NORMAL ones, as it gives the screen a better aesthetic as a whole
-    for counter in range(board.getMaxPos() + 1): #Loop through entire board
+    for counter in range(board.max_pos + 1): #Loop through entire board
         if board.getProp(counter).getType() == Prop_Type.SCHOOL or board.getProp(counter).getType() == Prop_Type.STATION:
             if board.getProp(counter).getOwner() == player_num:
                 ret_arr[pos_counter] = counter
@@ -715,7 +715,7 @@ def setupBoardPoses(board, player_num, num_owned):
 def getAssetsVal(board, player_num):
     ret_val = 0
 
-    for counter in range(board.getMaxPos() + 1):
+    for counter in range(board.max_pos + 1):
         if board.getProp(counter).getType() == Prop_Type.NORMAL:
             if board.getProp(counter).getOwner() == player_num:
                 ret_val += board.getProp(counter).getCost()
@@ -731,7 +731,7 @@ def getAssetsVal(board, player_num):
 def getObtainMon(board, player_num):
     ret_val = 0
 
-    for counter in range(board.getMaxPos() + 1):
+    for counter in range(board.max_pos + 1):
         if board.getProp(counter).getType() == Prop_Type.NORMAL:
             if board.getProp(counter).getOwner() == player_num:
                 ret_val += int(board.getProp(counter).getCHCost() * board.getProp(counter).getCH() / 2)
@@ -1153,7 +1153,7 @@ def MainScreen(mainGame):
                         gotoScreen = 4
                     
         #Clear screen and display main board
-        displayScreenAndBoard(mainGame.getBoard().getBoardImg())
+        displayScreenAndBoard(mainGame.getBoard().board_img)
         
         if dice_but_click: #If Roll Dice button was clicked
             #Roll dice, move the piece accordingly, and display the dice rolls
@@ -1174,8 +1174,8 @@ def MainScreen(mainGame):
             mainGame.getController().roll_img2 = pygame.transform.smoothscale(mainGame.getDie(1).getImg(), [70, 70])
             
             #Determine piece's place on the board
-            mainGame.getCurPlayer().getPiece().setX(getPieceX(mainGame.getCurPlayer().getPos(), mainGame.getBoard().getBoardSF()))
-            mainGame.getCurPlayer().getPiece().setY(getPieceY(mainGame.getCurPlayer().getPos(), mainGame.getBoard().getBoardSF()))
+            mainGame.getCurPlayer().getPiece().setX(getPieceX(mainGame.getCurPlayer().getPos(), mainGame.getBoard().board_sf))
+            mainGame.getCurPlayer().getPiece().setY(getPieceY(mainGame.getCurPlayer().getPos(), mainGame.getBoard().board_sf))
 
             if mainGame.getDie(0).getScore() != mainGame.getDie(1).getScore(): #If a double has not been rolled (rolling a double gives the player another turn)
                 mainGame.getController().player_rolled = True #So player only gets another turn if they rolled doubles
@@ -1198,9 +1198,9 @@ def MainScreen(mainGame):
 
             #If the current space returns a card
             if mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.POT_LUCK:
-                mainGame.getController().cur_card = mainGame.getBoard().getPLDeck().getNextCard()
+                mainGame.getController().cur_card = mainGame.getBoard().PL_Deck.getNextCard()
             elif mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.COUNCIL_CHEST:
-                mainGame.getController().cur_card = mainGame.getBoard().getCCDeck().getNextCard()
+                mainGame.getController().cur_card = mainGame.getBoard().CC_Deck.getNextCard()
 
             #If card will have just been returned, render the text that will show its effects
             if mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.POT_LUCK or mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.COUNCIL_CHEST: #Card will have been returned
@@ -1316,7 +1316,7 @@ def MainScreen(mainGame):
             elif (getObtainMon(mainGame.getBoard(), mainGame.getCurPlayerNum()) + mainGame.getCurPlayer().getMoney()) < 0: #If it is impossible for a player to not end up in debt, they go bankrupt
                 mainGame.getCurPlayer().deactivate() #Remove player from the game
                 cont = False
-                for counter in range(mainGame.getBoard().getMaxPos()):
+                for counter in range(mainGame.getBoard().max_pos):
                     if mainGame.getBoard().getProp(counter).getType() == Prop_Type.NORMAL:
                         if mainGame.getBoard().getProp(counter).getOwner() == mainGame.getCurPlayerNum():
                             mainGame.getBoard().getProp(counter).p_owner = -1

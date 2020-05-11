@@ -56,9 +56,9 @@ class Player:
     def movePlayer(self, movePos, board):
         self.board_pos = self.board_pos + int(movePos/self.nextRollMod) #Same as movePos * (1/nextRollMod)
         self.nextRollMod = 1 #Effects are only ever valid for one turn
-        if self.board_pos > board.getMaxPos():
-            self.board_pos = self.board_pos - (board.getMaxPos() + 1)
-            self.money = self.money + board.getJCMoney() #If player passes Job Centre, the collect the requisite amount of money
+        if self.board_pos > board.max_pos:
+            self.board_pos = self.board_pos - (board.max_pos + 1)
+            self.money = self.money + board.JC_money #If player passes Job Centre, the collect the requisite amount of money
 
     def setMissTurns(self, num):
         self.turnsToMiss = num

@@ -81,7 +81,7 @@ class Game:
             #Write all volatile data for the current player to a new line in the file
             fh.write(cur_player.p_name + ',' + str(cur_player.money) + ',' + str(cur_player.getPos()) + ',' + str(cur_player.getPiece().piece_num) + ',' + str(int(cur_player.hasBogMap)) + ',' + str(cur_player.nextRollMod) + ',' + str(cur_player.turnsToMiss) + ',' + str(int(cur_player.active)) + ',' + str(int(cur_player.inJail)) + '\n')
 
-        for counter in range(self.board.getMaxPos()+1):
+        for counter in range(self.board.max_pos+1):
             if self.board.getProp(counter).getType() == Prop_Type.NORMAL: #NORMAL properties have different attributes that change in-game
                 if self.board.getProp(counter).getOwner() != -1: #Nothing will have changed of the property is not owned
                     #Write all important/changing data for a NORMAL property on a new line
