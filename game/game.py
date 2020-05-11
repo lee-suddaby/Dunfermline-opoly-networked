@@ -1,5 +1,6 @@
 import numpy as np
 import pygame
+from .property import Prop_Type
 
 #------------------------------Game Class------------------------------
 #Brings all the game data together into one cohesive object that can be controlled more easily than all other data/objects independently
