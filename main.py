@@ -10,7 +10,7 @@ import os #Used for creating directories
 from textbox import TextBox #TextBox class found on GitHub
 from msgbox import MessageBox #MessageBox class is used for (surprisingly enough) displaying message boxes containing text to the user
 from anigif import AnimatedGif
-from game import *
+from cls import *
 
 #------------------------------Loading Screen functions------------------------------ 
 #Determine how many lines are in a text file
