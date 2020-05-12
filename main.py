@@ -431,7 +431,7 @@ def displayPlayerMoney(font, player_money):
 
 #Display the token (i.e. the thing that moves around the board for the current player)
 def displayPlayerToken(player):
-    screen.blit(pygame.transform.smoothscale(player.getPiece().getPieceImg(), [50,50]), [600, 0])
+    screen.blit(pygame.transform.smoothscale(player.getPiece().piece_img, [50,50]), [600, 0])
 
 #Display the graphic for, and number owned, of the available Council House and Tower Block upgrades
 def displayUpgrades(ch_img, tb_img, prop, font):
@@ -509,9 +509,9 @@ def displayPieces(gameObj):
     for counter in range(6):
         try:
             if gameObj.getPlayer(counter).getActive(): #Only show the pieces of active players
-                screen.blit(gameObj.getPlayer(counter).getPiece().getPieceImg(), [gameObj.getPlayer(counter).getPiece().getX(), gameObj.getPlayer(counter).getPiece().getY()])
+                screen.blit(gameObj.getPlayer(counter).getPiece().piece_img, [gameObj.getPlayer(counter).getPiece().piece_x, gameObj.getPlayer(counter).getPiece().piece_y])
                 if counter == gameObj.getCurPlayerNum(): #Draw red circle around the current player's token to highlight it to them
-                    pygame.draw.circle(screen, (255,0,0), [int(gameObj.getPlayer(counter).getPiece().getX() + 16), int(gameObj.getPlayer(counter).getPiece().getY() + 16)], 20, 5)
+                    pygame.draw.circle(screen, (255,0,0), [int(gameObj.getPlayer(counter).getPiece().piece_x + 16), int(gameObj.getPlayer(counter).getPiece().piece_y + 16)], 20, 5)
         except IndexError: #If index does not exist in the game's Players array, no more players are left to show, thus the break
             break
 
@@ -593,8 +593,8 @@ def determineRent(gameObj):
 
 def sendCurPlayerToBog(gameObj):
     gameObj.getCurPlayer().setPos(gameObj.getBoard().bogside_pos) #Move the player
-    gameObj.getCurPlayer().getPiece().setX(getPieceX(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf)) #Update piece co-ordinates as well
-    gameObj.getCurPlayer().getPiece().setY(getPieceY(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf))
+    gameObj.getCurPlayer().getPiece().piece_x = getPieceX(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf) #Update piece co-ordinates as well
+    gameObj.getCurPlayer().getPiece().piece_y = getPieceY(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf)
     gameObj.getCurPlayer().enterJail()
 
 #Apply the effects of a certain card
@@ -617,8 +617,8 @@ def applyCardEffects(gameObj, card_effects):
         gameObj.getCurPlayer().setMissTurns(card_effects[3])
     if card_effects[4] != -1: #Move a number of spaces
         gameObj.getCurPlayer().movePlayer(card_effects[4], gameObj.getBoard())
-        gameObj.getCurPlayer().getPiece().setX(getPieceX(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf)) #Update piece co-ordinates as well
-        gameObj.getCurPlayer().getPiece().setY(getPieceY(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf))
+        gameObj.getCurPlayer().getPiece().piece_x = getPieceX(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf) #Update piece co-ordinates as well
+        gameObj.getCurPlayer().getPiece().piece_y = getPieceY(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf)
 
         #Determine rent if applicable
         gameObj.getController().turn_rent = determineRent(gameObj)
@@ -630,8 +630,8 @@ def applyCardEffects(gameObj, card_effects):
     if card_effects[5] != -1: #Move to a certain spot (and collect money if passing Job Centre)
         orig_pos = gameObj.getCurPlayer().getPos()
         gameObj.getCurPlayer().setPos(card_effects[5])
-        gameObj.getCurPlayer().getPiece().setX(getPieceX(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf)) #Update piece co-ordinates as well
-        gameObj.getCurPlayer().getPiece().setY(getPieceY(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf))
+        gameObj.getCurPlayer().getPiece().piece_x = getPieceX(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf) #Update piece co-ordinates as well
+        gameObj.getCurPlayer().getPiece().piece_y = getPieceY(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf)
         if gameObj.getCurPlayer().getPos() < orig_pos: #Means player must have 'passed' the Job Centre
             gameObj.getCurPlayer().addMoney(gameObj.getBoard().JC_Money)
 
@@ -644,8 +644,8 @@ def applyCardEffects(gameObj, card_effects):
                 gameObj.getPlayer(gameObj.getBoard().getProp(gameObj.getCurPlayer().getPos()).getOwner()).addMoney(gameObj.getController().turn_rent)
     if card_effects[6] != -1: #Move to a certain spot (but do not collect money if passing Job Centre)
         gameObj.getCurPlayer().setPos(card_effects[6])
-        gameObj.getCurPlayer().getPiece().setX(getPieceX(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf)) #Update piece co-ordinates as well
-        gameObj.getCurPlayer().getPiece().setY(getPieceY(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf))
+        gameObj.getCurPlayer().getPiece().piece_x = getPieceX(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf) #Update piece co-ordinates as well
+        gameObj.getCurPlayer().getPiece().piece_y = getPieceY(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf)
 
         #Determine rent if applicable
         gameObj.getController().turn_rent = determineRent(gameObj)
@@ -1174,8 +1174,8 @@ def MainScreen(mainGame):
             mainGame.getController().roll_img2 = pygame.transform.smoothscale(mainGame.getDie(1).getImg(), [70, 70])
             
             #Determine piece's place on the board
-            mainGame.getCurPlayer().getPiece().setX(getPieceX(mainGame.getCurPlayer().getPos(), mainGame.getBoard().board_sf))
-            mainGame.getCurPlayer().getPiece().setY(getPieceY(mainGame.getCurPlayer().getPos(), mainGame.getBoard().board_sf))
+            mainGame.getCurPlayer().getPiece().piece_x = getPieceX(mainGame.getCurPlayer().getPos(), mainGame.getBoard().board_sf)
+            mainGame.getCurPlayer().getPiece().piece_y = getPieceY(mainGame.getCurPlayer().getPos(), mainGame.getBoard().board_sf)
 
             if mainGame.getDie(0).cur_score != mainGame.getDie(1).cur_score: #If a double has not been rolled (rolling a double gives the player another turn)
                 mainGame.getController().player_rolled = True #So player only gets another turn if they rolled doubles
