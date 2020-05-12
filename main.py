@@ -462,12 +462,12 @@ def displayRent(font, rent):
 
 #Display a Council Chest or Pot Luck card (only called if applicable)
 def displayCard(display_card):
-    screen.blit(display_card.getImg(), [635, 270])
+    screen.blit(display_card.card_img, [635, 270])
 
 #Render the texts describing the effects of the cards. Also returns the array of numerical values
 def renderCardTexts(font, card):
-    effs = card.getNums() #Obtain the numerical values for the effects
-    texts = card.getEffects() #Obtain the textual descriptors of the effects
+    effs = card.card_nums #Obtain the numerical values for the effects
+    texts = card.card_effects #Obtain the textual descriptors of the effects
     eff_count = 0 #Count how many effects are used in this card
     for counter in range(len(effs)):
         if int(effs[counter]) != -1: #-1 means not used
