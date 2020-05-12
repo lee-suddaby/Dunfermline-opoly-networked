@@ -633,7 +633,7 @@ def applyCardEffects(gameObj, card_effects):
         gameObj.getCurPlayer().getPiece().setX(getPieceX(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf)) #Update piece co-ordinates as well
         gameObj.getCurPlayer().getPiece().setY(getPieceY(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf))
         if gameObj.getCurPlayer().getPos() < orig_pos: #Means player must have 'passed' the Job Centre
-            gameObj.getCurPlayer().addMoney(gameObj.getBoard().JC_money)
+            gameObj.getCurPlayer().addMoney(gameObj.getBoard().JC_Money)
 
         #Determine rent if applicable
         gameObj.getController().turn_rent = determineRent(gameObj)
@@ -1164,7 +1164,7 @@ def MainScreen(mainGame):
             
             if mainGame.getCurPlayer().getInJail() == False:
                 mainGame.getCurPlayer().movePlayer(dice_total, mainGame.getBoard())
-            elif mainGame.getDie(0).getScore() == mainGame.getDie(1).getScore(): #Doubles rolled, so player gets out of bogside
+            elif mainGame.getDie(0).cur_score == mainGame.getDie(1).cur_score: #Doubles rolled, so player gets out of bogside
                 mainGame.getCurPlayer().leaveJail()
                 mainGame.getCurPlayer().movePlayer(dice_total, mainGame.getBoard())
             #Player does not move otherwise, as they must be lost in bogside
@@ -1177,11 +1177,11 @@ def MainScreen(mainGame):
             mainGame.getCurPlayer().getPiece().setX(getPieceX(mainGame.getCurPlayer().getPos(), mainGame.getBoard().board_sf))
             mainGame.getCurPlayer().getPiece().setY(getPieceY(mainGame.getCurPlayer().getPos(), mainGame.getBoard().board_sf))
 
-            if mainGame.getDie(0).getScore() != mainGame.getDie(1).getScore(): #If a double has not been rolled (rolling a double gives the player another turn)
+            if mainGame.getDie(0).cur_score != mainGame.getDie(1).cur_score: #If a double has not been rolled (rolling a double gives the player another turn)
                 mainGame.getController().player_rolled = True #So player only gets another turn if they rolled doubles
             mainGame.getController().may_buy = True
 
-            if mainGame.getDie(0).getScore() == mainGame.getDie(1).getScore():
+            if mainGame.getDie(0).cur_score == mainGame.getDie(1).cur_score:
                 mainGame.getController().cur_doubles += 1
                 
             if mainGame.getController().cur_doubles >= 3: #If player rolls 3 consecutive doubles, they go to Bogside

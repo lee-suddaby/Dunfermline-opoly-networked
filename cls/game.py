@@ -57,7 +57,7 @@ class Game:
         return self.dice[num]
 
     def getDiceTotal(self): #Sum score on both dice
-        return self.dice[0].getScore() + self.dice[1].getScore()
+        return self.dice[0].cur_score + self.dice[1].cur_score
 
     def getSavePath(self): 
         return self.save_path

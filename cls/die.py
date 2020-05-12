@@ -8,9 +8,6 @@ class Die:
         self.cur_score = 0
         self.images = np.array(imgArr) #Array of loaded pygame images
 
-    def getScore(self):
-        return self.cur_score
-
     def getImg(self):
         return self.images[self.cur_score - 1] #-1 as indexing starts at 0; scores start at 1
 
