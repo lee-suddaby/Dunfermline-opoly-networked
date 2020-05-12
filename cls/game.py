@@ -26,9 +26,9 @@ class Game:
             self.cur_player = 0 #Restart from first player
             if self.autosave: #If game is set to autosave, it does so every time the player loop back to the first player
                 self.saveGame()
-        if self.players[self.cur_player].getMissTurns() > 0 or self.players[self.cur_player].getActive() == False:
-            if self.players[self.cur_player].getMissTurns() > 0:
-                self.players[self.cur_player].setMissTurns(self.players[self.cur_player].getMissTurns()-1) #Player is skipped; the number of turns still to be missed decrements
+        if self.players[self.cur_player].player_turnsToMiss > 0 or self.players[self.cur_player].player_active == False:
+            if self.players[self.cur_player].player_turnsToMiss > 0:
+                self.players[self.cur_player].setMissTurns(self.players[self.cur_player].player_turnsToMiss - 1) #Player is skipped; the number of turns still to be missed decrements
             self.advancePlayer() #Recursively call function to try and advance to the player after the one missing a turn
 
     def getPlayer(self, p_num): #Return a specific player
@@ -37,7 +37,7 @@ class Game:
     def countActivePlayers(self): #Number of players that have not yet gone bankrupt
         ret_count = 0
         for counter in range(len(self.players)): #All players, active or not
-            if self.players[counter].getActive():
+            if self.players[counter].player_active:
                 ret_count += 1
         return ret_count
 
@@ -58,7 +58,7 @@ class Game:
         for counter in range(len(self.players)):
             cur_player = self.players[counter]
             #Write all volatile data for the current player to a new line in the file
-            fh.write(cur_player.p_name + ',' + str(cur_player.money) + ',' + str(cur_player.getPos()) + ',' + str(cur_player.getPiece().piece_num) + ',' + str(int(cur_player.hasBogMap)) + ',' + str(cur_player.nextRollMod) + ',' + str(cur_player.turnsToMiss) + ',' + str(int(cur_player.active)) + ',' + str(int(cur_player.inJail)) + '\n')
+            fh.write(cur_player.player_name + ',' + str(cur_player.player_money) + ',' + str(cur_player.player_pos) + ',' + str(cur_player.player_piece.piece_num) + ',' + str(int(cur_player.player_hasBogMap)) + ',' + str(cur_player.player_nextRollMod) + ',' + str(cur_player.player_turnsToMiss) + ',' + str(int(cur_player.player_active)) + ',' + str(int(cur_player.player_inJail)) + '\n')
 
         for counter in range(self.board.max_pos+1):
             if self.board.getProp(counter).getType() == Prop_Type.NORMAL: #NORMAL properties have different attributes that change in-game

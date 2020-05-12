@@ -7,73 +7,46 @@ class Player:
     #I'm going to guess this is relatively self-explanatory - it is called when the class in instantiated (creating an object) and sets up the instance variables of the new object
     def __init__(self, initial_money, new_piece, new_pos, new_name, new_in_jail=False, new_active=True):
         #Last 2 parameters are optional so they can be changed when loading in data, for example
-        self.board_pos = new_pos
-        self.piece = new_piece
-        self.p_name = new_name
-        self.money = initial_money
-        self.inJail = new_in_jail
-        self.active = new_active
-        self.nextRollMod = 1 #The reciprocal of this is used if a Card decreases the movement value of this player's next roll of the dice
-        self.turnsToMiss = 0 #Number of turns they still have to come that they may not move for
-        self.hasBogMap = False #Will become true if they collect a 'Map out of Bogside'
-
-    def getPos(self):
-        return self.board_pos
-
-    def setPos(self, newPos):
-        self.board_pos = newPos
-        
-    def getName(self):
-        return self.p_name
+        self.player_pos = new_pos
+        self.player_piece = new_piece
+        self.player_name = new_name
+        self.player_money = initial_money
+        self.player_inJail = new_in_jail
+        self.player_active = new_active
+        self.player_nextRollMod = 1 #The reciprocal of this is used if a Card decreases the movement value of this player's next roll of the dice
+        self.player_turnsToMiss = 0 #Number of turns they still have to come that they may not move for
+        self.player_hasBogMap = False #Will become true if they collect a 'Map out of Bogside'
     
-    def getMoney(self):
-        return self.money
-
     def spendMoney(self, amount):
-        self.money = self.money - amount
+        self.player_money = self.player_money - amount
 
     def addMoney(self, amount):
-        self.money = self.money + amount
-
-    def getPiece(self):
-        return self.piece
-    
-    def getActive(self):
-        return self.active
+        self.player_money = self.player_money + amount
 
     def deactivate(self):
-        self.active = False
-
-    def getInJail(self):
-        return self.inJail
+        self.player_active = False
 
     def enterJail(self):
-        self.inJail = True
+        self.player_inJail = True
 
     def leaveJail(self):
-        self.inJail = False
+        self.player_inJail = False
         
     def movePlayer(self, movePos, board):
-        self.board_pos = self.board_pos + int(movePos/self.nextRollMod) #Same as movePos * (1/nextRollMod)
-        self.nextRollMod = 1 #Effects are only ever valid for one turn
-        if self.board_pos > board.max_pos:
-            self.board_pos = self.board_pos - (board.max_pos + 1)
-            self.money = self.money + board.JC_money #If player passes Job Centre, the collect the requisite amount of money
+        self.player_pos = self.player_pos + int(movePos/self.player_nextRollMod) #Same as movePos * (1/nextRollMod)
+        self.player_nextRollMod = 1 #Effects are only ever valid for one turn
+        if self.player_pos > board.max_pos:
+            self.player_pos = self.player_pos - (board.max_pos + 1)
+            self.player_money = self.player_money + board.JC_money #If player passes Job Centre, the collect the requisite amount of money
 
     def setMissTurns(self, num):
-        self.turnsToMiss = num
+        self.player_turnsToMiss = num
 
-    def getMissTurns(self):
-        return self.turnsToMiss
-    
     def setRollMod(self, newMod):
-        self.nextRollMod = newMod
-
-    def getHasMap(self):
-        return self.hasBogMap
+        self.player_nextRollMod = newMod
 
     def giveBogMap(self):
-        self.hasBogMap = True
+        self.player_hasBogMap = True
 
     def useBogMap(self):
-        self.hasBogMap = False
+        self.player_hasBogMap = False
