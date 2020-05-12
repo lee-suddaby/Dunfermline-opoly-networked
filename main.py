@@ -79,13 +79,17 @@ def namesValid(boxes):
     else:
         return True
 
-def createPlayers(p_icons, boxes, board_dim): #Create Player objects using the names entered into text boxes and the corresponding icons
+def createPlayers(p_icons, boxes, board_dim, data_file_path): #Create Player objects using the names entered into text boxes and the corresponding icons
+    fh = open(data_file_path, "r")
+    init_mon = int(fh.readline())
+    fh.close()
+    
     new_players = np.array([None] * countNames(boxes))
     p_counter = 0 #Stores which element in the new_players array is next to be instantiated
     for b_counter in range(6):
         if len(boxes[b_counter].getContents()) > 0: #Name must have been entered for a player to come into existence
             p_piece = Player_Piece(getPieceX(0, board_dim/768), getPieceY(0, board_dim/768), pygame.transform.smoothscale(p_icons[b_counter], [32, 32]), b_counter) #Create piece separately
-            new_players[p_counter] = Player(1500, p_piece, 0, boxes[b_counter].getContents()) #Now create player. 1500 is the money and 0 is the initial board position
+            new_players[p_counter] = Player(init_mon, p_piece, 0, boxes[b_counter].getContents()) #Now create player. 1500 is the money and 0 is the initial board position
             p_counter += 1
     return new_players
 
@@ -997,7 +1001,7 @@ def NewGame():
 
             if valid:
                 if namesValid(box_arr): #Validate the player's username
-                    players = createPlayers(pieces, box_arr, 600) #Create array of Player objects
+                    players = createPlayers(pieces, box_arr, 600, "data/Player_Data.txt") #Create array of Player objects
                     prop_arr = LoadProperties("data/Property Values.txt") #Create array of Property objects
                     Pot_Luck_Deck = createDeck("Pot Luck", "img/PL/Pot Luck ", "data/Card_Texts.txt", "data/PL Master.txt", 16) #Create Card_Deck object
                     Council_Chest_Deck = createDeck("Council Chest", "img/CC/Council Chest ", "data/Card_Texts.txt", "data/CC Master.txt", 16) #Create Card_Deck object
