@@ -518,66 +518,6 @@ def displayPieces(gameObj):
                     pygame.draw.circle(screen, (255,0,0), [int(gameObj.getPlayer(counter).player_piece.piece_x + 16), int(gameObj.getPlayer(counter).player_piece.piece_y + 16)], 20, 5)
         except IndexError: #If index does not exist in the game's Players array, no more players are left to show, thus the break
             break
-
-#Checks if the group to which a certain property belongs 
-def wholeGroupOwned(board, player_num, prop_num):
-    if board.getProp(prop_num).prop_type != Prop_Type.NORMAL:
-        return False
-    find_col = board.getProp(prop_num).group_col #Colour of the group whose coalescence of ownership is being investigated
-    for counter in range(board.max_pos + 1):
-        if board.getProp(counter).prop_type == Prop_Type.NORMAL: #Prevents errors as no other types have a Group Colour
-            if board.getProp(counter).group_col == find_col and board.getProp(counter).prop_owner != player_num:
-                #This property is the same colour as the one that is being examined, however, the owner is different so this player cannot own the entire group
-                return False
-    return True
-
-#Counts the number of properties that are a memeber of a certain property's 'colour group'
-def countGroupSize(board, player_num, prop_num):
-    if board.getProp(prop_num).prop_type != Prop_Type.NORMAL: #Only NORMAL properties have a colour group
-        return 0
-    group_count = 0
-    find_col = board.getProp(prop_num).group_col #Colour of the group which we are concerned with
-    for counter in range(board.max_pos + 1):
-        if board.getProp(counter).prop_type == Prop_Type.NORMAL: #Prevents errors as no other types have a Group Colour
-            if board.getProp(counter).group_col == find_col and board.getProp(counter).prop_owner == player_num:
-                group_count += 1
-    return group_count
-
-#Add 1 Council House upgrade to every property in a certain group
-def buyCHGroup(board, player_num, prop_num):
-    if board.getProp(prop_num).prop_type == Prop_Type.NORMAL:
-        find_col = board.getProp(prop_num).group_col #Colour of the group which we are concerned with
-        for counter in range(board.max_pos + 1):
-            if board.getProp(counter).prop_type == Prop_Type.NORMAL: #Prevents errors as no other types have a Group Colour
-                if board.getProp(counter).group_col == find_col and board.getProp(counter).prop_owner == player_num:
-                    board.getProp(counter).buyCH()
-
-#Add 1 Tower Block upgrade to every property in a certain group
-def buyTBGroup(board, player_num, prop_num):
-    if board.getProp(prop_num).prop_type == Prop_Type.NORMAL:
-        find_col = board.getProp(prop_num).group_col #Colour of the group which we are concerned with
-        for counter in range(board.max_pos + 1):
-            if board.getProp(counter).prop_type == Prop_Type.NORMAL: #Prevents errors as no other types have a Group Colour
-                if board.getProp(counter).group_col == find_col and board.getProp(counter).prop_owner == player_num:
-                    board.getProp(counter).buyTB()
-
-#Remove 1 Council House upgrade from every property in a certain group
-def sellCHGroup(board, player_num, prop_num):
-    if board.getProp(prop_num).prop_type == Prop_Type.NORMAL:
-        find_col = board.getProp(prop_num).group_col #Colour of the group which we are concerned with
-        for counter in range(board.max_pos + 1):
-            if board.getProp(counter).prop_type == Prop_Type.NORMAL: #Prevents errors as no other types have a Group Colour
-                if board.getProp(counter).group_col == find_col and board.getProp(counter).prop_owner == player_num:
-                    board.getProp(counter).sellCH()
-
-#Remove 1 Council House upgrade from every property in a certain group
-def sellTBGroup(board, player_num, prop_num):
-    if board.getProp(prop_num).prop_type == Prop_Type.NORMAL:
-        find_col = board.getProp(prop_num).group_col #Colour of the group which we are concerned with
-        for counter in range(board.max_pos + 1):
-            if board.getProp(counter).prop_type == Prop_Type.NORMAL: #Prevents errors as no other types have a Group Colour
-                if board.getProp(counter).group_col == find_col and board.getProp(counter).prop_owner == player_num:
-                    board.getProp(counter).sellTB()
                     
 def determineRent(gameObj):
     ret_rent = 0
@@ -585,7 +525,7 @@ def determineRent(gameObj):
         if gameObj.board.getProp(gameObj.getCurPlayer().player_pos).prop_owner != -1 and gameObj.board.getProp(gameObj.getCurPlayer().player_pos).prop_owner != gameObj.cur_player: #If the property is not unowned (i.e. owned) and not owned by current player
             if gameObj.board.getProp(gameObj.getCurPlayer().player_pos).prop_type == Prop_Type.NORMAL: #Normal Property
                 ret_rent = gameObj.board.getProp(gameObj.getCurPlayer().player_pos).getRent()
-                if wholeGroupOwned(gameObj.board, gameObj.board.getProp(gameObj.getCurPlayer().player_pos).prop_owner, gameObj.getCurPlayer().player_pos) and gameObj.board.getProp(gameObj.getCurPlayer().player_pos).C_Houses == 0:
+                if gameObj.board.wholeGroupOwned(gameObj.board.getProp(gameObj.getCurPlayer().player_pos).prop_owner, gameObj.getCurPlayer().player_pos) and gameObj.board.getProp(gameObj.getCurPlayer().player_pos).C_Houses == 0:
                     ret_rent = ret_rent * 2
             elif gameObj.board.getProp(gameObj.getCurPlayer().player_pos).prop_type == Prop_Type.SCHOOL: #School (dependent on ownership of other schools)
                 ret_rent = gameObj.board.getProp(gameObj.getCurPlayer().player_pos).getRent(gameObj.board, gameObj.board.getProp(gameObj.getCurPlayer().player_pos).prop_owner)
@@ -1254,7 +1194,7 @@ def MainScreen(mainGame):
                 displayUpgrades(CH_img, TB_img, mainGame.board.getProp(mainGame.getCurPlayer().player_pos), font_40)
 
                 if mainGame.board.getProp(mainGame.getCurPlayer().player_pos).prop_owner == mainGame.cur_player:
-                    if wholeGroupOwned(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().player_pos): #May only be bought if the property is owned by the current player and the entire colour group is owned
+                    if mainGame.board.wholeGroupOwned(mainGame.cur_player, mainGame.getCurPlayer().player_pos): #May only be bought if the property is owned by the current player and the entire colour group is owned
                     
                         if mainGame.board.getProp(mainGame.getCurPlayer().player_pos).C_Houses < 4:
                             displayButtonRect(buy_upgrade_button, (100, 100, 100), font_20, 'Buy Council House', (0, 0, 0))
@@ -1297,7 +1237,7 @@ def MainScreen(mainGame):
                 if mainGame.controller.turn_rent != 0: #If rent has actually been charged then the player is told they themselves have paid whatever amount
                     displayPaidRent(font_28, mainGame.controller.turn_rent)
                 elif mainGame.board.getProp(mainGame.getCurPlayer().player_pos).prop_owner == mainGame.cur_player and mainGame.board.getProp(mainGame.getCurPlayer().player_pos).prop_type == Prop_Type.NORMAL: #If property is owned by the current player and NORMAL (since other properties depend on those owned and dice rolls
-                    if wholeGroupOwned(mainGame.board, mainGame.board.getProp(mainGame.getCurPlayer().player_pos).prop_owner, mainGame.getCurPlayer().player_pos) and mainGame.board.getProp(mainGame.getCurPlayer().player_pos).C_Houses == 0:
+                    if mainGame.board.wholeGroupOwned(mainGame.board.getProp(mainGame.getCurPlayer().player_pos).prop_owner, mainGame.getCurPlayer().player_pos) and mainGame.board.getProp(mainGame.getCurPlayer().player_pos).C_Houses == 0:
                         displayRent(font_28, mainGame.board.getProp(mainGame.getCurPlayer().player_pos).getRent()*2)
                     else:
                         displayRent(font_28, mainGame.board.getProp(mainGame.getCurPlayer().player_pos).getRent())
@@ -1374,26 +1314,26 @@ def MainScreen(mainGame):
                     mainGame.getCurPlayer().spendMoney(int(mainGame.board.getProp(mainGame.getCurPlayer().player_pos).mortgage_val * 1.2)) #Decrease player's money by the cost of unmortgaging the property
         
         #Button for buying a Council House or Tower Block
-        if buy_upgrade_but_click and mainGame.board.getProp(mainGame.getCurPlayer().player_pos).prop_type == Prop_Type.NORMAL and wholeGroupOwned(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().player_pos): #Player wishes to upgrade the property and said upgrade can actually be purchaed
+        if buy_upgrade_but_click and mainGame.board.getProp(mainGame.getCurPlayer().player_pos).prop_type == Prop_Type.NORMAL and mainGame.board.wholeGroupOwned(mainGame.cur_player, mainGame.getCurPlayer().player_pos): #Player wishes to upgrade the property and said upgrade can actually be purchaed
             if mainGame.board.getProp(mainGame.getCurPlayer().player_pos).prop_owner == mainGame.cur_player: #May only be bought if the property is owned by the current player     
                 if mainGame.board.getProp(mainGame.getCurPlayer().player_pos).C_Houses < 4: #Fewer than 4  Council Houses, so these are the next upgrade to be bought 
-                    if mainGame.getCurPlayer().player_money >= (mainGame.board.getProp(mainGame.getCurPlayer().player_pos).CH_cost * countGroupSize(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().player_pos)): #Player actually has enough money to buy the Council House upgrade
-                        buyCHGroup(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().player_pos) #Buy the Council Houses for the whole group
-                        mainGame.getCurPlayer().spendMoney(mainGame.board.getProp(mainGame.getCurPlayer().player_pos).CH_cost * countGroupSize(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().player_pos)) #Decrease the player's money by the cost of a Council House for however many properties are in the group
+                    if mainGame.getCurPlayer().player_money >= (mainGame.board.getProp(mainGame.getCurPlayer().player_pos).CH_cost * mainGame.board.countGroupSize(mainGame.cur_player, mainGame.getCurPlayer().player_pos)): #Player actually has enough money to buy the Council House upgrade
+                        mainGame.board.buyCHGroup(mainGame.cur_player, mainGame.getCurPlayer().player_pos) #Buy the Council Houses for the whole group
+                        mainGame.getCurPlayer().spendMoney(mainGame.board.getProp(mainGame.getCurPlayer().player_pos).CH_cost * mainGame.board.countGroupSize(mainGame.cur_player, mainGame.getCurPlayer().player_pos)) #Decrease the player's money by the cost of a Council House for however many properties are in the group
                 elif mainGame.board.getProp(mainGame.getCurPlayer().player_pos).C_Houses == 4 and mainGame.board.getProp(mainGame.getCurPlayer().player_pos).T_Blocks == 0: #4 Council Houses and no Tower Blocks, so Tower Block can be bought 
-                    if mainGame.getCurPlayer().player_money >= (mainGame.board.getProp(mainGame.getCurPlayer().player_pos).TB_cost * countGroupSize(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().player_pos)): #Player actually has enough money to buy the Tower Block upgrade
-                        buyTBGroup(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().player_pos) #Buy the Council Houses for the whole group
-                        mainGame.getCurPlayer().spendMoney(mainGame.board.getProp(mainGame.getCurPlayer().player_pos).TB_cost * countGroupSize(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().player_pos)) #Decrease the player's money by the cost of a Tower Block for however many properties are in the group
+                    if mainGame.getCurPlayer().player_money >= (mainGame.board.getProp(mainGame.getCurPlayer().player_pos).TB_cost * mainGame.board.countGroupSize(mainGame.cur_player, mainGame.getCurPlayer().player_pos)): #Player actually has enough money to buy the Tower Block upgrade
+                        mainGame.board.buyTBGroup(mainGame.cur_player, mainGame.getCurPlayer().player_pos) #Buy the Council Houses for the whole group
+                        mainGame.getCurPlayer().spendMoney(mainGame.board.getProp(mainGame.getCurPlayer().player_pos).TB_cost * mainGame.board.countGroupSize(mainGame.cur_player, mainGame.getCurPlayer().player_pos)) #Decrease the player's money by the cost of a Tower Block for however many properties are in the group
 
         #Button for selling a Council House or Tower Block
-        if sell_upgrade_but_click and mainGame.board.getProp(mainGame.getCurPlayer().player_pos).prop_type == Prop_Type.NORMAL and wholeGroupOwned(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().player_pos): #Player wishes to upgrade the property and said upgrade can actually be purchaed
+        if sell_upgrade_but_click and mainGame.board.getProp(mainGame.getCurPlayer().player_pos).prop_type == Prop_Type.NORMAL and mainGame.board.wholeGroupOwned(mainGame.cur_player, mainGame.getCurPlayer().player_pos): #Player wishes to upgrade the property and said upgrade can actually be purchaed
             if mainGame.board.getProp(mainGame.getCurPlayer().player_pos).prop_owner == mainGame.cur_player: #May only be bought if the property is owned by the current player     
                 if mainGame.board.getProp(mainGame.getCurPlayer().player_pos).T_Blocks > 0: #Property has a Tower Block that can be sold
-                    sellTBGroup(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().player_pos) #Sell the Tower Blocks for the whole group
-                    mainGame.getCurPlayer().addMoney(int(mainGame.board.getProp(mainGame.getCurPlayer().player_pos).TB_cost/2 * countGroupSize(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().player_pos))) #Increase the player's money by half of what the upgrades were bought for
+                    mainGame.board.sellTBGroup(mainGame.cur_player, mainGame.getCurPlayer().player_pos) #Sell the Tower Blocks for the whole group
+                    mainGame.getCurPlayer().addMoney(int(mainGame.board.getProp(mainGame.getCurPlayer().player_pos).TB_cost/2 * mainGame.board.countGroupSize(mainGame.cur_player, mainGame.getCurPlayer().player_pos))) #Increase the player's money by half of what the upgrades were bought for
                 elif mainGame.board.getProp(mainGame.getCurPlayer().player_pos).C_Houses > 0: #No Tower Blocks, buy some Council Houses which can instead be sold 
-                    sellCHGroup(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().player_pos) #Sell the Council Houses for the whole group
-                    mainGame.getCurPlayer().addMoney(int(mainGame.board.getProp(mainGame.getCurPlayer().player_pos).CH_cost/2 * countGroupSize(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().player_pos))) #Increase the player's money by half of what the upgrades were bought for
+                    mainGame.board.sellCHGroup(mainGame.cur_player, mainGame.getCurPlayer().player_pos) #Sell the Council Houses for the whole group
+                    mainGame.getCurPlayer().addMoney(int(mainGame.board.getProp(mainGame.getCurPlayer().player_pos).CH_cost/2 * mainGame.board.countGroupSize(mainGame.cur_player, mainGame.getCurPlayer().player_pos))) #Increase the player's money by half of what the upgrades were bought for
 
         #Button to buy a map out of Bogside for £50
         if leave_bogside_but_click and (mainGame.getCurPlayer().player_money >= 50 or mainGame.getCurPlayer().player_hasBogMap) and mainGame.getCurPlayer().player_inJail:
@@ -1521,7 +1461,7 @@ def PropDetails(mainGame):
                 pygame.draw.rect(screen, mainGame.board.getProp(board_poses[counter]).group_col, pygame.Rect(200,y_pos,30,20))
 
                 show_rent = mainGame.board.getProp(board_poses[counter]).getRent()
-                if wholeGroupOwned(mainGame.board, mainGame.cur_player, board_poses[counter]) and mainGame.board.getProp(board_poses[counter]).C_Houses == 0:
+                if mainGame.board.wholeGroupOwned(mainGame.cur_player, board_poses[counter]) and mainGame.board.getProp(board_poses[counter]).C_Houses == 0:
                     show_rent = show_rent * 2
                 text_2 = font_20.render(str(show_rent), True, (0,0,0))
                 screen.blit(text_2, [260, y_pos])
@@ -1533,7 +1473,7 @@ def PropDetails(mainGame):
 
             y_pos += y_space #Increment y co-ordinate variable by the difference in co-ordinates between each row, as already defined
 
-            if wholeGroupOwned(mainGame.board, mainGame.cur_player, board_poses[counter]):
+            if mainGame.board.wholeGroupOwned(mainGame.cur_player, board_poses[counter]):
                 if mainGame.board.getProp(board_poses[counter]).C_Houses < 4: #Council Houses are still available to buy
                     displayButtonRect(buy_buts[counter], (100, 100, 100), font_16, 'Buy CH', (0, 0, 0))
                 elif mainGame.board.getProp(board_poses[counter]).T_Blocks == 0: #Player may still buy a Tower Block
@@ -1568,21 +1508,21 @@ def PropDetails(mainGame):
 
         if buy_but_click != -1: #One of the buttons for buying CH or TB has been clicked
             if mainGame.board.getProp(board_poses[buy_but_click]).C_Houses < 4: #Fewer than 4  Council Houses, so these are the next upgrade to be bought 
-                if mainGame.getCurPlayer().player_money >= (mainGame.board.getProp(board_poses[buy_but_click]).CH_cost * countGroupSize(mainGame.board, mainGame.cur_player, board_poses[buy_but_click])): #Player actually has enough money to buy the Council House upgrade
-                    buyCHGroup(mainGame.board, mainGame.cur_player, board_poses[buy_but_click]) #Buy the Council Houses for the whole group
-                    mainGame.getCurPlayer().spendMoney(mainGame.board.getProp(board_poses[buy_but_click]).CH_cost * countGroupSize(mainGame.board, mainGame.cur_player, board_poses[buy_but_click])) #Decrease the player's money by the cost of a Council House for however many properties are in the group
+                if mainGame.getCurPlayer().player_money >= (mainGame.board.getProp(board_poses[buy_but_click]).CH_cost * mainGame.board.countGroupSize(mainGame.cur_player, board_poses[buy_but_click])): #Player actually has enough money to buy the Council House upgrade
+                    mainGame.board.buyCHGroup(mainGame.cur_player, board_poses[buy_but_click]) #Buy the Council Houses for the whole group
+                    mainGame.getCurPlayer().spendMoney(mainGame.board.getProp(board_poses[buy_but_click]).CH_cost * mainGame.board.countGroupSize(mainGame.cur_player, board_poses[buy_but_click])) #Decrease the player's money by the cost of a Council House for however many properties are in the group
             elif mainGame.board.getProp(board_poses[buy_but_click]).C_Houses == 4 and mainGame.board.getProp(board_poses[buy_but_click]).T_Blocks == 0: #4 Council Houses and no Tower Blocks, so Tower Block can be bought 
-                if mainGame.getCurPlayer().player_money >= (mainGame.board.getProp(board_poses[buy_but_click]).TB_cost * countGroupSize(mainGame.board, mainGame.cur_player, board_poses[buy_but_click])): #Player actually has enough money to buy the Tower Block upgrade
-                    buyTBGroup(mainGame.board, mainGame.cur_player, board_poses[buy_but_click]) #Buy the Council Houses for the whole group
-                    mainGame.getCurPlayer().spendMoney(mainGame.board.getProp(board_poses[buy_but_click]).TB_cost * countGroupSize(mainGame.board, mainGame.cur_player, board_poses[buy_but_click])) #Decrease the player's money by the cost of a Tower Block for however many properties are in the group
+                if mainGame.getCurPlayer().player_money >= (mainGame.board.getProp(board_poses[buy_but_click]).TB_cost * mainGame.board.countGroupSize(mainGame.cur_player, board_poses[buy_but_click])): #Player actually has enough money to buy the Tower Block upgrade
+                    mainGame.board.buyTBGroup(mainGame.cur_player, board_poses[buy_but_click]) #Buy the Council Houses for the whole group
+                    mainGame.getCurPlayer().spendMoney(mainGame.board.getProp(board_poses[buy_but_click]).TB_cost * mainGame.board.countGroupSize(mainGame.cur_player, board_poses[buy_but_click])) #Decrease the player's money by the cost of a Tower Block for however many properties are in the group
 
         if sell_but_click != -1: #One of the buttons for selling CH or TB has been clicked
             if mainGame.board.getProp(board_poses[sell_but_click]).T_Blocks > 0: #Property has a Tower Block that can be sold
-                sellTBGroup(mainGame.board, mainGame.cur_player, board_poses[sell_but_click]) #Sell the Tower Blocks for the whole group
-                mainGame.getCurPlayer().addMoney(int(mainGame.board.getProp(board_poses[sell_but_click]).TB_cost/2 * countGroupSize(mainGame.board, mainGame.cur_player, board_poses[sell_but_click]))) #Increase the player's money by half of what the upgrades were bought for
+                mainGame.board.sellTBGroup(mainGame.cur_player, board_poses[sell_but_click]) #Sell the Tower Blocks for the whole group
+                mainGame.getCurPlayer().addMoney(int(mainGame.board.getProp(board_poses[sell_but_click]).TB_cost/2 * mainGame.board.countGroupSize(mainGame.cur_player, board_poses[sell_but_click]))) #Increase the player's money by half of what the upgrades were bought for
             elif mainGame.board.getProp(board_poses[sell_but_click]).C_Houses > 0: #No Tower Blocks, buy some Council Houses which can instead be sold 
-                sellCHGroup(mainGame.board, mainGame.cur_player, board_poses[sell_but_click]) #Sell the Council Houses for the whole group
-                mainGame.getCurPlayer().addMoney(int(mainGame.board.getProp(board_poses[sell_but_click]).CH_cost/2 * countGroupSize(mainGame.board, mainGame.cur_player, board_poses[sell_but_click]))) #Increase the player's money by half of what the upgrades were bought for
+                mainGame.board.sellCHGroup(mainGame.cur_player, board_poses[sell_but_click]) #Sell the Council Houses for the whole group
+                mainGame.getCurPlayer().addMoney(int(mainGame.board.getProp(board_poses[sell_but_click]).CH_cost/2 * mainGame.board.countGroupSize(mainGame.cur_player, board_poses[sell_but_click]))) #Increase the player's money by half of what the upgrades were bought for
 
         #Reset all button variables so the actions of buttons only happen once
         buy_but_click = -1
