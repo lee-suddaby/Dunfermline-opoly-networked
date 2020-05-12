@@ -1261,7 +1261,9 @@ def MainScreen(mainGame):
                             displayButtonRect(sell_upgrade_button, (100, 100, 100), font_20, 'Sell Tower Block', (0, 0, 0))
                         elif mainGame.board.getProp(mainGame.getCurPlayer().player_pos).C_Houses > 0:
                             displayButtonRect(sell_upgrade_button, (100, 100, 100), font_20, 'Sell Council House', (0, 0, 0))
-
+            
+            if mainGame.board.getProp(mainGame.getCurPlayer().player_pos).prop_type == Prop_Type.NORMAL or mainGame.board.getProp(mainGame.getCurPlayer().player_pos).prop_type == Prop_Type.SCHOOL or mainGame.board.getProp(mainGame.getCurPlayer().player_pos).prop_type == Prop_Type.STATION:
+                if mainGame.board.getProp(mainGame.getCurPlayer().player_pos).prop_owner == mainGame.cur_player:
                     #Display relevant button for mortgaging or unmortgaging a property
                     if mainGame.board.getProp(mainGame.getCurPlayer().player_pos).mortgage_status: #Property is mortgaged
                         displayButtonRect(buy_prop_button, (100, 100, 100), font_28, 'Unmortgage Property', (0, 0, 0))
