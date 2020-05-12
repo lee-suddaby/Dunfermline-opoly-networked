@@ -61,15 +61,15 @@ class Game:
             fh.write(cur_player.player_name + ',' + str(cur_player.player_money) + ',' + str(cur_player.player_pos) + ',' + str(cur_player.player_piece.piece_num) + ',' + str(int(cur_player.player_hasBogMap)) + ',' + str(cur_player.player_nextRollMod) + ',' + str(cur_player.player_turnsToMiss) + ',' + str(int(cur_player.player_active)) + ',' + str(int(cur_player.player_inJail)) + '\n')
 
         for counter in range(self.board.max_pos+1):
-            if self.board.getProp(counter).getType() == Prop_Type.NORMAL: #NORMAL properties have different attributes that change in-game
-                if self.board.getProp(counter).getOwner() != -1: #Nothing will have changed of the property is not owned
+            if self.board.getProp(counter).prop_type == Prop_Type.NORMAL: #NORMAL properties have different attributes that change in-game
+                if self.board.getProp(counter).prop_owner != -1: #Nothing will have changed of the property is not owned
                     #Write all important/changing data for a NORMAL property on a new line
-                    fh.write(str(counter) + ',' + str(self.board.getProp(counter).getOwner()) + ',' + str(self.board.getProp(counter).getCH()) + ',' + str(self.board.getProp(counter).getTB()) + ',' + str(int(self.board.getProp(counter).getMortgageStatus())) + '\n')
+                    fh.write(str(counter) + ',' + str(self.board.getProp(counter).prop_owner) + ',' + str(self.board.getProp(counter).C_Houses) + ',' + str(self.board.getProp(counter).T_Blocks) + ',' + str(int(self.board.getProp(counter).mortgage_status)) + '\n')
                     
-            if self.board.getProp(counter).getType() == Prop_Type.SCHOOL or self.board.getProp(counter).getType() == Prop_Type.STATION: #SCHOOL and STATION properties have slightly different changing attributes than NORMAL ones
-                if self.board.getProp(counter).getOwner() != -1: #Nothing will have changed of the property is not owned
+            if self.board.getProp(counter).prop_type == Prop_Type.SCHOOL or self.board.getProp(counter).prop_type == Prop_Type.STATION: #SCHOOL and STATION properties have slightly different changing attributes than NORMAL ones
+                if self.board.getProp(counter).prop_owner != -1: #Nothing will have changed of the property is not owned
                     #Write all important/changing data for a SCHOOL or STATION property on a new line
-                    fh.write(str(counter) + ',' + str(self.board.getProp(counter).getOwner()) + ',' + str(int(self.board.getProp(counter).getMortgageStatus())) + '\n')
+                    fh.write(str(counter) + ',' + str(self.board.getProp(counter).prop_owner) + ',' + str(int(self.board.getProp(counter).mortgage_status)) + '\n')
                     
         fh.close() #Close file
 
