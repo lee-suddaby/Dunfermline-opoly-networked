@@ -38,6 +38,9 @@ class Player:
         if self.player_pos > board.max_pos:
             self.player_pos = self.player_pos - (board.max_pos + 1)
             self.player_money = self.player_money + board.JC_Money #If player passes Job Centre, the collect the requisite amount of money
+        
+        self.player_piece.piece_x = self.calcPieceX(self.player_pos, board.board_sf)
+        self.player_piece.piece_y = self.calcPieceY(self.player_pos, board.board_sf)
 
     def setMissTurns(self, num):
         self.player_turnsToMiss = num
@@ -50,3 +53,30 @@ class Player:
 
     def useBogMap(self):
         self.player_hasBogMap = False
+
+        #Determine the x and y coordinates of a player's token based on which property of the board it is occupying
+    #The calculations were based off of testing that used linear regression to find an 'optimal' relationship between board position and coordinate positions
+    #Scale factor (sf) is used so board size can easily be changed, as calculations were created with a 768x768 board
+    def calcPieceX(self, pos, sf):
+        p_x = 0
+        if 10 <= pos <= 20:
+            p_x = 10
+        elif pos == 0 or pos >= 30:
+            p_x = 710
+        elif pos < 10:
+            p_x = 666 - 61*pos
+        elif 20 < pos < 30:
+            p_x = 61*pos - 1168
+        return p_x * sf
+
+    def calcPieceY(self, pos, sf):
+        p_y = 0
+        if 0 <= pos <= 10:
+            p_y = 710
+        elif 20 <= pos <= 30:
+            p_y = 10
+        elif 10 < pos < 20:
+            p_y = 1281 - 61*pos
+        elif 30 < pos:
+            p_y = 61*pos - 1767
+        return p_y * sf
