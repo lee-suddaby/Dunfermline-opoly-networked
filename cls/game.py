@@ -16,9 +16,6 @@ class Game:
         self.autosave = new_auto
         self.pause = False #Whether the background music is paused of not
 
-    def getCurPlayerNum(self): #Returns element in the players array of the current player, rather than a Player object
-        return self.cur_player 
-
     def getCurPlayer(self):
         return self.players[self.cur_player]
     
@@ -44,29 +41,11 @@ class Game:
                 ret_count += 1
         return ret_count
 
-    def getBoard(self):
-        return self.board
-
-    def getThumbs(self):
-        return self.prop_thumbs
-
-    def updateThumbs(self, thumbs): #Replace thumbnails with new, already-generated image
-        self.prop_thumbs = thumbs
-
     def getDie(self, num):
         return self.dice[num]
 
     def getDiceTotal(self): #Sum score on both dice
         return self.dice[0].cur_score + self.dice[1].cur_score
-
-    def getSavePath(self): 
-        return self.save_path
-
-    def updateSavePath(self, new_path):
-        self.save_path = new_path
-
-    def getController(self):
-        return self.controller
 
     #Save all data required to restart the game at a later date to the game's save file
     def saveGame(self):

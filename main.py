@@ -510,7 +510,7 @@ def displayPieces(gameObj):
         try:
             if gameObj.getPlayer(counter).getActive(): #Only show the pieces of active players
                 screen.blit(gameObj.getPlayer(counter).getPiece().piece_img, [gameObj.getPlayer(counter).getPiece().piece_x, gameObj.getPlayer(counter).getPiece().piece_y])
-                if counter == gameObj.getCurPlayerNum(): #Draw red circle around the current player's token to highlight it to them
+                if counter == gameObj.cur_player: #Draw red circle around the current player's token to highlight it to them
                     pygame.draw.circle(screen, (255,0,0), [int(gameObj.getPlayer(counter).getPiece().piece_x + 16), int(gameObj.getPlayer(counter).getPiece().piece_y + 16)], 20, 5)
         except IndexError: #If index does not exist in the game's Players array, no more players are left to show, thus the break
             break
@@ -577,24 +577,24 @@ def sellTBGroup(board, player_num, prop_num):
                     
 def determineRent(gameObj):
     ret_rent = 0
-    if gameObj.getBoard().getProp(gameObj.getCurPlayer().getPos()).getType() == Prop_Type.NORMAL or gameObj.getBoard().getProp(gameObj.getCurPlayer().getPos()).getType() == Prop_Type.SCHOOL or gameObj.getBoard().getProp(gameObj.getCurPlayer().getPos()).getType() == Prop_Type.STATION: #If property actually has a rent attrubite(s)
-        if gameObj.getBoard().getProp(gameObj.getCurPlayer().getPos()).getOwner() != -1 and gameObj.getBoard().getProp(gameObj.getCurPlayer().getPos()).getOwner() != gameObj.getCurPlayerNum(): #If the property is not unowned (i.e. owned) and not owned by current player
-            if gameObj.getBoard().getProp(gameObj.getCurPlayer().getPos()).getType() == Prop_Type.NORMAL: #Normal Property
-                ret_rent = gameObj.getBoard().getProp(gameObj.getCurPlayer().getPos()).getRent()
-                if wholeGroupOwned(gameObj.getBoard(), gameObj.getBoard().getProp(gameObj.getCurPlayer().getPos()).getOwner(), gameObj.getCurPlayer().getPos()) and gameObj.getBoard().getProp(gameObj.getCurPlayer().getPos()).getCH() == 0:
+    if gameObj.board.getProp(gameObj.getCurPlayer().getPos()).getType() == Prop_Type.NORMAL or gameObj.board.getProp(gameObj.getCurPlayer().getPos()).getType() == Prop_Type.SCHOOL or gameObj.board.getProp(gameObj.getCurPlayer().getPos()).getType() == Prop_Type.STATION: #If property actually has a rent attrubite(s)
+        if gameObj.board.getProp(gameObj.getCurPlayer().getPos()).getOwner() != -1 and gameObj.board.getProp(gameObj.getCurPlayer().getPos()).getOwner() != gameObj.cur_player: #If the property is not unowned (i.e. owned) and not owned by current player
+            if gameObj.board.getProp(gameObj.getCurPlayer().getPos()).getType() == Prop_Type.NORMAL: #Normal Property
+                ret_rent = gameObj.board.getProp(gameObj.getCurPlayer().getPos()).getRent()
+                if wholeGroupOwned(gameObj.board, gameObj.board.getProp(gameObj.getCurPlayer().getPos()).getOwner(), gameObj.getCurPlayer().getPos()) and gameObj.board.getProp(gameObj.getCurPlayer().getPos()).getCH() == 0:
                     ret_rent = ret_rent * 2
-            elif gameObj.getBoard().getProp(gameObj.getCurPlayer().getPos()).getType() == Prop_Type.SCHOOL: #School (dependent on ownership of other schools)
-                ret_rent = gameObj.getBoard().getProp(gameObj.getCurPlayer().getPos()).getRent(gameObj.getBoard(), gameObj.getBoard().getProp(gameObj.getCurPlayer().getPos()).getOwner())
-            elif gameObj.getBoard().getProp(gameObj.getCurPlayer().getPos()).getType() == Prop_Type.STATION: #Station (depedent on ownership of the other station and the roll of the dice)
-                ret_rent = gameObj.getBoard().getProp(gameObj.getCurPlayer().getPos()).getRent(gameObj.getBoard(), gameObj.getBoard().getProp(gameObj.getCurPlayer().getPos()).getOwner(), gameObj.getDiceTotal())
-    if gameObj.getBoard().getProp(gameObj.getCurPlayer().getPos()).getType() == Prop_Type.PAYMENT: #Property that cannot be owned by incurs a charge when landed upon (taxes, etc.)
-        ret_rent = gameObj.getBoard().getProp(gameObj.getCurPlayer().getPos()).getCharge()
+            elif gameObj.board.getProp(gameObj.getCurPlayer().getPos()).getType() == Prop_Type.SCHOOL: #School (dependent on ownership of other schools)
+                ret_rent = gameObj.board.getProp(gameObj.getCurPlayer().getPos()).getRent(gameObj.board, gameObj.board.getProp(gameObj.getCurPlayer().getPos()).getOwner())
+            elif gameObj.board.getProp(gameObj.getCurPlayer().getPos()).getType() == Prop_Type.STATION: #Station (depedent on ownership of the other station and the roll of the dice)
+                ret_rent = gameObj.board.getProp(gameObj.getCurPlayer().getPos()).getRent(gameObj.board, gameObj.board.getProp(gameObj.getCurPlayer().getPos()).getOwner(), gameObj.getDiceTotal())
+    if gameObj.board.getProp(gameObj.getCurPlayer().getPos()).getType() == Prop_Type.PAYMENT: #Property that cannot be owned by incurs a charge when landed upon (taxes, etc.)
+        ret_rent = gameObj.board.getProp(gameObj.getCurPlayer().getPos()).getCharge()
     return ret_rent
 
 def sendCurPlayerToBog(gameObj):
-    gameObj.getCurPlayer().setPos(gameObj.getBoard().bogside_pos) #Move the player
-    gameObj.getCurPlayer().getPiece().piece_x = getPieceX(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf) #Update piece co-ordinates as well
-    gameObj.getCurPlayer().getPiece().piece_y = getPieceY(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf)
+    gameObj.getCurPlayer().setPos(gameObj.board.bogside_pos) #Move the player
+    gameObj.getCurPlayer().getPiece().piece_x = getPieceX(gameObj.getCurPlayer().getPos(), gameObj.board.board_sf) #Update piece co-ordinates as well
+    gameObj.getCurPlayer().getPiece().piece_y = getPieceY(gameObj.getCurPlayer().getPos(), gameObj.board.board_sf)
     gameObj.getCurPlayer().enterJail()
 
 #Apply the effects of a certain card
@@ -606,7 +606,7 @@ def applyCardEffects(gameObj, card_effects):
     if card_effects[2] != -1: #Player gets money from each other player
         pay_counter = 0 #No of players who have individually paid
         for counter in range(6):
-            if counter != gameObj.getCurPlayerNum(): #Player cannot pay themselves
+            if counter != gameObj.cur_player: #Player cannot pay themselves
                 try:
                     gameObj.getPlayer(counter).spendMoney(card_effects[2])
                     pay_counter += 1
@@ -616,70 +616,70 @@ def applyCardEffects(gameObj, card_effects):
     if card_effects[3] != -1: #Miss a number of turns
         gameObj.getCurPlayer().setMissTurns(card_effects[3])
     if card_effects[4] != -1: #Move a number of spaces
-        gameObj.getCurPlayer().movePlayer(card_effects[4], gameObj.getBoard())
-        gameObj.getCurPlayer().getPiece().piece_x = getPieceX(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf) #Update piece co-ordinates as well
-        gameObj.getCurPlayer().getPiece().piece_y = getPieceY(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf)
+        gameObj.getCurPlayer().movePlayer(card_effects[4], gameObj.board)
+        gameObj.getCurPlayer().getPiece().piece_x = getPieceX(gameObj.getCurPlayer().getPos(), gameObj.board.board_sf) #Update piece co-ordinates as well
+        gameObj.getCurPlayer().getPiece().piece_y = getPieceY(gameObj.getCurPlayer().getPos(), gameObj.board.board_sf)
 
         #Determine rent if applicable
-        gameObj.getController().turn_rent = determineRent(gameObj)
+        gameObj.controller.turn_rent = determineRent(gameObj)
 
-        if gameObj.getController().turn_rent != 0:
-            gameObj.getCurPlayer().spendMoney(gameObj.getController().turn_rent) #Decrease the player's money and credit the owner of the property that amount
-            if gameObj.getBoard().getProp(gameObj.getCurPlayer().getPos()).getType() != Prop_Type.PAYMENT:
-                gameObj.getPlayer(gameObj.getBoard().getProp(gameObj.getCurPlayer().getPos()).getOwner()).addMoney(gameObj.getController().turn_rent)
+        if gameObj.controller.turn_rent != 0:
+            gameObj.getCurPlayer().spendMoney(gameObj.controller.turn_rent) #Decrease the player's money and credit the owner of the property that amount
+            if gameObj.board.getProp(gameObj.getCurPlayer().getPos()).getType() != Prop_Type.PAYMENT:
+                gameObj.getPlayer(gameObj.board.getProp(gameObj.getCurPlayer().getPos()).getOwner()).addMoney(gameObj.controller.turn_rent)
     if card_effects[5] != -1: #Move to a certain spot (and collect money if passing Job Centre)
         orig_pos = gameObj.getCurPlayer().getPos()
         gameObj.getCurPlayer().setPos(card_effects[5])
-        gameObj.getCurPlayer().getPiece().piece_x = getPieceX(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf) #Update piece co-ordinates as well
-        gameObj.getCurPlayer().getPiece().piece_y = getPieceY(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf)
+        gameObj.getCurPlayer().getPiece().piece_x = getPieceX(gameObj.getCurPlayer().getPos(), gameObj.board.board_sf) #Update piece co-ordinates as well
+        gameObj.getCurPlayer().getPiece().piece_y = getPieceY(gameObj.getCurPlayer().getPos(), gameObj.board.board_sf)
         if gameObj.getCurPlayer().getPos() < orig_pos: #Means player must have 'passed' the Job Centre
-            gameObj.getCurPlayer().addMoney(gameObj.getBoard().JC_Money)
+            gameObj.getCurPlayer().addMoney(gameObj.board.JC_Money)
 
         #Determine rent if applicable
-        gameObj.getController().turn_rent = determineRent(gameObj)
+        gameObj.controller.turn_rent = determineRent(gameObj)
 
-        if gameObj.getController().turn_rent != 0:
-            gameObj.getCurPlayer().spendMoney(gameObj.getController().turn_rent) #Decrease the player's money and credit the owner of the property that amount
-            if gameObj.getBoard().getProp(gameObj.getCurPlayer().getPos()).getType() != Prop_Type.PAYMENT:
-                gameObj.getPlayer(gameObj.getBoard().getProp(gameObj.getCurPlayer().getPos()).getOwner()).addMoney(gameObj.getController().turn_rent)
+        if gameObj.controller.turn_rent != 0:
+            gameObj.getCurPlayer().spendMoney(gameObj.controller.turn_rent) #Decrease the player's money and credit the owner of the property that amount
+            if gameObj.board.getProp(gameObj.getCurPlayer().getPos()).getType() != Prop_Type.PAYMENT:
+                gameObj.getPlayer(gameObj.board.getProp(gameObj.getCurPlayer().getPos()).getOwner()).addMoney(gameObj.controller.turn_rent)
     if card_effects[6] != -1: #Move to a certain spot (but do not collect money if passing Job Centre)
         gameObj.getCurPlayer().setPos(card_effects[6])
-        gameObj.getCurPlayer().getPiece().piece_x = getPieceX(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf) #Update piece co-ordinates as well
-        gameObj.getCurPlayer().getPiece().piece_y = getPieceY(gameObj.getCurPlayer().getPos(), gameObj.getBoard().board_sf)
+        gameObj.getCurPlayer().getPiece().piece_x = getPieceX(gameObj.getCurPlayer().getPos(), gameObj.board.board_sf) #Update piece co-ordinates as well
+        gameObj.getCurPlayer().getPiece().piece_y = getPieceY(gameObj.getCurPlayer().getPos(), gameObj.board.board_sf)
 
         #Determine rent if applicable
-        gameObj.getController().turn_rent = determineRent(gameObj)
+        gameObj.controller.turn_rent = determineRent(gameObj)
 
-        if gameObj.getController().turn_rent != 0:
-            gameObj.getCurPlayer().spendMoney(gameObj.getController().turn_rent) #Decrease the player's money and credit the owner of the property that amount
-            if gameObj.getBoard().getProp(gameObj.getCurPlayer().getPos()).getType() != Prop_Type.PAYMENT:
-                gameObj.getPlayer(gameObj.getBoard().getProp(gameObj.getCurPlayer().getPos()).getOwner()).addMoney(gameObj.getController().turn_rent)
+        if gameObj.controller.turn_rent != 0:
+            gameObj.getCurPlayer().spendMoney(gameObj.controller.turn_rent) #Decrease the player's money and credit the owner of the property that amount
+            if gameObj.board.getProp(gameObj.getCurPlayer().getPos()).getType() != Prop_Type.PAYMENT:
+                gameObj.getPlayer(gameObj.board.getProp(gameObj.getCurPlayer().getPos()).getOwner()).addMoney(gameObj.controller.turn_rent)
     if card_effects[7] != -1: #Go to Bogside
         sendCurPlayerToBog(gameObj)
     if card_effects[8] != -1: #Collect a Map out of Bogside
         gameObj.getCurPlayer().giveBogMap()
     if card_effects[9] != -1: #Pay a certain amount of money for each Council House and Tower Block
         to_pay = 0
-        for counter in range(gameObj.getBoard().max_pos+1):
-            if gameObj.getBoard().getProp(counter).getType() == Prop_Type.NORMAL: #Only NORMAL properties acutually possess these upgrades
-                if gameObj.getBoard().getProp(counter).getOwner() == gameObj.getCurPlayerNum(): #The current property is owned by this player
-                    to_pay += card_effects[9] * (gameObj.getBoard().getProp(counter).getCH() + gameObj.getBoard().getProp(counter).getTB()) #Sum the number of CH and TB
+        for counter in range(gameObj.board.max_pos+1):
+            if gameObj.board.getProp(counter).getType() == Prop_Type.NORMAL: #Only NORMAL properties acutually possess these upgrades
+                if gameObj.board.getProp(counter).getOwner() == gameObj.cur_player: #The current property is owned by this player
+                    to_pay += card_effects[9] * (gameObj.board.getProp(counter).getCH() + gameObj.board.getProp(counter).getTB()) #Sum the number of CH and TB
         gameObj.getCurPlayer().spendMoney(to_pay)
     if card_effects[10] != -1: #Next dice roll's value is decreased
         gameObj.getCurPlayer().setRollMod(card_effects[10])
     if card_effects[11] != -1: #Pay a certain amount of money for each Council House only
         to_pay = 0
-        for counter in range(gameObj.getBoard().max_pos+1):
-            if gameObj.getBoard().getProp(counter).getType() == Prop_Type.NORMAL: #Only NORMAL properties acutually possess these upgrades
-                if gameObj.getBoard().getProp(counter).getOwner() == gameObj.getCurPlayerNum(): #The current property is owned by this player
-                    to_pay += card_effects[11] * gameObj.getBoard().getProp(counter).getCH() #Sum the number of CH
+        for counter in range(gameObj.board.max_pos+1):
+            if gameObj.board.getProp(counter).getType() == Prop_Type.NORMAL: #Only NORMAL properties acutually possess these upgrades
+                if gameObj.board.getProp(counter).getOwner() == gameObj.cur_player: #The current property is owned by this player
+                    to_pay += card_effects[11] * gameObj.board.getProp(counter).getCH() #Sum the number of CH
         gameObj.getCurPlayer().spendMoney(to_pay)
     if card_effects[12] != -1: #Pay a certain amount of money for each Tower Block only
         to_pay = 0
-        for counter in range(gameObj.getBoard().max_pos+1):
-            if gameObj.getBoard().getProp(counter).getType() == Prop_Type.NORMAL: #Only NORMAL properties acutually possess these upgrades
-                if gameObj.getBoard().getProp(counter).getOwner() == gameObj.getCurPlayerNum(): #The current property is owned by this player
-                    to_pay += card_effects[12] * gameObj.getBoard().getProp(counter).getTB() #Sum the number of TB
+        for counter in range(gameObj.board.max_pos+1):
+            if gameObj.board.getProp(counter).getType() == Prop_Type.NORMAL: #Only NORMAL properties acutually possess these upgrades
+                if gameObj.board.getProp(counter).getOwner() == gameObj.cur_player: #The current property is owned by this player
+                    to_pay += card_effects[12] * gameObj.board.getProp(counter).getTB() #Sum the number of TB
         gameObj.getCurPlayer().spendMoney(to_pay)
         
 #------------------------------Property Details Functions------------------------------
@@ -765,8 +765,8 @@ def setup2DArray(gameObj):
         if gameObj.getPlayer(counter).getActive(): 
             ret_2D[arr_count][0] = counter
             ret_2D[arr_count][1] = gameObj.getPlayer(counter).getMoney()
-            ret_2D[arr_count][2] = getAssetsVal(gameObj.getBoard(), counter)
-            ret_2D[arr_count][3] = gameObj.getPlayer(counter).getMoney() + getObtainMon(gameObj.getBoard(), counter)
+            ret_2D[arr_count][2] = getAssetsVal(gameObj.board, counter)
+            ret_2D[arr_count][3] = gameObj.getPlayer(counter).getMoney() + getObtainMon(gameObj.board, counter)
             arr_count += 1
     return ret_2D
 
@@ -1066,7 +1066,7 @@ def NewGame():
 
 #------------------------------Main Game Code------------------------------         
 def MainScreen(mainGame):
-    mainGame.updateThumbs(pygame.transform.smoothscale(CreateThumbs(mainGame.getBoard(), mainGame.getCurPlayerNum()), [385,170]))
+    mainGame.prop_thumbs = pygame.transform.smoothscale(CreateThumbs(mainGame.board, mainGame.cur_player), [385,170])
 
     roll_dice_button = pygame.Rect(180,610,150,70) #Create rectangle for roll dice/end turn button
     buy_prop_button = pygame.Rect(675,690,250,70) #Create rectangle for property buying button (also used for mortgaging and unmortgaging
@@ -1110,7 +1110,7 @@ def MainScreen(mainGame):
                     gotoScreen = -1
                 if advanceOnBoxClose and msgBox.should_exit:
                     mainGame.advancePlayer()
-                    mainGame.updateThumbs(pygame.transform.smoothscale(CreateThumbs(mainGame.getBoard(), mainGame.getCurPlayerNum()), [385,170])) #Generate thumbnails for new player (here so it is only done when the player changes, not every frame change)
+                    mainGame.prop_thumbs = pygame.transform.smoothscale(CreateThumbs(mainGame.board, mainGame.cur_player), [385,170]) #Generate thumbnails for new player (here so it is only done when the player changes, not every frame change)
                     advanceOnBoxClose = False
                 if msgBox.should_exit == False:
                     break
@@ -1125,14 +1125,14 @@ def MainScreen(mainGame):
                 if event.button == 1: #Left mouse button
                     mouse_pos = event.pos #Position of the cursor when nouse was clicked
                     if buy_prop_button.collidepoint(mouse_pos):
-                        if mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getOwner() == -1: #Property is unowned
+                        if mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getOwner() == -1: #Property is unowned
                             buy_but_click = True
-                        elif mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getOwner() == mainGame.getCurPlayerNum(): #If owned by current player, it may be mortgaged
+                        elif mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getOwner() == mainGame.cur_player: #If owned by current player, it may be mortgaged
                             mort_but_click = True
                     if roll_dice_button.collidepoint(mouse_pos):
-                        if mainGame.getController().card_used == False:
+                        if mainGame.controller.card_used == False:
                             use_card_but_click = True #Roll dice button was clicked
-                        elif mainGame.getController().player_rolled == False:
+                        elif mainGame.controller.player_rolled == False:
                             dice_but_click = True #End turn button was clicked
                         else:
                             turn_but_click = True #Button to apply card effects was clicked
@@ -1153,7 +1153,7 @@ def MainScreen(mainGame):
                         gotoScreen = 4
                     
         #Clear screen and display main board
-        displayScreenAndBoard(mainGame.getBoard().board_img)
+        displayScreenAndBoard(mainGame.board.board_img)
         
         if dice_but_click: #If Roll Dice button was clicked
             #Roll dice, move the piece accordingly, and display the dice rolls
@@ -1163,52 +1163,52 @@ def MainScreen(mainGame):
             dice_total = mainGame.getDiceTotal()
             
             if mainGame.getCurPlayer().getInJail() == False:
-                mainGame.getCurPlayer().movePlayer(dice_total, mainGame.getBoard())
+                mainGame.getCurPlayer().movePlayer(dice_total, mainGame.board)
             elif mainGame.getDie(0).cur_score == mainGame.getDie(1).cur_score: #Doubles rolled, so player gets out of bogside
                 mainGame.getCurPlayer().leaveJail()
-                mainGame.getCurPlayer().movePlayer(dice_total, mainGame.getBoard())
+                mainGame.getCurPlayer().movePlayer(dice_total, mainGame.board)
             #Player does not move otherwise, as they must be lost in bogside
 
             #Generate the dice images
-            mainGame.getController().roll_img1 = pygame.transform.smoothscale(mainGame.getDie(0).getImg(), [70, 70])
-            mainGame.getController().roll_img2 = pygame.transform.smoothscale(mainGame.getDie(1).getImg(), [70, 70])
+            mainGame.controller.roll_img1 = pygame.transform.smoothscale(mainGame.getDie(0).getImg(), [70, 70])
+            mainGame.controller.roll_img2 = pygame.transform.smoothscale(mainGame.getDie(1).getImg(), [70, 70])
             
             #Determine piece's place on the board
-            mainGame.getCurPlayer().getPiece().piece_x = getPieceX(mainGame.getCurPlayer().getPos(), mainGame.getBoard().board_sf)
-            mainGame.getCurPlayer().getPiece().piece_y = getPieceY(mainGame.getCurPlayer().getPos(), mainGame.getBoard().board_sf)
+            mainGame.getCurPlayer().getPiece().piece_x = getPieceX(mainGame.getCurPlayer().getPos(), mainGame.board.board_sf)
+            mainGame.getCurPlayer().getPiece().piece_y = getPieceY(mainGame.getCurPlayer().getPos(), mainGame.board.board_sf)
 
             if mainGame.getDie(0).cur_score != mainGame.getDie(1).cur_score: #If a double has not been rolled (rolling a double gives the player another turn)
-                mainGame.getController().player_rolled = True #So player only gets another turn if they rolled doubles
-            mainGame.getController().may_buy = True
+                mainGame.controller.player_rolled = True #So player only gets another turn if they rolled doubles
+            mainGame.controller.may_buy = True
 
             if mainGame.getDie(0).cur_score == mainGame.getDie(1).cur_score:
-                mainGame.getController().cur_doubles += 1
+                mainGame.controller.cur_doubles += 1
                 
-            if mainGame.getController().cur_doubles >= 3: #If player rolls 3 consecutive doubles, they go to Bogside
+            if mainGame.controller.cur_doubles >= 3: #If player rolls 3 consecutive doubles, they go to Bogside
                 sendCurPlayerToBog(mainGame)
-                mainGame.getController().player_rolled = True #Will not get to roll again
+                mainGame.controller.player_rolled = True #Will not get to roll again
             
             #Determine rent if applicable
-            mainGame.getController().turn_rent = determineRent(mainGame)
+            mainGame.controller.turn_rent = determineRent(mainGame)
 
-            if mainGame.getController().turn_rent != 0:
-                mainGame.getCurPlayer().spendMoney(mainGame.getController().turn_rent) #Decrease the player's money and credit the owner of the property that amount
-                if mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() != Prop_Type.PAYMENT:
-                    mainGame.getPlayer(mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getOwner()).addMoney(mainGame.getController().turn_rent)
+            if mainGame.controller.turn_rent != 0:
+                mainGame.getCurPlayer().spendMoney(mainGame.controller.turn_rent) #Decrease the player's money and credit the owner of the property that amount
+                if mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() != Prop_Type.PAYMENT:
+                    mainGame.getPlayer(mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getOwner()).addMoney(mainGame.controller.turn_rent)
 
             #If the current space returns a card
-            if mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.POT_LUCK:
-                mainGame.getController().cur_card = mainGame.getBoard().PL_Deck.getNextCard()
-            elif mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.COUNCIL_CHEST:
-                mainGame.getController().cur_card = mainGame.getBoard().CC_Deck.getNextCard()
+            if mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.POT_LUCK:
+                mainGame.controller.cur_card = mainGame.board.PL_Deck.getNextCard()
+            elif mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.COUNCIL_CHEST:
+                mainGame.controller.cur_card = mainGame.board.CC_Deck.getNextCard()
 
             #If card will have just been returned, render the text that will show its effects
-            if mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.POT_LUCK or mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.COUNCIL_CHEST: #Card will have been returned
-                mainGame.getController().card_effs, mainGame.getController().card_texts = renderCardTexts(font_28, mainGame.getController().cur_card)
-                mainGame.getController().card_used = False
+            if mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.POT_LUCK or mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.COUNCIL_CHEST: #Card will have been returned
+                mainGame.controller.card_effs, mainGame.controller.card_texts = renderCardTexts(font_28, mainGame.controller.cur_card)
+                mainGame.controller.card_used = False
                                 
             #If the player lands on the 'Go To Bogside' space
-            if mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.GO_TO_BOGSIDE:
+            if mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.GO_TO_BOGSIDE:
                 sendCurPlayerToBog(mainGame)
 
             
@@ -1216,8 +1216,8 @@ def MainScreen(mainGame):
         displayWhoseTurn(font_28, mainGame.getCurPlayer())
         displayPlayerMoney(font_28, mainGame.getCurPlayer().getMoney())
         displayPlayerToken(mainGame.getCurPlayer())
-        displayPropThumbs(mainGame.getThumbs(), 610, 50)
-        displayDiceScore(mainGame.getController().roll_img1, mainGame.getController().roll_img2)
+        displayPropThumbs(mainGame.prop_thumbs, 610, 50)
+        displayDiceScore(mainGame.controller.roll_img1, mainGame.controller.roll_img2)
         
         #Display buttons for viewing the pause menu, property details and leaderboards
         displayButtonRect(leaderboard_button, (100, 100, 100), font_28, 'Leaderboards', (0, 0, 0))
@@ -1228,9 +1228,9 @@ def MainScreen(mainGame):
         displayPieces(mainGame)
 
         #Show the Roll Dice/End Turn button, and the appropriate caption
-        if mainGame.getController().card_used == False:
+        if mainGame.controller.card_used == False:
             displayButtonRect(roll_dice_button, (100, 100, 100), font_40, 'Use Card', (0, 0, 0))
-        elif mainGame.getController().player_rolled == False:
+        elif mainGame.controller.player_rolled == False:
             displayButtonRect(roll_dice_button, (100, 100, 100), font_40, 'Roll Dice', (0, 0, 0))
         else:
             displayButtonRect(roll_dice_button, (100, 100, 100), font_40, 'End Turn', (0, 0, 0))
@@ -1241,42 +1241,42 @@ def MainScreen(mainGame):
             displayButtonRect(in_jail_button, (100, 100, 100), font_28, 'Buy Map (£50)', (0, 0, 0))
 
         #Display title deed for property currently on
-        if mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.NORMAL or mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.SCHOOL or mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.STATION: #If property actually will have a title deed to display
-            title_deed = pygame.transform.smoothscale(mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getTitleDeed(), [270,400])
+        if mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.NORMAL or mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.SCHOOL or mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.STATION: #If property actually will have a title deed to display
+            title_deed = pygame.transform.smoothscale(mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getTitleDeed(), [270,400])
             screen.blit(title_deed, [665, 230])
 
-            if mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.NORMAL:
+            if mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.NORMAL:
                 #Normal properties are the only ones that can have Council Houses and Tower Blocks on them
-                displayUpgrades(CH_img, TB_img, mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()), font_40)
+                displayUpgrades(CH_img, TB_img, mainGame.board.getProp(mainGame.getCurPlayer().getPos()), font_40)
 
-                if mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getOwner() == mainGame.getCurPlayerNum():
-                    if wholeGroupOwned(mainGame.getBoard(), mainGame.getCurPlayerNum(), mainGame.getCurPlayer().getPos()): #May only be bought if the property is owned by the current player and the entire colour group is owned
+                if mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getOwner() == mainGame.cur_player:
+                    if wholeGroupOwned(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().getPos()): #May only be bought if the property is owned by the current player and the entire colour group is owned
                     
-                        if mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getCH() < 4:
+                        if mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getCH() < 4:
                             displayButtonRect(buy_upgrade_button, (100, 100, 100), font_20, 'Buy Council House', (0, 0, 0))
-                        elif mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getTB() == 0:
+                        elif mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getTB() == 0:
                             displayButtonRect(buy_upgrade_button, (100, 100, 100), font_20, 'Buy Tower Block', (0, 0, 0))
 
-                        if mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getTB() > 0:
+                        if mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getTB() > 0:
                             displayButtonRect(sell_upgrade_button, (100, 100, 100), font_20, 'Sell Tower Block', (0, 0, 0))
-                        elif mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getCH() > 0:
+                        elif mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getCH() > 0:
                             displayButtonRect(sell_upgrade_button, (100, 100, 100), font_20, 'Sell Council House', (0, 0, 0))
 
                     #Display relevant button for mortgaging or unmortgaging a property
-                    if mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getMortgageStatus(): #Property is mortgaged
+                    if mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getMortgageStatus(): #Property is mortgaged
                         displayButtonRect(buy_prop_button, (100, 100, 100), font_28, 'Unmortgage Property', (0, 0, 0))
                     else:
                         displayButtonRect(buy_prop_button, (100, 100, 100), font_28, 'Mortgage Property', (0, 0, 0))
 
-            if mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getOwner() == -1 and mainGame.getController().may_buy:
+            if mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getOwner() == -1 and mainGame.controller.may_buy:
                 #Give player the opportunity to buy property (since it is available and they have began their turn by rolling the dice)
                 displayButtonRect(buy_prop_button, (100, 100, 100), font_40, 'Buy Property', (0, 0, 0))
-            elif mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getOwner() != -1:
+            elif mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getOwner() != -1:
                 #Property is owned by a player so display information pertaining to the owning of said property by this aforementioned player
-                displayOwner(font_28, mainGame.getPlayer(mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getOwner()))
+                displayOwner(font_28, mainGame.getPlayer(mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getOwner()))
         else:
-            if mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() != Prop_Type.LOST_IN_BOGSIDE: #Will work perfectly normally for all properties but the Lost In Bogside square
-                tit_str = mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getTitle()
+            if mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() != Prop_Type.LOST_IN_BOGSIDE: #Will work perfectly normally for all properties but the Lost In Bogside square
+                tit_str = mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getTitle()
             elif mainGame.getCurPlayer().getInJail(): #If Player is actually 'in jail'
                 tit_str = "Lost In Bogside"
             else:
@@ -1286,23 +1286,23 @@ def MainScreen(mainGame):
             t_width, t_height = font_40.size(tit_str)
             screen.blit(tit_text, [(400-t_width)/2 + 600, 220])
 
-        if mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.NORMAL or mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.SCHOOL or mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.STATION or mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.PAYMENT: #If incurs a charge
+        if mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.NORMAL or mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.SCHOOL or mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.STATION or mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.PAYMENT: #If incurs a charge
             try:
-                if mainGame.getController().turn_rent != 0: #If rent has actually been charged then the player is told they themselves have paid whatever amount
-                    displayPaidRent(font_28, mainGame.getController().turn_rent)
-                elif mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getOwner() == mainGame.getCurPlayerNum() and mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.NORMAL: #If property is owned by the current player and NORMAL (since other properties depend on those owned and dice rolls
-                    if wholeGroupOwned(mainGame.getBoard(), mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getOwner(), mainGame.getCurPlayer().getPos()) and mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getCH() == 0:
-                        displayRent(font_28, mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getRent()*2)
+                if mainGame.controller.turn_rent != 0: #If rent has actually been charged then the player is told they themselves have paid whatever amount
+                    displayPaidRent(font_28, mainGame.controller.turn_rent)
+                elif mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getOwner() == mainGame.cur_player and mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.NORMAL: #If property is owned by the current player and NORMAL (since other properties depend on those owned and dice rolls
+                    if wholeGroupOwned(mainGame.board, mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getOwner(), mainGame.getCurPlayer().getPos()) and mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getCH() == 0:
+                        displayRent(font_28, mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getRent()*2)
                     else:
-                        displayRent(font_28, mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getRent())
+                        displayRent(font_28, mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getRent())
             except AttributeError: #Prevents errors as PAYMENT property has no owner but changes variable turn_rent
                 pass
             
-        if mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.POT_LUCK or mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.COUNCIL_CHEST:
-            if mainGame.getController().cur_card != None: #If player was already on one of these places when their turn begins, cur_card and card_texts will be None object; this condition prevents an error when the following code thinks that it is
-                displayCard(mainGame.getController().cur_card)
+        if mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.POT_LUCK or mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.COUNCIL_CHEST:
+            if mainGame.controller.cur_card != None: #If player was already on one of these places when their turn begins, cur_card and card_texts will be None object; this condition prevents an error when the following code thinks that it is
+                displayCard(mainGame.controller.cur_card)
                 t_count = 0
-                for cur_text in mainGame.getController().card_texts:
+                for cur_text in mainGame.controller.card_texts:
                     w, h = cur_text.get_size()
                     screen.blit(cur_text, [(400-w)/2 + 600, 480 + t_count*25])
                     t_count += 1
@@ -1310,23 +1310,23 @@ def MainScreen(mainGame):
         if turn_but_click: #End Turn button
             #If player could sell some things to avoid going bankrupt
             cont = True
-            if mainGame.getCurPlayer().getMoney() < 0 and (getObtainMon(mainGame.getBoard(), mainGame.getCurPlayerNum()) + mainGame.getCurPlayer().getMoney()) >= 0:
+            if mainGame.getCurPlayer().getMoney() < 0 and (getObtainMon(mainGame.board, mainGame.cur_player) + mainGame.getCurPlayer().getMoney()) >= 0:
                 msgBox = MessageBox(screen, 'You need to ensure your money is 0 or above before you can finish your turn. Please sell or mortgage some assets to continue.', 'Not Enough Money')
                 cont = False
-            elif (getObtainMon(mainGame.getBoard(), mainGame.getCurPlayerNum()) + mainGame.getCurPlayer().getMoney()) < 0: #If it is impossible for a player to not end up in debt, they go bankrupt
+            elif (getObtainMon(mainGame.board, mainGame.cur_player) + mainGame.getCurPlayer().getMoney()) < 0: #If it is impossible for a player to not end up in debt, they go bankrupt
                 mainGame.getCurPlayer().deactivate() #Remove player from the game
                 cont = False
-                for counter in range(mainGame.getBoard().max_pos):
-                    if mainGame.getBoard().getProp(counter).getType() == Prop_Type.NORMAL:
-                        if mainGame.getBoard().getProp(counter).getOwner() == mainGame.getCurPlayerNum():
-                            mainGame.getBoard().getProp(counter).p_owner = -1
-                            mainGame.getBoard().getProp(counter).setMortgageStatus(False)
-                            mainGame.getBoard().getProp(counter).C_Houses = 0
-                            mainGame.getBoard().getProp(counter).T_Blocks = 0
-                    if mainGame.getBoard().getProp(counter).getType() == Prop_Type.SCHOOL or mainGame.getBoard().getProp(counter).getType() == Prop_Type.STATION:
-                        if mainGame.getBoard().getProp(counter).getOwner() == mainGame.getCurPlayerNum():
-                            mainGame.getBoard().getProp(counter).p_owner = -1
-                            mainGame.getBoard().getProp(counter).setMortgageStatus(False)
+                for counter in range(mainGame.board.max_pos):
+                    if mainGame.board.getProp(counter).getType() == Prop_Type.NORMAL:
+                        if mainGame.board.getProp(counter).getOwner() == mainGame.cur_player:
+                            mainGame.board.getProp(counter).p_owner = -1
+                            mainGame.board.getProp(counter).setMortgageStatus(False)
+                            mainGame.board.getProp(counter).C_Houses = 0
+                            mainGame.board.getProp(counter).T_Blocks = 0
+                    if mainGame.board.getProp(counter).getType() == Prop_Type.SCHOOL or mainGame.board.getProp(counter).getType() == Prop_Type.STATION:
+                        if mainGame.board.getProp(counter).getOwner() == mainGame.cur_player:
+                            mainGame.board.getProp(counter).p_owner = -1
+                            mainGame.board.getProp(counter).setMortgageStatus(False)
                         
                 msgBox = MessageBox(screen, 'Unfortunately, this utopian capitalist world has ceased to be utopian for you: you have gone bankrupt and are no longer in the game.', 'Game Over')
                 advanceOnBoxClose = True
@@ -1334,7 +1334,7 @@ def MainScreen(mainGame):
             #Next player's turn now (if the previous player has no more to do
             if cont:
                 mainGame.advancePlayer()
-                mainGame.updateThumbs(pygame.transform.smoothscale(CreateThumbs(mainGame.getBoard(), mainGame.getCurPlayerNum()), [385,170])) #Generate thumbnails for new player (here so it is only done when the player changes, not every frame change)
+                mainGame.prop_thumbs = pygame.transform.smoothscale(CreateThumbs(mainGame.board, mainGame.cur_player), [385,170]) #Generate thumbnails for new player (here so it is only done when the player changes, not every frame change)
 
             if mainGame.countActivePlayers() < 2:
                 mainGame.advancePlayer()
@@ -1342,52 +1342,52 @@ def MainScreen(mainGame):
                 exitOnBoxClose = True
             
         #Button for buying a property has been clicked
-        if buy_but_click and (mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.NORMAL or mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.SCHOOL or mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.STATION): #Final check that the property can actually be owned
+        if buy_but_click and (mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.NORMAL or mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.SCHOOL or mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.STATION): #Final check that the property can actually be owned
             #Player wished to buy property
-            if mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getOwner() == -1: #Property is unowned, hence can actually be bought
-                if mainGame.getCurPlayer().getMoney() >=  mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getCost():
+            if mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getOwner() == -1: #Property is unowned, hence can actually be bought
+                if mainGame.getCurPlayer().getMoney() >=  mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getCost():
                     #Player has enough money
-                    mainGame.getCurPlayer().spendMoney(mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getCost()) #Decrease the player's bank balance accordingly
-                    mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).buyProperty(mainGame.getCurPlayerNum()) #Change the property's status to track the new ownership
-                    mainGame.updateThumbs(pygame.transform.smoothscale(CreateThumbs(mainGame.getBoard(), mainGame.getCurPlayerNum()), [385,170])) #Update title deed thumbnails to reflect newly purchased properties
+                    mainGame.getCurPlayer().spendMoney(mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getCost()) #Decrease the player's bank balance accordingly
+                    mainGame.board.getProp(mainGame.getCurPlayer().getPos()).buyProperty(mainGame.cur_player) #Change the property's status to track the new ownership
+                    mainGame.prop_thumbs = pygame.transform.smoothscale(CreateThumbs(mainGame.board, mainGame.cur_player), [385,170]) #Update title deed thumbnails to reflect newly purchased properties
         
         #Button to apply the effects of a Pot Luck or Council Chest card
-        if use_card_but_click and mainGame.getController().cur_card != None: #Check there is a card to work with
-            mainGame.getController().card_used = True
-            applyCardEffects(mainGame, mainGame.getController().card_effs) #Apply card effects
+        if use_card_but_click and mainGame.controller.cur_card != None: #Check there is a card to work with
+            mainGame.controller.card_used = True
+            applyCardEffects(mainGame, mainGame.controller.card_effs) #Apply card effects
 
         #All of the following may only be done if the current player owns the property
         #Button for mortgaging or unmortgaging a property
-        if mort_but_click and (mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.NORMAL or mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.SCHOOL or mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.STATION): #Final check that the property is one that may be mortgaged
-            if mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getOwner() == mainGame.getCurPlayerNum() and mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getMortgageStatus() == False: #Property must be owned by the current player and not already mortgaged
-                mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).setMortgageStatus(True) #Property is now mortgaged
-                mainGame.getCurPlayer().addMoney(int(mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getMortgageVal()))
-            elif mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getOwner() == mainGame.getCurPlayerNum() and mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getMortgageStatus(): #Property must be owned by the current player and is mortgaged
-                if mainGame.getCurPlayer().getMoney() >= mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getMortgageVal() * 1.2: #Player has sufficient money to unmortgage the property (twice the money gotten by mortgaging it)
-                    mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).setMortgageStatus(False) #Property is no longer in a state of being mortgaged
-                    mainGame.getCurPlayer().spendMoney(int(mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getMortgageVal() * 1.2)) #Decrease player's money by the cost of unmortgaging the property
+        if mort_but_click and (mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.NORMAL or mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.SCHOOL or mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.STATION): #Final check that the property is one that may be mortgaged
+            if mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getOwner() == mainGame.cur_player and mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getMortgageStatus() == False: #Property must be owned by the current player and not already mortgaged
+                mainGame.board.getProp(mainGame.getCurPlayer().getPos()).setMortgageStatus(True) #Property is now mortgaged
+                mainGame.getCurPlayer().addMoney(int(mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getMortgageVal()))
+            elif mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getOwner() == mainGame.cur_player and mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getMortgageStatus(): #Property must be owned by the current player and is mortgaged
+                if mainGame.getCurPlayer().getMoney() >= mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getMortgageVal() * 1.2: #Player has sufficient money to unmortgage the property (twice the money gotten by mortgaging it)
+                    mainGame.board.getProp(mainGame.getCurPlayer().getPos()).setMortgageStatus(False) #Property is no longer in a state of being mortgaged
+                    mainGame.getCurPlayer().spendMoney(int(mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getMortgageVal() * 1.2)) #Decrease player's money by the cost of unmortgaging the property
         
         #Button for buying a Council House or Tower Block
-        if buy_upgrade_but_click and mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.NORMAL and wholeGroupOwned(mainGame.getBoard(), mainGame.getCurPlayerNum(), mainGame.getCurPlayer().getPos()): #Player wishes to upgrade the property and said upgrade can actually be purchaed
-            if mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getOwner() == mainGame.getCurPlayerNum(): #May only be bought if the property is owned by the current player     
-                if mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getCH() < 4: #Fewer than 4  Council Houses, so these are the next upgrade to be bought 
-                    if mainGame.getCurPlayer().getMoney() >= (mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getCHCost() * countGroupSize(mainGame.getBoard(), mainGame.getCurPlayerNum(), mainGame.getCurPlayer().getPos())): #Player actually has enough money to buy the Council House upgrade
-                        buyCHGroup(mainGame.getBoard(), mainGame.getCurPlayerNum(), mainGame.getCurPlayer().getPos()) #Buy the Council Houses for the whole group
-                        mainGame.getCurPlayer().spendMoney(mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getCHCost() * countGroupSize(mainGame.getBoard(), mainGame.getCurPlayerNum(), mainGame.getCurPlayer().getPos())) #Decrease the player's money by the cost of a Council House for however many properties are in the group
-                elif mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getCH() == 4 and mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getTB() == 0: #4 Council Houses and no Tower Blocks, so Tower Block can be bought 
-                    if mainGame.getCurPlayer().getMoney() >= (mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getTBCost() * countGroupSize(mainGame.getBoard(), mainGame.getCurPlayerNum(), mainGame.getCurPlayer().getPos())): #Player actually has enough money to buy the Tower Block upgrade
-                        buyTBGroup(mainGame.getBoard(), mainGame.getCurPlayerNum(), mainGame.getCurPlayer().getPos()) #Buy the Council Houses for the whole group
-                        mainGame.getCurPlayer().spendMoney(mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getTBCost() * countGroupSize(mainGame.getBoard(), mainGame.getCurPlayerNum(), mainGame.getCurPlayer().getPos())) #Decrease the player's money by the cost of a Tower Block for however many properties are in the group
+        if buy_upgrade_but_click and mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.NORMAL and wholeGroupOwned(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().getPos()): #Player wishes to upgrade the property and said upgrade can actually be purchaed
+            if mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getOwner() == mainGame.cur_player: #May only be bought if the property is owned by the current player     
+                if mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getCH() < 4: #Fewer than 4  Council Houses, so these are the next upgrade to be bought 
+                    if mainGame.getCurPlayer().getMoney() >= (mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getCHCost() * countGroupSize(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().getPos())): #Player actually has enough money to buy the Council House upgrade
+                        buyCHGroup(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().getPos()) #Buy the Council Houses for the whole group
+                        mainGame.getCurPlayer().spendMoney(mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getCHCost() * countGroupSize(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().getPos())) #Decrease the player's money by the cost of a Council House for however many properties are in the group
+                elif mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getCH() == 4 and mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getTB() == 0: #4 Council Houses and no Tower Blocks, so Tower Block can be bought 
+                    if mainGame.getCurPlayer().getMoney() >= (mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getTBCost() * countGroupSize(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().getPos())): #Player actually has enough money to buy the Tower Block upgrade
+                        buyTBGroup(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().getPos()) #Buy the Council Houses for the whole group
+                        mainGame.getCurPlayer().spendMoney(mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getTBCost() * countGroupSize(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().getPos())) #Decrease the player's money by the cost of a Tower Block for however many properties are in the group
 
         #Button for selling a Council House or Tower Block
-        if sell_upgrade_but_click and mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.NORMAL and wholeGroupOwned(mainGame.getBoard(), mainGame.getCurPlayerNum(), mainGame.getCurPlayer().getPos()): #Player wishes to upgrade the property and said upgrade can actually be purchaed
-            if mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getOwner() == mainGame.getCurPlayerNum(): #May only be bought if the property is owned by the current player     
-                if mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getTB() > 0: #Property has a Tower Block that can be sold
-                    sellTBGroup(mainGame.getBoard(), mainGame.getCurPlayerNum(), mainGame.getCurPlayer().getPos()) #Sell the Tower Blocks for the whole group
-                    mainGame.getCurPlayer().addMoney(int(mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getTBCost()/2 * countGroupSize(mainGame.getBoard(), mainGame.getCurPlayerNum(), mainGame.getCurPlayer().getPos()))) #Increase the player's money by half of what the upgrades were bought for
-                elif mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getCH() > 0: #No Tower Blocks, buy some Council Houses which can instead be sold 
-                    sellCHGroup(mainGame.getBoard(), mainGame.getCurPlayerNum(), mainGame.getCurPlayer().getPos()) #Sell the Council Houses for the whole group
-                    mainGame.getCurPlayer().addMoney(int(mainGame.getBoard().getProp(mainGame.getCurPlayer().getPos()).getCHCost()/2 * countGroupSize(mainGame.getBoard(), mainGame.getCurPlayerNum(), mainGame.getCurPlayer().getPos()))) #Increase the player's money by half of what the upgrades were bought for
+        if sell_upgrade_but_click and mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getType() == Prop_Type.NORMAL and wholeGroupOwned(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().getPos()): #Player wishes to upgrade the property and said upgrade can actually be purchaed
+            if mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getOwner() == mainGame.cur_player: #May only be bought if the property is owned by the current player     
+                if mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getTB() > 0: #Property has a Tower Block that can be sold
+                    sellTBGroup(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().getPos()) #Sell the Tower Blocks for the whole group
+                    mainGame.getCurPlayer().addMoney(int(mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getTBCost()/2 * countGroupSize(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().getPos()))) #Increase the player's money by half of what the upgrades were bought for
+                elif mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getCH() > 0: #No Tower Blocks, buy some Council Houses which can instead be sold 
+                    sellCHGroup(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().getPos()) #Sell the Council Houses for the whole group
+                    mainGame.getCurPlayer().addMoney(int(mainGame.board.getProp(mainGame.getCurPlayer().getPos()).getCHCost()/2 * countGroupSize(mainGame.board, mainGame.cur_player, mainGame.getCurPlayer().getPos()))) #Increase the player's money by half of what the upgrades were bought for
 
         #Button to buy a map out of Bogside for £50
         if leave_bogside_but_click and (mainGame.getCurPlayer().getMoney() >= 50 or mainGame.getCurPlayer().getHasMap()) and mainGame.getCurPlayer().getInJail():
@@ -1422,8 +1422,8 @@ def PropDetails(mainGame):
     font_20b = pygame.font.SysFont('Arial', 20, True) #Font for column headings
     font_16 = pygame.font.SysFont('Arial', 16) #Font for button captions
 
-    props_owned = countPropsOwned(mainGame.getBoard(), mainGame.getCurPlayerNum())
-    board_poses = setupBoardPoses(mainGame.getBoard(), mainGame.getCurPlayerNum(), props_owned) #Array containing the board positions of all of the current player's owned properties
+    props_owned = countPropsOwned(mainGame.board, mainGame.cur_player)
+    board_poses = setupBoardPoses(mainGame.board, mainGame.cur_player, props_owned) #Array containing the board positions of all of the current player's owned properties
 
     #Initialise button arrays
     buy_buts = np.array([None] * props_owned)
@@ -1508,37 +1508,37 @@ def PropDetails(mainGame):
 
         y_pos = y_top #Y co-ordinate of the first row of data
         for counter in range(props_owned):
-            text_1 = font_20.render(mainGame.getBoard().getProp(board_poses[counter]).getTitle(), True, (0,0,0)) #Property name/title
+            text_1 = font_20.render(mainGame.board.getProp(board_poses[counter]).getTitle(), True, (0,0,0)) #Property name/title
             screen.blit(text_1, [30, y_pos])
             
-            if mainGame.getBoard().getProp(board_poses[counter]).getType() == Prop_Type.NORMAL: #SCHOOL and STATION properties have no 'Group Colour', Council Houses or Tower Blocks
-                pygame.draw.rect(screen, mainGame.getBoard().getProp(board_poses[counter]).getGroupCol(), pygame.Rect(200,y_pos,30,20))
+            if mainGame.board.getProp(board_poses[counter]).getType() == Prop_Type.NORMAL: #SCHOOL and STATION properties have no 'Group Colour', Council Houses or Tower Blocks
+                pygame.draw.rect(screen, mainGame.board.getProp(board_poses[counter]).getGroupCol(), pygame.Rect(200,y_pos,30,20))
 
-                show_rent = mainGame.getBoard().getProp(board_poses[counter]).getRent()
-                if wholeGroupOwned(mainGame.getBoard(), mainGame.getCurPlayerNum(), board_poses[counter]) and mainGame.getBoard().getProp(board_poses[counter]).getCH() == 0:
+                show_rent = mainGame.board.getProp(board_poses[counter]).getRent()
+                if wholeGroupOwned(mainGame.board, mainGame.cur_player, board_poses[counter]) and mainGame.board.getProp(board_poses[counter]).getCH() == 0:
                     show_rent = show_rent * 2
                 text_2 = font_20.render(str(show_rent), True, (0,0,0))
                 screen.blit(text_2, [260, y_pos])
-                text_4 = font_20.render(str(mainGame.getBoard().getProp(board_poses[counter]).getCH()) + '/' + str(mainGame.getBoard().getProp(board_poses[counter]).getTB()), True, (0,0,0))
+                text_4 = font_20.render(str(mainGame.board.getProp(board_poses[counter]).getCH()) + '/' + str(mainGame.board.getProp(board_poses[counter]).getTB()), True, (0,0,0))
                 screen.blit(text_4, [440, y_pos])
 
-            text_3 = font_20.render(str(mainGame.getBoard().getProp(board_poses[counter]).getMortgageVal()), True, (0,0,0)) #Mortgage value of the property
+            text_3 = font_20.render(str(mainGame.board.getProp(board_poses[counter]).getMortgageVal()), True, (0,0,0)) #Mortgage value of the property
             screen.blit(text_3, [330, y_pos])
 
             y_pos += y_space #Increment y co-ordinate variable by the difference in co-ordinates between each row, as already defined
 
-            if wholeGroupOwned(mainGame.getBoard(), mainGame.getCurPlayerNum(), board_poses[counter]):
-                if mainGame.getBoard().getProp(board_poses[counter]).getCH() < 4: #Council Houses are still available to buy
+            if wholeGroupOwned(mainGame.board, mainGame.cur_player, board_poses[counter]):
+                if mainGame.board.getProp(board_poses[counter]).getCH() < 4: #Council Houses are still available to buy
                     displayButtonRect(buy_buts[counter], (100, 100, 100), font_16, 'Buy CH', (0, 0, 0))
-                elif mainGame.getBoard().getProp(board_poses[counter]).getTB() == 0: #Player may still buy a Tower Block
+                elif mainGame.board.getProp(board_poses[counter]).getTB() == 0: #Player may still buy a Tower Block
                     displayButtonRect(buy_buts[counter], (100, 100, 100), font_16, 'Buy TB', (0, 0, 0))
 
-                if mainGame.getBoard().getProp(board_poses[counter]).getTB() > 0: #Player has Tower Blocks available to sell
+                if mainGame.board.getProp(board_poses[counter]).getTB() > 0: #Player has Tower Blocks available to sell
                     displayButtonRect(sell_buts[counter], (100, 100, 100), font_16, 'Sell TB', (0, 0, 0))
-                elif mainGame.getBoard().getProp(board_poses[counter]).getCH() > 0: #Player has no Tower Blocks, but still has Council Houses which may be sold
+                elif mainGame.board.getProp(board_poses[counter]).getCH() > 0: #Player has no Tower Blocks, but still has Council Houses which may be sold
                     displayButtonRect(sell_buts[counter], (100, 100, 100), font_16, 'Sell CH', (0, 0, 0))
 
-            if mainGame.getBoard().getProp(board_poses[counter]).getMortgageStatus(): #Properrty is mortgaged, thus it can only be bought back
+            if mainGame.board.getProp(board_poses[counter]).getMortgageStatus(): #Properrty is mortgaged, thus it can only be bought back
                 displayButtonRect(mort_buts[counter], (100, 100, 100), font_16, 'Buy-Back', (0, 0, 0))
             else: #Property may be mortgaged as it is not currently mortgaged
                 displayButtonRect(mort_buts[counter], (100, 100, 100), font_16, 'Mortgage', (0, 0, 0))
@@ -1546,37 +1546,37 @@ def PropDetails(mainGame):
             displayButtonRect(deed_buts[counter], (100, 100, 100), font_16, 'View Deed', (0, 0, 0))
 
         if mort_but_click != -1: #One of the mortgaging buttons has been clicked
-            if mainGame.getBoard().getProp(board_poses[mort_but_click]).getMortgageStatus() == False: #Unmortgaged
-                mainGame.getBoard().getProp(board_poses[mort_but_click]).setMortgageStatus(True) #Mortgage property
-                mainGame.getCurPlayer().addMoney(mainGame.getBoard().getProp(board_poses[mort_but_click]).getMortgageVal()) #Increase the player's money by the mortgage value of the property
+            if mainGame.board.getProp(board_poses[mort_but_click]).getMortgageStatus() == False: #Unmortgaged
+                mainGame.board.getProp(board_poses[mort_but_click]).setMortgageStatus(True) #Mortgage property
+                mainGame.getCurPlayer().addMoney(mainGame.board.getProp(board_poses[mort_but_click]).getMortgageVal()) #Increase the player's money by the mortgage value of the property
             else: #Mortgaged already
-                if mainGame.getCurPlayer().getMoney() >= mainGame.getBoard().getProp(board_poses[mort_but_click]).getMortgageVal() * 1.2: #If the player has 120% of the mortgage value of the property (this is the buy-back cost)
-                    mainGame.getBoard().getProp(board_poses[mort_but_click]).setMortgageStatus(False) #Unmortgage the property
-                    mainGame.getCurPlayer().spendMoney(int(mainGame.getBoard().getProp(board_poses[mort_but_click]).getMortgageVal() * 1.2)) #Debit the player's money by 120% of the mortgage value
+                if mainGame.getCurPlayer().getMoney() >= mainGame.board.getProp(board_poses[mort_but_click]).getMortgageVal() * 1.2: #If the player has 120% of the mortgage value of the property (this is the buy-back cost)
+                    mainGame.board.getProp(board_poses[mort_but_click]).setMortgageStatus(False) #Unmortgage the property
+                    mainGame.getCurPlayer().spendMoney(int(mainGame.board.getProp(board_poses[mort_but_click]).getMortgageVal() * 1.2)) #Debit the player's money by 120% of the mortgage value
             if deed_prop == board_poses[mort_but_click]: #If title deed has changed 
-                cur_deed = pygame.transform.smoothscale(mainGame.getBoard().getProp(board_poses[mort_but_click]).getTitleDeed(), [225,400])
+                cur_deed = pygame.transform.smoothscale(mainGame.board.getProp(board_poses[mort_but_click]).getTitleDeed(), [225,400])
 
         if deed_but_click != -1: #One of the buttons for viewing a title deed has been clicked
-            cur_deed = pygame.transform.smoothscale(mainGame.getBoard().getProp(board_poses[deed_but_click]).getTitleDeed(), [225,400]) #Scale title deed so it fits in the narrow sidebar
+            cur_deed = pygame.transform.smoothscale(mainGame.board.getProp(board_poses[deed_but_click]).getTitleDeed(), [225,400]) #Scale title deed so it fits in the narrow sidebar
             deed_prop = board_poses[deed_but_click]
 
         if buy_but_click != -1: #One of the buttons for buying CH or TB has been clicked
-            if mainGame.getBoard().getProp(board_poses[buy_but_click]).getCH() < 4: #Fewer than 4  Council Houses, so these are the next upgrade to be bought 
-                if mainGame.getCurPlayer().getMoney() >= (mainGame.getBoard().getProp(board_poses[buy_but_click]).getCHCost() * countGroupSize(mainGame.getBoard(), mainGame.getCurPlayerNum(), board_poses[buy_but_click])): #Player actually has enough money to buy the Council House upgrade
-                    buyCHGroup(mainGame.getBoard(), mainGame.getCurPlayerNum(), board_poses[buy_but_click]) #Buy the Council Houses for the whole group
-                    mainGame.getCurPlayer().spendMoney(mainGame.getBoard().getProp(board_poses[buy_but_click]).getCHCost() * countGroupSize(mainGame.getBoard(), mainGame.getCurPlayerNum(), board_poses[buy_but_click])) #Decrease the player's money by the cost of a Council House for however many properties are in the group
-            elif mainGame.getBoard().getProp(board_poses[buy_but_click]).getCH() == 4 and mainGame.getBoard().getProp(board_poses[buy_but_click]).getTB() == 0: #4 Council Houses and no Tower Blocks, so Tower Block can be bought 
-                if mainGame.getCurPlayer().getMoney() >= (mainGame.getBoard().getProp(board_poses[buy_but_click]).getTBCost() * countGroupSize(mainGame.getBoard(), mainGame.getCurPlayerNum(), board_poses[buy_but_click])): #Player actually has enough money to buy the Tower Block upgrade
-                    buyTBGroup(mainGame.getBoard(), mainGame.getCurPlayerNum(), board_poses[buy_but_click]) #Buy the Council Houses for the whole group
-                    mainGame.getCurPlayer().spendMoney(mainGame.getBoard().getProp(board_poses[buy_but_click]).getTBCost() * countGroupSize(mainGame.getBoard(), mainGame.getCurPlayerNum(), board_poses[buy_but_click])) #Decrease the player's money by the cost of a Tower Block for however many properties are in the group
+            if mainGame.board.getProp(board_poses[buy_but_click]).getCH() < 4: #Fewer than 4  Council Houses, so these are the next upgrade to be bought 
+                if mainGame.getCurPlayer().getMoney() >= (mainGame.board.getProp(board_poses[buy_but_click]).getCHCost() * countGroupSize(mainGame.board, mainGame.cur_player, board_poses[buy_but_click])): #Player actually has enough money to buy the Council House upgrade
+                    buyCHGroup(mainGame.board, mainGame.cur_player, board_poses[buy_but_click]) #Buy the Council Houses for the whole group
+                    mainGame.getCurPlayer().spendMoney(mainGame.board.getProp(board_poses[buy_but_click]).getCHCost() * countGroupSize(mainGame.board, mainGame.cur_player, board_poses[buy_but_click])) #Decrease the player's money by the cost of a Council House for however many properties are in the group
+            elif mainGame.board.getProp(board_poses[buy_but_click]).getCH() == 4 and mainGame.board.getProp(board_poses[buy_but_click]).getTB() == 0: #4 Council Houses and no Tower Blocks, so Tower Block can be bought 
+                if mainGame.getCurPlayer().getMoney() >= (mainGame.board.getProp(board_poses[buy_but_click]).getTBCost() * countGroupSize(mainGame.board, mainGame.cur_player, board_poses[buy_but_click])): #Player actually has enough money to buy the Tower Block upgrade
+                    buyTBGroup(mainGame.board, mainGame.cur_player, board_poses[buy_but_click]) #Buy the Council Houses for the whole group
+                    mainGame.getCurPlayer().spendMoney(mainGame.board.getProp(board_poses[buy_but_click]).getTBCost() * countGroupSize(mainGame.board, mainGame.cur_player, board_poses[buy_but_click])) #Decrease the player's money by the cost of a Tower Block for however many properties are in the group
 
         if sell_but_click != -1: #One of the buttons for selling CH or TB has been clicked
-            if mainGame.getBoard().getProp(board_poses[sell_but_click]).getTB() > 0: #Property has a Tower Block that can be sold
-                sellTBGroup(mainGame.getBoard(), mainGame.getCurPlayerNum(), board_poses[sell_but_click]) #Sell the Tower Blocks for the whole group
-                mainGame.getCurPlayer().addMoney(int(mainGame.getBoard().getProp(board_poses[sell_but_click]).getTBCost()/2 * countGroupSize(mainGame.getBoard(), mainGame.getCurPlayerNum(), board_poses[sell_but_click]))) #Increase the player's money by half of what the upgrades were bought for
-            elif mainGame.getBoard().getProp(board_poses[sell_but_click]).getCH() > 0: #No Tower Blocks, buy some Council Houses which can instead be sold 
-                sellCHGroup(mainGame.getBoard(), mainGame.getCurPlayerNum(), board_poses[sell_but_click]) #Sell the Council Houses for the whole group
-                mainGame.getCurPlayer().addMoney(int(mainGame.getBoard().getProp(board_poses[sell_but_click]).getCHCost()/2 * countGroupSize(mainGame.getBoard(), mainGame.getCurPlayerNum(), board_poses[sell_but_click]))) #Increase the player's money by half of what the upgrades were bought for
+            if mainGame.board.getProp(board_poses[sell_but_click]).getTB() > 0: #Property has a Tower Block that can be sold
+                sellTBGroup(mainGame.board, mainGame.cur_player, board_poses[sell_but_click]) #Sell the Tower Blocks for the whole group
+                mainGame.getCurPlayer().addMoney(int(mainGame.board.getProp(board_poses[sell_but_click]).getTBCost()/2 * countGroupSize(mainGame.board, mainGame.cur_player, board_poses[sell_but_click]))) #Increase the player's money by half of what the upgrades were bought for
+            elif mainGame.board.getProp(board_poses[sell_but_click]).getCH() > 0: #No Tower Blocks, buy some Council Houses which can instead be sold 
+                sellCHGroup(mainGame.board, mainGame.cur_player, board_poses[sell_but_click]) #Sell the Council Houses for the whole group
+                mainGame.getCurPlayer().addMoney(int(mainGame.board.getProp(board_poses[sell_but_click]).getCHCost()/2 * countGroupSize(mainGame.board, mainGame.cur_player, board_poses[sell_but_click]))) #Increase the player's money by half of what the upgrades were bought for
 
         #Reset all button variables so the actions of buttons only happen once
         buy_but_click = -1
@@ -1718,7 +1718,7 @@ def Leaderboards(mainGame):
 #------------------------------Pause Menu Code------------------------------ 
 def PauseMenu(mainGame):
     save_file_box = TextBox((340, 300, 560, 50), clear_on_enter=False, inactive_on_enter=False, active=False, active_color=pygame.Color("red")) #Create text box for storing save file path
-    save_file_box.buffer = list(mainGame.getSavePath()) #list() is used to convert string into array of characters
+    save_file_box.buffer = list(mainGame.save_path) #list() is used to convert string into array of characters
 
     sae_button = pygame.Rect(150,425,300,80) #This lot is used for registering if mouse clicks are on a certain button
     ews_button = pygame.Rect(600,425,300,80)
@@ -1840,7 +1840,7 @@ def PauseMenu(mainGame):
                     valid = False #Path is not valid as cannot be created without error
 
             if valid:
-                mainGame.updateSavePath(save_file_box.getContents()) #Update save file within the Game object
+                mainGame.save_path = save_file_box.getContents() #Update save file within the Game object
                 mainGame.saveGame() #Save the game in the newly entered file
 
         if enable_but_click: #Button for toggline autosave feature on/off
