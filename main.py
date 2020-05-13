@@ -880,8 +880,6 @@ def MainScreen(mainGame):
     font_40 = pygame.font.SysFont('Arial', 40) #Font object for button captions
     font_28 = pygame.font.SysFont('Arial', 28) #font object for displaying whose turn it is (among other things)
     font_20 = pygame.font.SysFont('Arial', 20) #Font for the upgrade buttons
-    
-    #maxpos = 39 #Index of the final property before you get back to the start
 
     dice_but_click = False #Booleans tracking whether the roll dice, end turn and but property buttons have been clicked yet this turn
     turn_but_click = False
@@ -969,10 +967,6 @@ def MainScreen(mainGame):
             #Generate the dice images
             mainGame.controller.roll_img1 = pygame.transform.smoothscale(mainGame.getDie(0).getImg(), [70, 70])
             mainGame.controller.roll_img2 = pygame.transform.smoothscale(mainGame.getDie(1).getImg(), [70, 70])
-            
-            #Determine piece's place on the board
-            #mainGame.getCurPlayer().player_piece.piece_x = getPieceX(mainGame.getCurPlayer().player_pos, mainGame.board.board_sf)
-            #mainGame.getCurPlayer().player_piece.piece_y = getPieceY(mainGame.getCurPlayer().player_pos, mainGame.board.board_sf)
 
             if mainGame.getDie(0).cur_score != mainGame.getDie(1).cur_score: #If a double has not been rolled (rolling a double gives the player another turn)
                 mainGame.controller.player_rolled = True #So player only gets another turn if they rolled doubles
@@ -1402,17 +1396,20 @@ def Leaderboards(mainGame):
     arrow_down = pygame.image.load("img/Arrows/down.png")
     
     #Initialise button array
-    sort_buts = np.array([None] * 3)
-    sort_buts[0] = pygame.Rect(360,80,40,40)
-    sort_buts[1] = pygame.Rect(610,80,40,40)
-    sort_buts[2] = pygame.Rect(940,80,40,40)
-    
-    exit_but = pygame.Rect(880,10,120,50)
-    help_but = pygame.Rect(810,10,50,50)
+    sort_buts = [pygame.Rect(360,80,40,40), pygame.Rect(610,80,40,40), pygame.Rect(940,80,40,40)]
+
+    leader_buts = [Button(880, 10, 120, 50, 'Exit', font_40),
+                   Button(819, 10, 50, 50, '?', font_40)]
 
     msgBox = MessageBox(screen, 'Total Money measures simply how much money each player has in the Bank. \n Total Assets counts the values of all owned properties, upgrades, etc. based on how much was paid for them initially. \n Obtainable Money is how much money each player could get if they were to sell off all of their properties and the like.', 'Leaderboards: Explained')
     msgBox.should_exit = True
     
+    tit_text = font_48.render('Viewing Leaderboards:', True, (0,0,0)) #Render title at top left of screen
+    head_1 = font_32b.render('Player', True, (0,0,0))
+    head_2 = font_32b.render('Total Money', True, (0,0,0))
+    head_3 = font_32b.render('Total Assets', True, (0,0,0))
+    head_4 = font_32b.render('Obtainable Money', True, (0,0,0))
+
     y_top = 120 #First y co-ordinate for a row of details
     y_space = 40 #Co-ordinate spacing between rows
     
@@ -1425,6 +1422,9 @@ def Leaderboards(mainGame):
     leaderboards_running = True
     while leaderboards_running: #Main loop for this part of the program
         for event in pygame.event.get():
+            for but in leader_buts:
+                but.handle_input_event(event)
+
             msgBox.handle_input_event(event)
             if msgBox.should_exit == False:
                 break
@@ -1438,22 +1438,13 @@ def Leaderboards(mainGame):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1: #Left mouse button
                     mouse_pos = event.pos #Position of the cursor when nouse was clicked
-                    if exit_but.collidepoint(mouse_pos):
-                        leaderboards_running = False
-                        gotoScreen = 1
-                    if help_but.collidepoint(mouse_pos):
-                        msgBox.should_exit = False
                     for counter in range(3): #Cycle through all the arrays of buttons to see if any have been clicked
                         if sort_buts[counter].collidepoint(mouse_pos):
                             sort_but_click = counter
 
         screen.fill((255,255,255))
         
-        tit_text = font_48.render('Viewing Leaderboards:', True, (0,0,0)) #Render title at top left of screen
         screen.blit(tit_text, [10, 10])
-
-        displayButtonRect(exit_but, (100, 100, 100), font_40, 'Exit', (0, 0, 0)) #Exit button at top right of screen
-        displayButtonRect(help_but, (100, 100, 100), font_40, '?', (0, 0, 0))
         
         mon_text = font_48.render(mainGame.getCurPlayer().player_name, True, (0,0,0)) #Render player money on screen
         f_width, f_height = font_48.size(mainGame.getCurPlayer().player_name)
@@ -1462,13 +1453,9 @@ def Leaderboards(mainGame):
         pygame.draw.rect(screen, (0,0,0), pygame.Rect(10,70,1000,700), 10) #Draw black rectangle surrounding the property data
 
         #Display each of the column headings (bold text)
-        head_1 = font_32b.render('Player', True, (0,0,0))
         screen.blit(head_1, [30, 80])
-        head_2 = font_32b.render('Total Money', True, (0,0,0))
         screen.blit(head_2, [200, 80])
-        head_3 = font_32b.render('Total Assets', True, (0,0,0))
         screen.blit(head_3, [450, 80])
-        head_4 = font_32b.render('Obtainable Money', True, (0,0,0))
         screen.blit(head_4, [700, 80])
 
         for counter in range(3):
@@ -1505,10 +1492,20 @@ def Leaderboards(mainGame):
 
             lead_arr = quickSort(lead_arr, 0, lead_arr.shape[0]-1, sort_column, sort_asc)
 
+        if leader_buts[0].clicked():
+            leaderboards_running = False
+            gotoScreen = 1
+
+        if leader_buts[1].clicked():
+            msgBox.should_exit = False
+
         msgBox.update()
         if msgBox.should_exit == False:
             msgBox.draw(screen)
-            
+
+        for but in leader_buts:
+            but.render(screen)
+
         sort_but_click = -1
         clock.tick(fps) #10 fps currently, but could easily be changed to update more or less often
         pygame.display.flip() #Refresh display from a pygame perspective, to reflect the screen.blit()s
