@@ -626,10 +626,6 @@ t_width, t_height = tip_font.size(tip_use) #Get width and height for centring th
 tip_text2 = tip_font.render("Top Tip:", True, (255,255,255))
 t_width2, t_height2 = tip_font.size("Top Tip:")
 
-but_font = pygame.font.SysFont('Arial', 48) #Font for the play button
-but_text = but_font.render("Play", True, (0,0,0)) #Create text for play button
-b_width, b_height = but_font.size("Play")
-
 #Create array of 12 strings, containing the paths of each of the frames of the coin animation
 imagesCA = np.array([" "*32] * 12)
 for counter in range(12):
@@ -642,7 +638,7 @@ width = 936
 main = pygame.transform.smoothscale(pygame.image.load("img/Title.png"), [width, int(height/2)]) #Dunfermline-opoly title
 coin1 = AnimatedGif(int(50*width/468),int(210*height/360),int(64*width/468),int(64*width/468),imagesCA) #Two coin animations at the bottom-left and bottom-right corners of the screen
 coin2 = AnimatedGif(int(354*width/468),int(210*height/360),int(64*width/468),int(64*width/468),imagesCA)#Coin animations are animated GIFS created using the AnimatedGif class
-Play_but = pygame.Rect((width-200)/2, (850-height)/2, 200, 80) #Rectangle used both for the main part of the play button, and for detecting when the button is clicked
+play_but = Button((width-200)/2, (850-height)/2, 200, 80, "Play", pygame.font.SysFont('Arial', 48))
 
 user32 = ctypes.windll.user32
 screen_w = user32.GetSystemMetrics(0)
@@ -656,6 +652,7 @@ running = True
 tip_counter = 0 #Counts how many frames the current tip has been displayed for
 while running:
     for event in pygame.event.get():
+        play_but.handle_input_event(event)
         if event.type == pygame.QUIT:
             running = False
             pygame.quit()
@@ -663,11 +660,6 @@ while running:
             if event.key == pygame.K_ESCAPE: #If escape key is pressed
                 running = False #Game exists completely
                 pygame.quit() 
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1: #Left mouse button
-                mouse_pos = event.pos     
-                if Play_but.collidepoint(mouse_pos): #If mouse down and over play button (in other words, if play button clicked)
-                    running = False #This screen is finished with; move to next screen
 
     #Clear screen and display title, and the current frame of each GIF                
     screen.fill((0,0,0))
@@ -687,8 +679,11 @@ while running:
     screen.blit(tip_text, [(width-t_width)/2,(380-t_height)/2])
 
     #Display the Play button
-    displayButtonRect(Play_but, (100,100,100), but_font, 'Play', (0,0,0))
+    play_but.render(screen)
     
+    if play_but.clicked():
+        running = False
+
     tip_counter = tip_counter + 1
     clock.tick(10)
     pygame.display.flip() #Update display
@@ -721,17 +716,16 @@ def NewGame():
     save_initial = 'C:/Users/' + getpass.getuser() + '/Dunfermline-opoly/' + str(now.year) + month[-2:] + day[-2:] + '_' + hour[-2:] + minute[-2:] + second[-2:] + '.dfo'
     save_path_box.buffer = list(save_initial)
 
-    create_game_button = pygame.Rect(150,650,300,80) #This lot is used for registering if mouse clicks are on a certain button
-    load_game_button = pygame.Rect(600,650,300,80)
-    exit_button = pygame.Rect(870,20,120,70)
-    info_button = pygame.Rect(935,100,55,55)
     font_48 = pygame.font.SysFont('Arial', 48) #Fonts used for texts
     font_60 = pygame.font.SysFont('Arial', 60)
 
+    new_buts = [Button(150, 650, 300, 80, 'Create Game', font_60), #Create Game
+                Button(600, 650, 300, 80, 'Load Game', font_60), #Load Game
+                Button(870, 20, 120, 70, 'Exit', font_48), #Exit
+                Button(935, 100, 55, 55, '?', font_48)] #Info
+
     msgBox = None
     
-    create_but_click = False
-    load_but_click = False
     screen_running = True
     while screen_running:
         for event in pygame.event.get():
@@ -746,30 +740,19 @@ def NewGame():
                 if event.key == pygame.K_ESCAPE: #Escape key exits the game
                     screen_running = False
                     gotoScreen = -1 #Game will completely exit
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1: #Left mouse button
-                    mouse_pos = event.pos #Position of the cursor when nouse was clicked
-                    if exit_button.collidepoint(mouse_pos): #Button used to exit this screen/the entire game
-                        screen_running = False
-                        gotoScreen = -1
-                    if create_game_button.collidepoint(mouse_pos): #Button for creating the game
-                        create_but_click = True
-                    if load_game_button.collidepoint(mouse_pos):
-                        load_but_click = True
-                    if info_button.collidepoint(mouse_pos): #Button for finding out what the pieces represent
-                         msgBox = MessageBox(screen, 'Bottle: A common and very possibly-alcoholic beverage enjoyed often enjoyed by Dunfermine residents (only those over 18 of course). \n Can: A popular soft drink that definitely does not infringe upon any Intellectual Property Rights. \n Coal: Coal mining was a prosperous (albeit dangerous) industry  for hundreds of years in the Dunfermline and Fife area. \n Crown: Dunfermline is a royal burgh. \n Badly-drawn Sheep: Sheep farming is very common in the Dunfermline area. \n Battleship: Dunfermline is situated near to the Royal Navy dockyard in Rosyth.', 'Token Info')
+
+            for but in new_buts:
+                but.handle_input_event(event)
             for box in box_arr: 
                 box.get_event(event) #Function that allows each textbox to register key presses and the like
             save_path_box.get_event(event)
             
 
         screen.fill((255,255,255)) #Clear the screen
-        #Display 3 buttons whose functions should be relatively self-explanatory based on their captions
-        displayButtonRect(create_game_button, (100,100,100), font_60, 'Create Game', (0,0,0))
-        displayButtonRect(load_game_button, (100,100,100), font_60, 'Load Game', (0,0,0))
-        displayButtonRect(exit_button, (100,100,100), font_48, 'Exit', (0,0,0))
-        displayButtonRect(info_button, (100,100,100), font_48, '?', (0,0,0))
-        
+
+        for but in new_buts: #Display buttons
+            but.render(screen)
+
         #Display pure text aspects of the screen
         new_game_title = font_60.render("New Game:", True, (0,0,0))
         screen.blit(new_game_title, [10, 10])
@@ -790,7 +773,14 @@ def NewGame():
         for piece_count in range(6): #Display the 6 pieces on screen to the left of the relevant text box
             screen.blit(pieces[piece_count], [45 + 500*(piece_count%2), 175 + 55*int(piece_count/2)])
 
-        if create_but_click: #If button to create the game itself was clicked
+        if new_buts[3].clicked():
+            msgBox = MessageBox(screen, 'Bottle: A common and very possibly-alcoholic beverage enjoyed often enjoyed by Dunfermine residents (only those over 18 of course). \n Can: A popular soft drink that definitely does not infringe upon any Intellectual Property Rights. \n Coal: Coal mining was a prosperous (albeit dangerous) industry  for hundreds of years in the Dunfermline and Fife area. \n Crown: Dunfermline is a royal burgh. \n Badly-drawn Sheep: Sheep farming is very common in the Dunfermline area. \n Battleship: Dunfermline is situated near to the Royal Navy dockyard in Rosyth.', 'Token Info')
+
+        if new_buts[2].clicked():
+            screen_running = False
+            gotoScreen = -1
+
+        if new_buts[0].clicked(): #If button to create the game itself was clicked
             valid = True #Whether the file part of the process is alright
             if save_path_box.getContents()[-3:].lower() != "dfo": #Must have correct file ending, or invalid
                 msgBox = MessageBox(screen, 'Invalid file. Please ensure the entered file has the correct .dfo file ending.', 'File Error')
@@ -819,7 +809,7 @@ def NewGame():
                 else:
                     msgBox = MessageBox(screen, 'The names you entered are invalid. Please ensure all names are 12 characters or less, different (this part is not case-sensitive) and you have entered at least two user names', 'Invalid Usernames')                    
 
-        if load_but_click:
+        if new_buts[1].clicked():
             valid = True
             if save_path_box.getContents()[-3:].lower() != "dfo": #Must have correct file ending, or invalid
                 msgBox = MessageBox(screen, 'Invalid file. Please select a different file or create a new game', 'File Error')
@@ -865,8 +855,6 @@ def NewGame():
             if msgBox.should_exit == False:
                 msgBox.draw(screen)
 
-        create_but_click = False
-        load_but_click = False
         clock.tick(30) #30 fps
         pygame.display.flip() #Refresh screen
 
