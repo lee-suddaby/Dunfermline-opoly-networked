@@ -6,6 +6,7 @@ from copy import copy #Used when swapping and copy objects in arrays (e.g. the 2
 import getpass #Used for getting the user's username, needed for choosing the directory of save files
 from datetime import datetime #Getting the current date and time as understood by humans (rather than UNIX time)
 import os #Used for creating directories
+import ctypes #For getting screen dimensions
 
 from textbox import TextBox #TextBox class found on GitHub
 from msgbox import MessageBox #MessageBox class is used for (surprisingly enough) displaying message boxes containing text to the user
@@ -642,7 +643,12 @@ main = pygame.transform.smoothscale(pygame.image.load("img/Title.png"), [width, 
 coin1 = AnimatedGif(int(50*width/468),int(210*height/360),int(64*width/468),int(64*width/468),imagesCA) #Two coin animations at the bottom-left and bottom-right corners of the screen
 coin2 = AnimatedGif(int(354*width/468),int(210*height/360),int(64*width/468),int(64*width/468),imagesCA)#Coin animations are animated GIFS created using the AnimatedGif class
 Play_but = pygame.Rect((width-200)/2, (850-height)/2, 200, 80) #Rectangle used both for the main part of the play button, and for detecting when the button is clicked
-    
+
+user32 = ctypes.windll.user32
+screen_w = user32.GetSystemMetrics(0)
+screen_h = user32.GetSystemMetrics(1)
+os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % ((screen_w - width)/2,(screen_h - height)/2)
+
 screen = pygame.display.set_mode([width,height], pygame.NOFRAME)
 screen.fill((0,0,0))
 
@@ -1694,7 +1700,11 @@ def PauseMenu(mainGame):
     return mainGame, gotoScreen #Pass the Game object and the integer storing where the game will go to next back out to the main game loop
        
 #------------------------------Main Game Loop------------------------------
-screen = pygame.display.set_mode([1024,768])#, pygame.FULLSCREEN) #Create screen in fullscreen mode and fill white
+screen_w = user32.GetSystemMetrics(0)
+screen_h = user32.GetSystemMetrics(1)
+os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % ((screen_w - 1024)/2,(screen_h - 768)/2)
+
+screen = pygame.display.set_mode([1024,768]) #Create screen in fullscreen mode and fill white
 pygame.display.set_caption('Dunfermline-opoly')
 screen.fill((255,255,255))
 
@@ -1704,7 +1714,7 @@ screen.fill((255,255,255))
 nextScreen = 0
 mGame = None #Create blank object that will store the Game object
 while nextScreen != -1: #Main Game Loop
-    if nextScreen == 0:
+    if nextScreen == 0: #New Game Screen
         mGame, nextScreen = NewGame()
     elif nextScreen == 1: #Main Game Screen
         mGame, nextScreen = MainScreen(mGame)
