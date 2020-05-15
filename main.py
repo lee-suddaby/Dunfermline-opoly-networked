@@ -867,11 +867,8 @@ def MainScreen(mainGame):
 
     roll_dice_button = pygame.Rect(180,610,150,70) #Create rectangle for roll dice/end turn button
     buy_prop_button = pygame.Rect(675,690,250,70) #Create rectangle for property buying button (also used for mortgaging and unmortgaging
-    pause_button = pygame.Rect(10,610,150,70)
-    leaderboard_button = pygame.Rect(10,690,150,70)
     buy_upgrade_button = pygame.Rect(350,700,150,50)
     sell_upgrade_button = pygame.Rect(520,700,150,50)
-    details_button = pygame.Rect(900,160,100,50)
     in_jail_button = pygame.Rect(350,610,150,70)
 
     TB_img = pygame.transform.smoothscale(pygame.image.load("img/Tower Block.png"), [75, 75])
@@ -880,6 +877,10 @@ def MainScreen(mainGame):
     font_40 = pygame.font.SysFont('Arial', 40) #Font object for button captions
     font_28 = pygame.font.SysFont('Arial', 28) #font object for displaying whose turn it is (among other things)
     font_20 = pygame.font.SysFont('Arial', 20) #Font for the upgrade buttons
+    
+    main_buts = [Button(10, 690, 150, 70, "Leaderboards", font_28),
+               Button(10, 610, 150, 70, "Pause", font_40),
+               Button(900, 160, 100, 50, "Details", font_28)]
 
     dice_but_click = False #Booleans tracking whether the roll dice, end turn and but property buttons have been clicked yet this turn
     turn_but_click = False
@@ -898,6 +899,9 @@ def MainScreen(mainGame):
     main_screen_running = True
     while main_screen_running:
         for event in pygame.event.get():
+            for but in main_buts:
+                but.handle_input_event(event)
+
             if msgBox != None:
                 msgBox.handle_input_event(event)
                 if exitOnBoxClose and msgBox.should_exit:
@@ -937,15 +941,7 @@ def MainScreen(mainGame):
                         buy_upgrade_but_click = True
                     if sell_upgrade_button.collidepoint(mouse_pos):
                         sell_upgrade_but_click = True
-                    if details_button.collidepoint(mouse_pos):
-                        main_screen_running = False
-                        gotoScreen = 2
-                    if leaderboard_button.collidepoint(mouse_pos):
-                        main_screen_running = False
-                        gotoScreen = 3
-                    if pause_button.collidepoint(mouse_pos):
-                        main_screen_running = False
-                        gotoScreen = 4
+                    
                     
         #Clear screen and display main board
         displayScreenAndBoard(mainGame.board.board_img)
@@ -1009,11 +1005,6 @@ def MainScreen(mainGame):
         displayPlayerToken(mainGame.getCurPlayer())
         displayPropThumbs(mainGame.prop_thumbs, 610, 50)
         displayDiceScore(mainGame.controller.roll_img1, mainGame.controller.roll_img2)
-        
-        #Display buttons for viewing the pause menu, property details and leaderboards
-        displayButtonRect(leaderboard_button, (100, 100, 100), font_28, 'Leaderboards', (0, 0, 0))
-        displayButtonRect(pause_button, (100, 100, 100), font_40, 'Pause', (0, 0, 0))
-        displayButtonRect(details_button, (100, 100, 100), font_28, 'Details', (0, 0, 0))
         
         #Show each of the player's pieces at its requisite position on the board
         displayPieces(mainGame)
@@ -1194,7 +1185,20 @@ def MainScreen(mainGame):
             msgBox.update()
             if msgBox.should_exit == False:
                 msgBox.draw(screen)
-            
+        
+        if main_buts[2].clicked(): #Details
+            main_screen_running = False
+            gotoScreen = 2
+        if main_buts[0].clicked(): #Leaderboards
+            main_screen_running = False
+            gotoScreen = 3
+        if main_buts[1].clicked(): #Pause
+            main_screen_running = False
+            gotoScreen = 4
+
+        for but in main_buts:
+            but.render(screen)
+
         #Reset button booleans so that effects of clicking buttons do not happen more than once
         dice_but_click = False
         turn_but_click = False
@@ -1218,6 +1222,16 @@ def PropDetails(mainGame):
     props_owned = countPropsOwned(mainGame.board, mainGame.cur_player)
     board_poses = setupBoardPoses(mainGame.board, mainGame.cur_player, props_owned) #Array containing the board positions of all of the current player's owned properties
 
+    tit_text = font_40.render('Viewing Property Details:', True, (0,0,0)) #Render title at top left of screen
+
+    headers = [font_20b.render('Property', True, (0,0,0)),
+               font_20b.render('Group', True, (0,0,0)),
+               font_20b.render('Rent (£)', True, (0,0,0)),
+               font_20b.render('Mortgage(£)', True, (0,0,0)),
+               font_20b.render('CH/TB', True, (0,0,0)),
+               font_20b.render('Options', True, (0,0,0))]
+    head_x = [30, 200, 260, 330, 440, 640]
+
     #Initialise button arrays
     buy_buts = np.array([None] * props_owned)
     sell_buts = np.array([None] * props_owned)
@@ -1234,7 +1248,8 @@ def PropDetails(mainGame):
         sell_buts[counter] = pygame.Rect(565,y_top + y_space*counter,60,25)
         mort_buts[counter] = pygame.Rect(630,y_top + y_space*counter,60,25)
         deed_buts[counter] = pygame.Rect(695,y_top + y_space*counter,75,25)
-    
+    exit_but = Button(880, 10, 120, 50, "Exit", font_40)
+
     fps = 10
     cur_deed = None #Image for a title deed that is being displayed at any one moment
     deed_prop = -1 #Board position of the property whose title deed is currently being shown
@@ -1246,6 +1261,7 @@ def PropDetails(mainGame):
     prop_details_running = True
     while prop_details_running: #Main loop for this part of the program
         for event in pygame.event.get():
+            exit_but.handle_input_event(event)
             if event.type == pygame.QUIT:
                 prop_details_running = False
                 gotoScreen = -1
@@ -1256,9 +1272,6 @@ def PropDetails(mainGame):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1: #Left mouse button
                     mouse_pos = event.pos #Position of the cursor when nouse was clicked
-                    if exit_but.collidepoint(mouse_pos):
-                        prop_details_running = False
-                        gotoScreen = 1
                     for counter in range(props_owned): #Cycle through all the arrays of buttons ot see if any have been clicked
                         if buy_buts[counter].collidepoint(mouse_pos):
                             buy_but_click = counter
@@ -1271,30 +1284,16 @@ def PropDetails(mainGame):
 
         screen.fill((255,255,255))
         
-        tit_text = font_40.render('Viewing Property Details:', True, (0,0,0)) #Render title at top left of screen
         screen.blit(tit_text, [10, 0])
+        pygame.draw.rect(screen, (0,0,0), pygame.Rect(10,50,770,700), 10) #Draw black rectangle surrounding the property data
 
-        displayButtonRect(exit_but, (100, 100, 100), font_40, 'Exit', (0, 0, 0)) #Exit button at top right of screen
-        
         mon_text = font_40.render('£' + str(mainGame.getCurPlayer().player_money), True, (0,0,0)) #Render player money on screen
         f_width, f_height = font_40.size('£' + str(mainGame.getCurPlayer().player_money))
         screen.blit(mon_text, [(770-f_width), 0])
 
-        pygame.draw.rect(screen, (0,0,0), pygame.Rect(10,50,770,700), 10) #Draw black rectangle surrounding the property data
-
-        #Display each of the column headings (bold text)
-        head_1 = font_20b.render('Property', True, (0,0,0))
-        screen.blit(head_1, [30, 60])
-        head_2 = font_20b.render('Group', True, (0,0,0))
-        screen.blit(head_2, [200, 60])
-        head_3 = font_20b.render('Rent (£)', True, (0,0,0))
-        screen.blit(head_3, [260, 60])
-        head_4 = font_20b.render('Mortgage(£)', True, (0,0,0))
-        screen.blit(head_4, [330, 60])
-        head_5 = font_20b.render('CH/TB', True, (0,0,0))
-        screen.blit(head_5, [440, 60])
-        head_6 = font_20b.render('Options', True, (0,0,0))
-        screen.blit(head_6, [640, 60])
+        #Display each of the column headings
+        for counter in range(6):
+            screen.blit(headers[counter], [head_x[counter], 60])
 
         if cur_deed != None: #Can only display a chosen title deed if one has already been chosen
             screen.blit(cur_deed, [790, 200])
@@ -1370,6 +1369,11 @@ def PropDetails(mainGame):
             elif mainGame.board.getProp(board_poses[sell_but_click]).C_Houses > 0: #No Tower Blocks, buy some Council Houses which can instead be sold 
                 mainGame.board.sellCHGroup(mainGame.cur_player, board_poses[sell_but_click]) #Sell the Council Houses for the whole group
                 mainGame.getCurPlayer().addMoney(int(mainGame.board.getProp(board_poses[sell_but_click]).CH_cost/2 * mainGame.board.countGroupSize(mainGame.cur_player, board_poses[sell_but_click]))) #Increase the player's money by half of what the upgrades were bought for
+        
+        if exit_but.clicked():
+            prop_details_running = False
+            gotoScreen = 1
+        exit_but.render(screen)
 
         #Reset all button variables so the actions of buttons only happen once
         buy_but_click = -1
@@ -1409,6 +1413,8 @@ def Leaderboards(mainGame):
     head_2 = font_32b.render('Total Money', True, (0,0,0))
     head_3 = font_32b.render('Total Assets', True, (0,0,0))
     head_4 = font_32b.render('Obtainable Money', True, (0,0,0))
+    mon_text = font_48.render(mainGame.getCurPlayer().player_name, True, (0,0,0)) #Render player money on screen
+    f_width, f_height = font_48.size(mainGame.getCurPlayer().player_name)
 
     y_top = 120 #First y co-ordinate for a row of details
     y_space = 40 #Co-ordinate spacing between rows
@@ -1418,7 +1424,6 @@ def Leaderboards(mainGame):
     sort_asc = False
     sort_but_click = -1
     lead_arr = quickSort(lead_arr, 0, lead_arr.shape[0]-1, sort_column, sort_asc)
-    
     leaderboards_running = True
     while leaderboards_running: #Main loop for this part of the program
         for event in pygame.event.get():
@@ -1443,13 +1448,8 @@ def Leaderboards(mainGame):
                             sort_but_click = counter
 
         screen.fill((255,255,255))
-        
         screen.blit(tit_text, [10, 10])
-        
-        mon_text = font_48.render(mainGame.getCurPlayer().player_name, True, (0,0,0)) #Render player money on screen
-        f_width, f_height = font_48.size(mainGame.getCurPlayer().player_name)
         screen.blit(mon_text, [(770-f_width), 10])
-
         pygame.draw.rect(screen, (0,0,0), pygame.Rect(10,70,1000,700), 10) #Draw black rectangle surrounding the property data
 
         #Display each of the column headings (bold text)
@@ -1479,7 +1479,6 @@ def Leaderboards(mainGame):
             screen.blit(text_3, [450, y_pos])
             text_4 = font_28.render(str(lead_arr[counter][3]), True, (0,0,0))
             screen.blit(text_4, [700, y_pos])
-
 
             y_pos += y_space #Increment y co-ordinate variable by the difference in co-ordinates between each row, as already defined
 
