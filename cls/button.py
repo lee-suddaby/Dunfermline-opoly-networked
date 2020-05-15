@@ -13,11 +13,11 @@ class Button:
         
         self.but_rect = pygame.Rect(x, y, w, h)
 
-        f_width, f_height = font.size(self.but_caption)
+        f_width, f_height = self.but_font.size(self.but_caption)
         self.txt_x = (self.but_w - f_width)/2 + self.but_x
         self.txt_y = (self.but_h - f_height)/2 + self.but_y
 
-        self.cap_text = font.render(self.but_caption, True, self.txt_col)
+        self.cap_text = self.but_font.render(self.but_caption, True, self.txt_col)
 
     def render(self, screen):
         pygame.draw.rect(screen, self.but_col, self.but_rect)
@@ -39,8 +39,8 @@ class Button:
     def updateCap(self, new_cap):
         self.but_caption = new_cap
 
-        f_width, f_height = font.size(self.but_caption)
+        f_width, f_height = self.but_font.size(self.but_caption)
         self.txt_x = (self.but_w - f_width)/2 + self.but_x
         self.txt_y = (self.but_h - f_height)/2 + self.but_y
 
-        self.cap_text = font.render(self.but_caption, True, self.txt_col)
+        self.cap_text = self.but_font.render(self.but_caption, True, self.txt_col)
