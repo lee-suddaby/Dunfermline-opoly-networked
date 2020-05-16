@@ -467,15 +467,6 @@ def displayDiceScore(img_1, img_2):
         screen.blit(img_1, [185, 690])
         screen.blit(img_2, [255, 690])
 
-#Generic function for creating a rectangle that can be used as a button, of a certain size, in a certain position and colour, and with a certain textual caption
-def displayButton(x, y, w, h, but_col, font, caption, txt_col):
-    rect = pygame.Rect(x,y,w,h)
-    pygame.draw.rect(screen, but_col, rect)
-
-    f_width, f_height = font.size(caption)
-    cap_text = font.render(caption, True, txt_col)
-    screen.blit(cap_text, [(w-f_width)/2 + x,(h-f_height)/2 + y]) #Displays the text in the centre of the button - (button_width - text_width)/2
-
 #Generic function similar to displayButton(), but where it uses a pygame.Rect object (which I also use for mouse click collision detection) in drawing the button
 def displayButtonRect(rect, but_col, font, caption, txt_col):
     pygame.draw.rect(screen, but_col, rect)
