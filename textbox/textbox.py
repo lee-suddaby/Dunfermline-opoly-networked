@@ -15,6 +15,11 @@ class TextBox(object):
         self.render_area = None
         self.blink = True
         self.blink_timer = 0.0
+        self.key_cur = 0
+        self.key_uni = None
+        self.key_timer = 0.0
+        self.back_press = False
+        self.back_timer = 0.0
         self.process_kwargs(kwargs)
 
     def process_kwargs(self,kwargs):
@@ -41,13 +46,24 @@ class TextBox(object):
     
     def get_event(self,event):
         if event.type == pg.KEYDOWN and self.active:
+            if event.key != pg.K_BACKSPACE:
+                self.back_press = False
+            if event.key != self.key_cur:
+                self.key_cur = 0
             if event.key in (pg.K_RETURN,pg.K_KP_ENTER):
                 self.execute()
             elif event.key == pg.K_BACKSPACE:
                 if self.buffer:
                     self.buffer.pop()
+                    if not self.back_press:
+                        self.back_timer = pg.time.get_ticks()
+                        self.back_press = True
             elif event.unicode in ACCEPTED:
                 self.buffer.append(event.unicode)
+                if self.key_cur != event.key:
+                    self.key_timer = pg.time.get_ticks()
+                    self.key_cur = event.key
+                    self.key_uni = event.unicode
         elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
             self.active = self.rect.collidepoint(event.pos)
 
@@ -59,6 +75,22 @@ class TextBox(object):
             self.buffer = []
 
     def update(self):
+        #Handle the input of holding down backspace to repeatedly remove letters
+        if self.active and pg.key.get_pressed()[pg.K_BACKSPACE] and pg.time.get_ticks()-self.back_timer > 500 and self.back_press:
+            self.back_timer -= 200
+            if self.buffer:
+                self.buffer.pop()
+        if not pg.key.get_pressed()[pg.K_BACKSPACE]:
+            self.back_press = False
+        
+        #Handle holding down of non-backspace keys
+        if self.active and pg.key.get_pressed()[self.key_cur] and pg.time.get_ticks()-self.key_timer > 500:
+            self.key_timer -= 200
+            self.buffer.append(self.key_uni)
+        if not pg.key.get_pressed()[self.key_cur]:
+            self.key_cur = 0
+            self.key_uni = None
+
         new = "".join(self.buffer)
         if new != self.final:
             self.final = new
@@ -71,7 +103,7 @@ class TextBox(object):
                                            self.render_rect.height)
             else:
                 self.render_area = self.rendered.get_rect(topleft=(0,0))
-        if pg.time.get_ticks()-self.blink_timer > 200:
+        if pg.time.get_ticks()-self.blink_timer > 500:
             self.blink = not self.blink
             self.blink_timer = pg.time.get_ticks()
 
