@@ -1,5 +1,4 @@
 import pygame #Used for the creation of the GUI
-#from pygame.locals import * #Another part of the pygame module - contains various constants used by pygame itself
 import os #Used for creating directories
 import ctypes #For getting screen dimensions
 
@@ -26,8 +25,8 @@ screen = pygame.display.set_mode([1024,768]) #Create screen in fullscreen mode a
 pygame.display.set_caption('Dunfermline-opoly')
 screen.fill((255,255,255))
 
-#pygame.mixer.music.load('music.mp3') #Load in and set background music to play endlessly
-#pygame.mixer.music.play(-1)
+pygame.mixer.music.load('music.mp3') #Load in and set background music to play endlessly
+pygame.mixer.music.play(-1)
 
 nextScreen = 0
 mGame = None #Create blank object that will store the Game object

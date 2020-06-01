@@ -131,10 +131,10 @@ def PauseMenu(mainGame, screen, clock):
             gotoScreen = 1
 
         if music_box_click: #Check box for background music
-            """ if mainGame.pause: #Music is currently paused
+            if mainGame.pause: #Music is currently paused
                 pygame.mixer.music.unpause() #Unpause music
             else: #Music is currently unpaused
-                pygame.mixer.music.pause() #Pause music """
+                pygame.mixer.music.pause() #Pause music
             mainGame.pause = not mainGame.pause #Toggle state of pause in Game class
          
         if msgBox != None: #If a MessageBox has been created
