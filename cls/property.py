@@ -125,8 +125,8 @@ class School_Property(Property):
         
         rent_count = 0
         for counter in range(board.max_pos + 1):
-            if board.getProp(counter).getType() == Prop_Type.SCHOOL:
-                if board.getProp(counter).proprop_owner == playerNo:            
+            if board.getProp(counter).prop_type == Prop_Type.SCHOOL:
+                if board.getProp(counter).prop_owner == playerNo:            
                     rent_count = rent_count + 1
         return self.rent_vals[rent_count-1] #-1 as array is zero-indexed
 
@@ -165,8 +165,8 @@ class Station_Property(Property):
         
         rent_count = 0
         for counter in range(board.max_pos + 1):
-            if board.getProp(counter).getType() == Prop_Type.STATION:
-                if board.getProp(counter).proprop_owner == playerNo:            
+            if board.getProp(counter).prop_type == Prop_Type.STATION:
+                if board.getProp(counter).prop_owner == playerNo:            
                     rent_count = rent_count + 1
         #Rent for a station property is dependent on the dice roll, as well as how many of the two are owned
         return self.rent_mods[rent_count-1] * diceRoll #-1 as array is zero-indexed
