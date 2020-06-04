@@ -10,11 +10,12 @@ from loading import LoadScreen
 from maingame import MainScreen
 from new import NewGame
 from pause import PauseMenu
-
+from newonoff import NewOnOff
 
 #------------------------------Main Game Loop------------------------------
 clock = pygame.time.Clock()
 LoadScreen(clock)
+nextScreen = NewOnOff(clock)
 
 user32 = ctypes.windll.user32
 screen_w = user32.GetSystemMetrics(0)
@@ -28,7 +29,6 @@ screen.fill((255,255,255))
 pygame.mixer.music.load('music.mp3') #Load in and set background music to play endlessly
 pygame.mixer.music.play(-1)
 
-nextScreen = 0
 mGame = None #Create blank object that will store the Game object
 while nextScreen != -1: #Main Game Loop
     if nextScreen == 0: #New Game Screen
@@ -41,5 +41,7 @@ while nextScreen != -1: #Main Game Loop
         mGame, nextScreen = Leaderboards(mGame, screen, clock)
     elif nextScreen == 4: #Pause Menu
         mGame, nextScreen = PauseMenu(mGame, screen, clock)
+    elif nextScreen == 5: #Will be menu for starting a multiplayer game, yet to be implemented.#
+        nextScreen = -1 #Prevents getting stuck in an infinite loop
     
 pygame.quit() #Quits the pygame module and hence the GUI
