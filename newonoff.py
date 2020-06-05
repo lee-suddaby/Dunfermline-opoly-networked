@@ -18,8 +18,12 @@ def NewOnOff(clock):
 
     buts = [Button((width-400)/3, 120, 200, 80, "Offline", font_48),
             Button(200+2*(width-400)/3, 120, 200, 80, "Networked", font_48)]
-    title_text = font_60.render("Choose your Game Mode:", True, (0,0,0))
+    title_text = font_60.render("Choose your Game Mode:", True, (255,255,255))
     t_width, t_height = font_60.size("Choose your Game Mode:")
+    pc_img = pygame.transform.smoothscale(pygame.image.load("img/PC.png"), [height, height])
+    
+    overlay = pygame.Surface((width,height), pygame.SRCALPHA)
+    overlay.fill((0,0,0,196))
 
     user32 = ctypes.windll.user32
     screen_w = user32.GetSystemMetrics(0)
@@ -27,7 +31,7 @@ def NewOnOff(clock):
     os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % ((screen_w - width)/2,(screen_h - height)/2)
 
     screen = pygame.display.set_mode([width,height], pygame.NOFRAME)
-    screen.fill((255,255,255))
+    screen.fill((0,0,0))
 
     running = True
     while running:
@@ -42,7 +46,9 @@ def NewOnOff(clock):
                     running = False #Game exists completely
                     pygame.quit() 
               
-        screen.fill((255,255,255))
+        screen.fill((0,0,0))
+        screen.blit(pc_img, [0,0])
+        screen.blit(overlay, (0,0))
         screen.blit(title_text, [(width-t_width)/2, 30])
 
         #Display the buttons
