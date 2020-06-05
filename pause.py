@@ -17,7 +17,7 @@ def PauseMenu(mainGame, screen, clock):
     font_40 = pygame.font.SysFont('Arial', 40)
     font_28 = pygame.font.SysFont('Arial', 28)
 
-    enable_txt = "Ensable"
+    enable_txt = "Enable"
     if mainGame.autosave:
         enable_txt = "Disable"
 
