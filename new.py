@@ -311,6 +311,10 @@ def NewGame(screen, clock):
     font_48 = pygame.font.SysFont('Arial', 48) #Fonts used for texts
     font_60 = pygame.font.SysFont('Arial', 60)
 
+    new_game_title = font_60.render("New Game:", True, (0,0,0))
+    icon_title = font_48.render("Enter Player Names (max 12 characters)", True, (0,0,0))
+    save_title = font_48.render("Save File Path:", True, (0,0,0))
+
     new_buts = [Button(150, 650, 300, 80, 'Create Game', font_60), #Create Game
                 Button(600, 650, 300, 80, 'Load Game', font_60), #Load Game
                 Button(870, 20, 120, 70, 'Exit', font_48), #Exit
@@ -346,13 +350,8 @@ def NewGame(screen, clock):
             but.render(screen)
 
         #Display pure text aspects of the screen
-        new_game_title = font_60.render("New Game:", True, (0,0,0))
         screen.blit(new_game_title, [10, 10])
-
-        icon_title = font_48.render("Enter Player Names (max 12 characters)", True, (0,0,0))
         screen.blit(icon_title, [30, 75])
-
-        save_title = font_48.render("Save File Path:", True, (0,0,0))
         screen.blit(save_title, [50, 545])
         
         for box in box_arr:
