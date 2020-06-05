@@ -18,6 +18,9 @@ def NewOnOff(clock):
 
     buts = [Button((width-400)/3, 120, 200, 80, "Offline", font_48),
             Button(200+2*(width-400)/3, 120, 200, 80, "Networked", font_48)]
+
+    mode_buts = [Button((width-400)/3, 120, 200, 80, "Host", font_48, visible=False),
+                Button(200+2*(width-400)/3, 120, 200, 80, "Connect", font_48, visible=False)]
     title_text = font_60.render("Choose your Game Mode:", True, (255,255,255))
     t_width, t_height = font_60.size("Choose your Game Mode:")
     pc_img = pygame.transform.smoothscale(pygame.image.load("img/PC.png"), [height, height])
@@ -38,6 +41,8 @@ def NewOnOff(clock):
         for event in pygame.event.get():
             for but in buts:
                 but.handle_input_event(event)
+            for but in mode_buts:
+                but.handle_input_event(event)
             if event.type == pygame.QUIT:
                 running = False
                 pygame.quit()
@@ -54,14 +59,26 @@ def NewOnOff(clock):
         #Display the buttons
         for but in buts:
             but.render(screen)
+        for but in mode_buts:
+            but.render(screen)
         
         if buts[0].clicked():
             running = False
             gotoScreen = 0
         elif buts[1].clicked():
-            running = False
             gotoScreen = 5
+            mode_buts[0].showBut()
+            mode_buts[1].showBut()
+            buts[0].hideBut()
+            buts[1].hideBut()
+        
+        if mode_buts[0].clicked():
+            running = False
+            mode = "Host"
+        elif mode_buts[1].clicked():
+            running = False
+            mode = "Connect"
 
         clock.tick(10)
         pygame.display.flip() #Update display
-    return gotoScreen #0 = Offline, 5 = Networked online
+    return gotoScreen, mode #0 = Offline, 5 = Networked online

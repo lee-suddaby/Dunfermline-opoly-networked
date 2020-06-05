@@ -42,17 +42,17 @@ def CreateLobby():
     return lobby
 
 #------------------------------New Networked Game Method------------------------------ 
-def NewNet(screen, clock):
-    font_60 = pygame.font.SysFont('Arial', 60)
-    mode_buts = [Button(237, 500, 250, 80, "Host", font_60),
-                Button(537, 500, 250, 80, "Connect", font_60)]
+def NewNet(mode, screen, clock):
+    font_48 = pygame.font.SysFont('Arial', 48)
+    
+    if mode == "Host":
+        lobby = CreateLobby()
+        ip_text = font_48.render("Your IP: " + socket.gethostbyname(socket.gethostname()), True, (0,0,0))
+        host_text = font_48.render("Host Name: " + socket.gethostname(), True, (0,0,0))
 
-    mode = ""
     newnet_running = True
     while newnet_running:
         for event in pygame.event.get():
-            for but in mode_buts:
-                but.handle_input_event(event)
             if event.type == pygame.QUIT:
                 newnet_running = False
                 gotoScreen = -1
@@ -63,20 +63,9 @@ def NewNet(screen, clock):
         
         screen.fill((255,255,255))
 
-        if mode == "":
-            for but in mode_buts:
-                but.render(screen)
-
-            if mode_buts[0].clicked():
-                mode = "Host"
-                lobby = CreateLobby()
-                ip_text = font_60.render("Your IP: " + socket.gethostbyname(socket.gethostname()), True, (0,0,0))
-
-            elif mode_buts[1].clicked():
-                mode = "Connect"
-        
         if mode == "Host":
             screen.blit(ip_text, [10, 10])
+            screen.blit(host_text, [10, 60])
 
         clock.tick(10) #10 fps
         pygame.display.flip() #Refresh screen
