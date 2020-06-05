@@ -11,6 +11,7 @@ from maingame import MainScreen
 from new import NewGame
 from pause import PauseMenu
 from newonoff import NewOnOff
+from newnet import NewNet
 
 #------------------------------Main Game Loop------------------------------
 clock = pygame.time.Clock()
@@ -26,8 +27,8 @@ screen = pygame.display.set_mode([1024,768]) #Create screen in fullscreen mode a
 pygame.display.set_caption('Dunfermline-opoly')
 screen.fill((255,255,255))
 
-pygame.mixer.music.load('music.mp3') #Load in and set background music to play endlessly
-pygame.mixer.music.play(-1)
+"""pygame.mixer.music.load('music.mp3') #Load in and set background music to play endlessly
+pygame.mixer.music.play(-1)"""
 
 mGame = None #Create blank object that will store the Game object
 while nextScreen != -1: #Main Game Loop
@@ -41,7 +42,7 @@ while nextScreen != -1: #Main Game Loop
         mGame, nextScreen = Leaderboards(mGame, screen, clock)
     elif nextScreen == 4: #Pause Menu
         mGame, nextScreen = PauseMenu(mGame, screen, clock)
-    elif nextScreen == 5: #Will be menu for starting a multiplayer game, yet to be implemented.#
-        nextScreen = -1 #Prevents getting stuck in an infinite loop
+    elif nextScreen == 5: #Menu for starting a multiplayer game, currently in development
+        nextScreen = NewNet(screen, clock)
     
 pygame.quit() #Quits the pygame module and hence the GUI
