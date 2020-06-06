@@ -16,7 +16,7 @@ from newnet import NewNet
 #------------------------------Main Game Loop------------------------------
 clock = pygame.time.Clock()
 LoadScreen(clock)
-nextScreen, mode = NewOnOff(clock)
+nextScreen = NewOnOff(clock)
 
 user32 = ctypes.windll.user32
 screen_w = user32.GetSystemMetrics(0)
@@ -43,6 +43,6 @@ while nextScreen != -1: #Main Game Loop
     elif nextScreen == 4: #Pause Menu
         mGame, nextScreen = PauseMenu(mGame, screen, clock)
     elif nextScreen == 5: #Menu for starting a multiplayer game, currently in development
-        nextScreen = NewNet(mode, screen, clock)
+        nextScreen = NewNet(screen, clock)
     
 pygame.quit() #Quits the pygame module and hence the GUI
