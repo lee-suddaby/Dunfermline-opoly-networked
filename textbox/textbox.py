@@ -25,6 +25,7 @@ class TextBox(object):
         self.back_timer = 0.0
         self.del_press = False
         self.del_timer = 0.0
+        self.visible = True
         self.process_kwargs(kwargs)
 
     def process_kwargs(self,kwargs):
@@ -49,6 +50,13 @@ class TextBox(object):
     def getContents(self):
         return "".join(self.buffer)
     
+    def show(self):
+        self.visible = False
+    
+    def hide(self):
+        self.visible = False
+        self.active = False
+
     def get_event(self,event):
         if event.type == pg.KEYDOWN and self.active:
             if event.key != pg.K_BACKSPACE:
@@ -100,7 +108,7 @@ class TextBox(object):
                         self.key_timer = pg.time.get_ticks()
                         self.key_cur = event.key
                         self.key_unicode = event.unicode
-        elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+        elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1 and self.visible:
             self.active = self.rect.collidepoint(event.pos)
 
     def execute(self):
