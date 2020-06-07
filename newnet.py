@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 import socket
 import Pyro4
+import numpy as np
 
 from cls import Button
 from textbox import TextBox
@@ -25,6 +26,16 @@ def renderLobby(screen, lobby, x, y, font_tit, font_det):
         cur_name = font_det.render(lobby_ren[i][1], True, (0,0,0))
         screen.blit(cur_ip, [x, y+50+30*i])
         screen.blit(cur_name, [x+200, y+50+30*i])
+
+def renderPieces(screen, pieces, lobby, x, y):
+    conns = lobby.getUsedPieces()
+    for i in range(6):
+        screen.blit(pieces[i], [x + 110*(i%2), y + 110*int(i/2)])
+        for piece in conns:
+            if piece-1 == i: #Piece is already chosen
+                overlay = pygame.Surface((100,100), pygame.SRCALPHA)
+                overlay.fill((255,255,255,196))
+                screen.blit(overlay, [x + 110*(i%2), y + 110*int(i/2)]) #Semi-transparent overlay to indicate unavailable piece
 
 #------------------------------New Networked Game Method------------------------------ 
 def NewNet(screen, clock):
@@ -56,7 +67,9 @@ def NewNet(screen, clock):
         if not name_box.visible: #Player has entered name; show lobby and following game setup
             screen.blit(ip_text, [10, 10])
             screen.blit(host_text, [10, 60])
+            screen.blit(choose_text, [600, 110])
             renderLobby(screen, lobby, 10, 110, font_40, font_28)
+            renderPieces(screen, pieces, lobby, 600, 160)
 
         if name_box.visible: #Player is entering name
             name_box.update()
@@ -67,12 +80,18 @@ def NewNet(screen, clock):
         if name_button.clicked():
             #Determine if the name entered is valid. Will try and do something to prevent duplicate naming...
             if not("," in name_box.getContents()) and len(name_box.getContents()) <=  12: #Name is valid
+                #Display your IP and name, and connect to server using Pyro4 module
                 ip_text = font_48.render("Your IP: " + socket.gethostbyname(socket.gethostname()), True, (0,0,0))
                 host_text = font_48.render("Your Name: " + name_box.getContents(), True, (0,0,0))
                 lobby = Pyro4.Proxy("PYRONAME:dfo.lobby")
                 lobby.connect(socket.gethostbyname(socket.gethostname()), name_box.getContents())
 
                 name_box.hide()
+
+                choose_text = font_40.render("Choose Your Piece:", True, (0,0,0))
+                pieces = np.array([None] * 6) #Load 6 available player pieces
+                for p_counter in range(6):
+                    pieces[p_counter] = pygame.transform.smoothscale(pygame.image.load("img/Pieces/" + str(p_counter+1) + ".png"), [100, 100]) #Load image into pygame and resize
 
         clock.tick(10) #10 fps
         pygame.display.flip() #Refresh screen

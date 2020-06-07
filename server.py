@@ -19,6 +19,12 @@ class Lobby():
     def getConns(self):
         return self.conns
 
+    def getUsedPieces(self):
+        used = []
+        for conn in self.conns:
+            used.append(conn.getPiece())
+        return used
+
     def connect(self, c_ip, c_name):
         for conn in self.conns:
             if conn.getIP() == c_ip: #Avoids duplicate connections:
@@ -35,17 +41,32 @@ class Lobby():
                 self.conns.pop(i)
                 return "Successfully disconnected"
         return "IP not found. Was never connected"
+    
+    def setPiece(self, c_ip, c_piece):
+        for conn in self.conns:
+            if conn.getIP() == c_ip:
+                conn.setPiece(c_piece)
+                return
+        return "IP not found"
+        
 
 class Conn():
     def __init__(self, c_ip, c_name):
         self.conn_ip = c_ip
         self.conn_name = c_name
+        self.conn_piece = 0
     
     def getIP(self):
         return self.conn_ip
     
     def getName(self):
         return self.conn_name
+    
+    def getPiece(self):
+        return self.conn_piece
+    
+    def setPiece(self, piece_num):
+        self.conn_piece = piece_num
 
 
 #------------------------------Main Server Setup------------------------------ 
