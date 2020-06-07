@@ -101,7 +101,7 @@ def PauseMenu(mainGame, screen, clock):
                 mainGame.save_path = save_file_box.getContents() #Update save file within the Game object
                 mainGame.saveGame() #Save the game in the newly entered file
 
-        if pause_buts[6].clicked(): #Button for toggline autosave feature on/off
+        if pause_buts[6].clicked(): #Button for toggling autosave feature on/off
             mainGame.autosave = not mainGame.autosave #Toggle the boolean value of autosave
             if mainGame.autosave:
                 pause_buts[6].updateCap("Disable")
@@ -113,20 +113,20 @@ def PauseMenu(mainGame, screen, clock):
             pause_menu_running = False #This screen no longer running
             gotoScreen = -1 #Don't go to any other screen (i.e. exit completely)
 
-        if pause_buts[1].clicked():
+        if pause_buts[1].clicked(): #Exit without saving
             pause_menu_running = False #This screen no longer running
             gotoScreen = -1 #Don't go to any other screen (i.e. exit completely)
 
-        if pause_buts[2].clicked():
+        if pause_buts[2].clicked(): #Save and restart
             mainGame.saveGame() #Save the game
             pause_menu_running = False #This screen no longer running
             gotoScreen = 0
 
-        if pause_buts[3].clicked():
+        if pause_buts[3].clicked(): #Restart without saving
             pause_menu_running = False #This screen no longer running
             gotoScreen = 0 #Goto new game screen
 
-        if pause_buts[4].clicked():
+        if pause_buts[4].clicked(): #Resume
             pause_menu_running = False
             gotoScreen = 1
 

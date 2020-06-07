@@ -28,7 +28,7 @@ pygame.display.set_caption('Dunfermline-opoly')
 screen.fill((255,255,255))
 
 """pygame.mixer.music.load('music.mp3') #Load in and set background music to play endlessly
-pygame.mixer.music.play(-1)"""
+pygame.mixer.music.play(-1)""" #Turned off while I'm developing this. Perhaps indefinitely if it turns out to be annoying enough.
 
 mGame = None #Create blank object that will store the Game object
 while nextScreen != -1: #Main Game Loop
@@ -44,5 +44,7 @@ while nextScreen != -1: #Main Game Loop
         mGame, nextScreen = PauseMenu(mGame, screen, clock)
     elif nextScreen == 5: #Menu for starting a multiplayer game, currently in development
         nextScreen = NewNet(screen, clock)
+    """elif nextScreen == 6: #Choose whether a new game is offline or networked (online)
+        nextScreen = NewOnOff(clock)"""
     
 pygame.quit() #Quits the pygame module and hence the GUI

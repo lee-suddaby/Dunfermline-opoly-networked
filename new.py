@@ -356,7 +356,6 @@ def NewGame(screen, clock):
         
         for box in box_arr:
             box.update() #To do with internal workings - take clicks, key pressed etc. into account
-        for box in box_arr:
             box.draw(screen)   #Display the boxes on screen - one of the TextBox classes methods 
         save_path_box.update() #Do the same as above but for the object that is not part of the array
         save_path_box.draw(screen)
