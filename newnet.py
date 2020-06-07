@@ -4,6 +4,7 @@ import socket
 import Pyro4
 
 from cls import Button
+from textbox import TextBox
 
 #------------------------------New Networked Game Functions------------------------------ 
 def dim(a): #Function to determine the dimensions of a python list
@@ -31,14 +32,17 @@ def NewNet(screen, clock):
     font_40 = pygame.font.SysFont('Arial', 40)
     font_28 = pygame.font.SysFont('Arial', 28)
 
-    ip_text = font_48.render("Your IP: " + socket.gethostbyname(socket.gethostname()), True, (0,0,0))
-    host_text = font_48.render("Your Name: " + socket.gethostname(), True, (0,0,0))
-    lobby = Pyro4.Proxy("PYRONAME:dfo.lobby")
-    lobby.connect(socket.gethostbyname(socket.gethostname()), socket.gethostname())
+    name_box = TextBox((320, 400, 380, 50), clear_on_enter=True, inactive_on_enter=True, active=True, active_color=pygame.Color("red"))
+    name_text = font_48.render("Enter your Name (max 12 chars, no commas):", True, (0,0,0))
+    n_width, n_height = font_48.size("Enter your Name (max 12 chars, no commas):")
+    name_button = Button(400, 460, 200, 80, "Confirm", font_48)
 
     newnet_running = True
     while newnet_running:
         for event in pygame.event.get():
+            if name_box.visible:
+                name_box.get_event(event)
+                name_button.handle_input_event(event)
             if event.type == pygame.QUIT:
                 newnet_running = False
                 gotoScreen = -1
@@ -48,9 +52,27 @@ def NewNet(screen, clock):
                     gotoScreen = -1 #Game will completely exit
         
         screen.fill((255,255,255))
-        screen.blit(ip_text, [10, 10])
-        screen.blit(host_text, [10, 60])
-        renderLobby(screen, lobby, 10, 110, font_40, font_28)
+
+        if not name_box.visible: #Player has entered name; show lobby and following game setup
+            screen.blit(ip_text, [10, 10])
+            screen.blit(host_text, [10, 60])
+            renderLobby(screen, lobby, 10, 110, font_40, font_28)
+
+        if name_box.visible: #Player is entering name
+            name_box.update()
+            name_box.draw(screen)
+            name_button.render(screen)
+            screen.blit(name_text, [(1024-n_width)/2, 335])
+        
+        if name_button.clicked():
+            #Determine if the name entered is valid. Will try and do something to prevent duplicate naming...
+            if not("," in name_box.getContents()) and len(name_box.getContents()) <=  12: #Name is valid
+                ip_text = font_48.render("Your IP: " + socket.gethostbyname(socket.gethostname()), True, (0,0,0))
+                host_text = font_48.render("Your Name: " + name_box.getContents(), True, (0,0,0))
+                lobby = Pyro4.Proxy("PYRONAME:dfo.lobby")
+                lobby.connect(socket.gethostbyname(socket.gethostname()), name_box.getContents())
+
+                name_box.hide()
 
         clock.tick(10) #10 fps
         pygame.display.flip() #Refresh screen
