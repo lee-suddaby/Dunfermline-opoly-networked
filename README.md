@@ -1,5 +1,5 @@
 # Dunfermline-opoly
-It's in the title: Monopoly recreated around the scottish town of Dunfermline. Made for an AH computing science project.
+It's in the title: Monopoly recreated around the scottish town of Dunfermline. Made for an AH computing science project. **PLEASE NOTE THIS IS CURRENTLY IN DEVELOPMENT**
 
 ## Running the Game
 Clone/download the repository, which contains all data files and all assets that the game requires. Run `main.py` and install any mising modules via pip. Then you should be good to go.
