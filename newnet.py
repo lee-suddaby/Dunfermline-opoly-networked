@@ -24,8 +24,8 @@ def drawCheck(screen, x, y, w, h):
 def drawCross(screen, x, y, w, h):
     draw_screen = pygame.Surface((100, 100))
     draw_screen.fill((255,255,255))
-    pygame.draw.line(draw_screen, (0,0,0), [0, 0], [100, 100], 10) #Display two lines corresponding to the two lines of the cross (x)
-    pygame.draw.line(draw_screen, (0,0,0), [0, 100], [100, 0], 10)
+    pygame.draw.line(draw_screen, (0,0,0), [5, 5], [95, 95], 10) #Display two lines corresponding to the two lines of the cross (x)
+    pygame.draw.line(draw_screen, (0,0,0), [5, 95], [95, 5], 10)
     draw_screen = pygame.transform.smoothscale(draw_screen, [w, h])
     screen.blit(draw_screen, [x, y])
 
@@ -69,12 +69,12 @@ def renderPieces(screen, pieces, lobby, x, y, choose_text):
     screen.blit(choose_text, [x, y-50])
     conns = lobby.getUsedPieces()
     for i in range(6):
-        screen.blit(pieces[i], [x + 110*(i%2), y + 110*int(i/2)])
+        screen.blit(pieces[i], [x + 110*(i%3), y + 110*int(i/3)])
         for piece in conns:
             if piece-1 == i: #Piece is already chosen
                 overlay = pygame.Surface((100,100), pygame.SRCALPHA)
                 overlay.fill((255,255,255,196))
-                screen.blit(overlay, [x + 110*(i%2), y + 110*int(i/2)]) #Semi-transparent overlay to indicate unavailable piece
+                screen.blit(overlay, [x + 110*(i%3), y + 110*int(i/3)]) #Semi-transparent overlay to indicate unavailable piece
 
 #------------------------------New Networked Game Method------------------------------ 
 def NewNet(screen, clock):
@@ -82,10 +82,10 @@ def NewNet(screen, clock):
     font_40 = pygame.font.SysFont('Arial', 40)
     font_28 = pygame.font.SysFont('Arial', 28)
 
-    pieces_x = 400
-    pieces_y = 410
+    pieces_x = 350
+    pieces_y = 450
 
-    name_box = TextBox((320, 400, 380, 50), clear_on_enter=True, inactive_on_enter=True, active=True, active_color=pygame.Color("red"))
+    name_box = TextBox((320, 400, 380, 50), clear_on_enter=False, inactive_on_enter=True, active=True, active_color=pygame.Color("red"))
     name_text = font_48.render("Enter your Name (max 12 chars, no commas):", True, (0,0,0))
     n_width, n_height = font_48.size("Enter your Name (max 12 chars, no commas):")
     name_button = Button(400, 460, 200, 80, "Confirm", font_48)
@@ -93,7 +93,7 @@ def NewNet(screen, clock):
     piece_rects = [None] * 6
     piece_imgs_lobby = [None] * 6
     for n in range(6):
-        piece_rects[n] = pygame.Rect(pieces_x + 110*(n%2), pieces_y + 110*int(n/2), 100, 100)
+        piece_rects[n] = pygame.Rect(pieces_x + 110*(n%3), pieces_y + 110*int(n/3), 100, 100)
         piece_imgs_lobby[n] = pygame.transform.smoothscale(pygame.image.load("img/Pieces/" + str(n+1) + ".png"), [30, 30])
 
     choose_text = font_40.render("Choose Your Piece:", True, (0,0,0))

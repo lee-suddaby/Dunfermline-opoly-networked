@@ -51,7 +51,23 @@ class Lobby():
                 conn.setPiece(c_piece)
                 return
         return "IP not found"
-        
+    
+    def readyUp(self, c_ip):
+        for conn in self.conns:
+            if conn.getIP() == c_ip:
+                conn.ReadyUp()
+                return
+        return "IP not found"
+    
+    def readyToStart(self, c_ip):
+        for conn in self.conns:
+            if conn.getIP() == c_ip:
+                if conn.getReadyUp():
+                    conn.ReadyToStart()
+                    return
+                else:
+                    "Must Ready Up first"
+        return "IP not found"
 
 class Conn():
     def __init__(self, c_ip, c_name):

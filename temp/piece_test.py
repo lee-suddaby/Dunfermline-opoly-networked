@@ -11,3 +11,5 @@ lobby.connect("192.168.1.759", "Test5")
 lobby.setPiece("192.168.1.755", 1)
 lobby.setPiece("192.168.1.756", 2)
 lobby.setPiece("192.168.1.757", 3)
+
+lobby.readyUp("192.168.1.755")
