@@ -10,11 +10,13 @@ class Lobby():
         self.max_conns = 6
 
     def getLobby(self):
-        ret_lobby = [[0 for x in range(3)] for y in range(len(self.conns))]
+        ret_lobby = [[0 for x in range(5)] for y in range(len(self.conns))]
         for i in range(len(self.conns)):
             ret_lobby[i][0] = self.conns[i].getIP()
             ret_lobby[i][1] = self.conns[i].getName()
             ret_lobby[i][2] = self.conns[i].getPiece()
+            ret_lobby[i][3] = self.conns[i].getReadyUp()
+            ret_lobby[i][4] = self.conns[i].getStartGame()
         return ret_lobby
 
     def getConns(self):
@@ -56,6 +58,8 @@ class Conn():
         self.conn_ip = c_ip
         self.conn_name = c_name
         self.conn_piece = 0
+        self.ready_up = False
+        self.start_game = False
     
     def getIP(self):
         return self.conn_ip
@@ -68,6 +72,18 @@ class Conn():
     
     def setPiece(self, piece_num):
         self.conn_piece = piece_num
+    
+    def getReadyUp(self):
+        return self.ready_up
+    
+    def ReadyUp(self):
+        self.ready_up = True
+    
+    def getStartGame(self):
+        return self.start_game
+    
+    def ReadyToStart(self):
+        self.start_game = True
 
 
 #------------------------------Main Server Setup------------------------------ 
