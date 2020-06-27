@@ -10,10 +10,11 @@ class Lobby():
         self.max_conns = 6
 
     def getLobby(self):
-        ret_lobby = [[0 for x in range(2)] for y in range(len(self.conns))]
+        ret_lobby = [[0 for x in range(3)] for y in range(len(self.conns))]
         for i in range(len(self.conns)):
             ret_lobby[i][0] = self.conns[i].getIP()
             ret_lobby[i][1] = self.conns[i].getName()
+            ret_lobby[i][2] = self.conns[i].getPiece()
         return ret_lobby
 
     def getConns(self):
