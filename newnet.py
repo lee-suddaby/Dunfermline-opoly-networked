@@ -105,7 +105,15 @@ def NewNet(screen, clock):
     pieces_large = np.array([None] * 6) #Load 6 available player pieces
     for p_counter in range(6):
         pieces_large[p_counter] = pygame.transform.smoothscale(pygame.image.load("img/Pieces/" + str(p_counter+1) + ".png"), [100, 100]) #Load image into pygame and resize
-                
+
+    # Some setup code that was previously run while the screen was active.
+    # Having it here instead streamlines things a bit.    
+    ip_text = font_48.render("Your IP: " + socket.gethostbyname(socket.gethostname()), True, (0,0,0))
+    lobby = Pyro4.Proxy("PYRONAME:dfo.lobby")
+
+    waiting_texts = [font_48.render("Waiting to start.", True, (0,0,0)),
+                     font_48.render("Waiting to start..", True, (0,0,0)),
+                     font_48.render("Waiting to start...", True, (0,0,0))]
 
     newnet_running = True
     piece_choice = -1
@@ -147,6 +155,9 @@ def NewNet(screen, clock):
                 renderPieces(screen, pieces_large, lobby, pieces_x, pieces_y, choose_text)
             ready_up_but.render(screen)
             start_game_but.render(screen)
+            
+            if start_game:
+                screen.blit(waiting_texts[int(pygame.time.get_ticks()/500) % 3], [375, 460])
 
         if name_box.visible: #Player is entering name
             name_box.update()
@@ -156,11 +167,9 @@ def NewNet(screen, clock):
         
         if name_button.clicked():
             #Determine if the name entered is valid. Will try and do something to prevent duplicate naming...
-            if not("," in name_box.getContents()) and len(name_box.getContents()) <=  12: #Name is valid
+            if not("," in name_box.getContents()) and len(name_box.getContents()) <=  12 and len(name_box.getContents()) != 0: #Name is valid
                 #Display your IP and name, and connect to server using Pyro4 module
-                ip_text = font_48.render("Your IP: " + socket.gethostbyname(socket.gethostname()), True, (0,0,0))
                 host_text = font_48.render("Your Name: " + name_box.getContents(), True, (0,0,0))
-                lobby = Pyro4.Proxy("PYRONAME:dfo.lobby")
                 lobby.connect(socket.gethostbyname(socket.gethostname()), name_box.getContents())
 
                 name_box.hide()
@@ -170,9 +179,9 @@ def NewNet(screen, clock):
         if piece_choice != -1 and name_chosen:
             if not(piece_choice+1 in lobby.getUsedPieces()):
                 lobby.setPiece(socket.gethostbyname(socket.gethostname()), piece_choice+1)
+                piece_chosen = True
+                ready_up_but.showBut()
             piece_choice = -1
-            piece_chosen = True
-            ready_up_but.showBut()
 
         if ready_up_but.clicked():
             lobby.readyUp(socket.gethostbyname(socket.gethostname()))
