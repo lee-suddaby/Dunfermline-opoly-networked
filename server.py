@@ -68,6 +68,18 @@ class Lobby():
                 else:
                     "Must Ready Up first"
         return "IP not found"
+    
+    def allReadyUp(self):
+        for conn in self.conns:
+            if not conn.getReadyUp():
+                return False
+        return True
+    
+    def allReadyToStart(self):
+        for conn in self.conns:
+            if not conn.getStartGame():
+                return False
+        return True
 
 class Conn():
     def __init__(self, c_ip, c_name):

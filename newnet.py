@@ -90,6 +90,11 @@ def NewNet(screen, clock):
     n_width, n_height = font_48.size("Enter your Name (max 12 chars, no commas):")
     name_button = Button(400, 460, 200, 80, "Confirm", font_48)
 
+    ready_up_but = Button(400, 460, 200, 80, "Ready Up", font_48)
+    start_game_but = Button(400, 460, 200, 80, "Start Game", font_48)
+    ready_up_but.hideBut()
+    start_game_but.hideBut()
+
     piece_rects = [None] * 6
     piece_imgs_lobby = [None] * 6
     for n in range(6):
@@ -106,11 +111,16 @@ def NewNet(screen, clock):
     piece_choice = -1
     piece_chosen = False
     name_chosen = False
+    ready_up = False
+    start_game = False
     while newnet_running:
         for event in pygame.event.get():
             if name_box.visible:
                 name_box.get_event(event)
                 name_button.handle_input_event(event)
+            ready_up_but.handle_input_event(event)
+            start_game_but.handle_input_event(event)
+
             if event.type == pygame.QUIT:
                 newnet_running = False
                 gotoScreen = -1
@@ -135,6 +145,8 @@ def NewNet(screen, clock):
             renderLobby(screen, lobby, 10, 110, font_40, font_28, piece_imgs_lobby)
             if not piece_chosen:
                 renderPieces(screen, pieces_large, lobby, pieces_x, pieces_y, choose_text)
+            ready_up_but.render(screen)
+            start_game_but.render(screen)
 
         if name_box.visible: #Player is entering name
             name_box.update()
@@ -153,13 +165,28 @@ def NewNet(screen, clock):
 
                 name_box.hide()
                 name_chosen = True
+                name_button.hideBut()
 
         if piece_choice != -1 and name_chosen:
             if not(piece_choice+1 in lobby.getUsedPieces()):
                 lobby.setPiece(socket.gethostbyname(socket.gethostname()), piece_choice+1)
             piece_choice = -1
             piece_chosen = True
+            ready_up_but.showBut()
 
+        if ready_up_but.clicked():
+            lobby.readyUp(socket.gethostbyname(socket.gethostname()))
+            ready_up = True
+            ready_up_but.hideBut()
+
+        if start_game_but.clicked():
+            lobby.readyToStart(socket.gethostbyname(socket.gethostname()))
+            start_game = True
+            start_game_but.hideBut()
+
+        if not start_game and name_chosen and not start_game_but.visible and ready_up:
+            if lobby.allReadyUp():
+                start_game_but.showBut()
 
         clock.tick(10) #10 fps
         pygame.display.flip() #Refresh screen
