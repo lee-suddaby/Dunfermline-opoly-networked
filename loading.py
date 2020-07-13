@@ -6,7 +6,7 @@ import os
 import ctypes #For getting screen dimensions
 
 from anigif import AnimatedGif
-from cls import Button
+from button import Button
 from lib import getFileLines
 
 #------------------------------Loading Screen functions------------------------------ 

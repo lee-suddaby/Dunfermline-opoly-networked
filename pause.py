@@ -5,6 +5,7 @@ import os
 from textbox import TextBox
 from msgbox import MessageBox
 from cls import *
+from button import Button
 
 #------------------------------Pause Menu Method------------------------------ 
 def PauseMenu(mainGame, screen, clock):

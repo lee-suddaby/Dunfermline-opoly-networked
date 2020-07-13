@@ -4,6 +4,7 @@ from copy import copy #Used when swapping and copy objects in arrays (e.g. the 2
 import numpy as np
 
 from cls import *
+from button import Button
 from lib import getObtainMon, displayButtonRect
 from msgbox import MessageBox
 

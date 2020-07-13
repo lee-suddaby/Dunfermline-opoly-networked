@@ -3,7 +3,7 @@ from pygame.locals import *
 import ctypes
 import os
 
-from cls import Button
+from button import Button
 
 # Player chooses whether a new game will be online or played over a network
 def NewOnOff(clock): 
