@@ -46,20 +46,10 @@ class Normal_Property(Property): #Create as subclass of Property
         self.CH_cost = int(vals[8])
         self.TB_cost = int(vals[9])
         self.mortgage_val = int(vals[10])
-        self.title_deed = new_deed #Image storing the title deed for the property
-        self.mortgage_deed = new_mdeed  #Image for the title deed to be shown when the property is mortgaged
-        #Pygame colour linked to the group. 2 or 3 properties on the board will share one
-        self.group_col = pygame.Color(int(vals[11]), int(vals[12]), int(vals[13]), 0) #Sets up the colour so that pygame recognises it as a RGB colour sequence, rather than an array of 3 numbers, as could potentially happen without
         self.C_Houses = 0
         self.T_Blocks = 0
         self.prop_owner = -1 #Numerical identifier of the player who owns it. -1 if unowned
         self.mortgage_status = False #Boolean for whether the property is mortgaged or not. False = not mortgaged
-        
-    def getTitleDeed(self):
-        if self.mortgage_status:
-            return self.mortgage_deed
-        else:
-            return self.title_deed
 
     #Determine how much rent should be paid based on CH and TB owned
     def getRent(self):
@@ -107,16 +97,8 @@ class School_Property(Property):
         self.rent_vals = np.array([0] * 4)
         for counter in range(4):
             self.rent_vals[counter] = int(vals[counter+2])
-        self.title_deed = new_deed
-        self.mortgage_deed = new_mdeed
         self.prop_owner = -1
         self.mortgage_status = False
-
-    def getTitleDeed(self):
-        if self.mortgage_status:
-            return self.mortgage_deed
-        else:
-            return self.title_deed
 
     def getRent(self, board, playerNo): #propArr is an array of Property classes (including subclasses of it)
         #Counting occurrences algorithm, to count how many schools (including this one) are owned by a specific player
@@ -147,16 +129,8 @@ class Station_Property(Property):
         self.rent_mods = np.array([0] * 2)
         for counter in range(2):
             self.rent_mods[counter] = int(vals[counter+2])
-        self.title_deed = new_deed
-        self.mortgage_deed = new_mdeed
         self.prop_owner = -1
         self.mortgage_status = False
-
-    def getTitleDeed(self):
-        if self.mortgage_status:
-            return self.mortgage_deed
-        else:
-            return self.title_deed
 
     def getRent(self, board, playerNo, diceRoll): #propArr is an array of Property classes (including subclasses of it)
         #Counting occurrences algorithm, to count how many schools (including this one) are owned by a specific player
@@ -181,6 +155,9 @@ class Charge_Property(Property):
     def __init__(self, new_title, new_charge):
         Property.__init__(self, new_title, Prop_Type.PAYMENT) #Initialise superclass first
         self.surcharge = int(new_charge)
+    
+    def getCharge(self):
+        return self.surcharge
 
 
 #------------------------------Go To Bogside Property Subclass------------------------------ 
@@ -189,3 +166,6 @@ class Go_To_Bogside(Property):
     def __init__(self, new_title, new_pos):
         Property.__init__(self, new_title, Prop_Type.GO_TO_BOGSIDE) #Initialise superclass first
         self.bogside_pos = new_pos
+    
+    def getBogsidePos(self):
+        return self.bogside_pos
