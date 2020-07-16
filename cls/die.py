@@ -3,7 +3,7 @@ import random
 #------------------------------Dice Class------------------------------
 #Images and current state data for a single die.
 class Die:
-    def __init__(self, imgArr): #Simple constructor
+    def __init__(self): #Simple constructor
         self.cur_score = 0
 
     def roll(self):

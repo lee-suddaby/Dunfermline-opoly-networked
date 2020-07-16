@@ -9,13 +9,12 @@ class Board:
         self.properties = np.array(new_props) #Objects of various subclasses of the Property superclass
         self.max_pos = len(new_props) - 1 #Highest position (when zero-indexed) that a player can be on; also highest indexed element in properties array
         self.bogside_pos = new_jpos
-        self.JC_Money = new_JCmon 
+        self.JC_Money = new_JCmon
         self.PL_Deck = new_PL #Card_Deck object
         self.CC_Deck = new_CC #Card_Deck object
 
     def getProp(self,b_pos):
         return self.properties[b_pos]
-        #Checks if the group to which a certain property belongs 
 
     def wholeGroupOwned(self, player_num, prop_num):
         if self.getProp(prop_num).prop_type != Prop_Type.NORMAL:

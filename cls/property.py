@@ -35,7 +35,7 @@ class Prop_Type(Enum):
 class Normal_Property(Property): #Create as subclass of Property
     #Constructor
     #Vals is an array where each element is one of the comma-separated values read on from the data file (where each property was stored on one line)
-    def __init__(self, vals, new_deed, new_mdeed):
+    def __init__(self, vals):
         Property.__init__(self, vals[0], Prop_Type.NORMAL) #Initialise superclass first with the two values it takes in its constructor
         self.cost = int(vals[1])
         self.rentNo = int(vals[2])
@@ -90,7 +90,7 @@ class Normal_Property(Property): #Create as subclass of Property
 #Schools determine rent based off of how many of them are owned by the one player
 class School_Property(Property):
     #Constructor - vals array works in the same way as it does for the NormalProperty class
-    def __init__(self, vals, new_deed, new_mdeed):
+    def __init__(self, vals):
         Property.__init__(self, vals[0], Prop_Type.SCHOOL) #Initialise superclass first
         self.cost = int(vals[1])
         self.mortgage_val = int(vals[6])
@@ -122,7 +122,7 @@ class School_Property(Property):
 #This time, rents are determined based on the current score on the dice, and whether one or both stations are owned
 class Station_Property(Property):
     #Constructor - vals array works in the same way as it does for the NormalProperty class
-    def __init__(self, vals, new_deed, new_mdeed):
+    def __init__(self, vals):
         Property.__init__(self, vals[0], Prop_Type.STATION) #Initialise superclass first
         self.cost = int(vals[1])
         self.mortgage_val = int(vals[4])

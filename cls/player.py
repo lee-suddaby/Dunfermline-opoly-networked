@@ -3,10 +3,10 @@
 class Player:
     #Constructor for Player class
     #I'm going to guess this is relatively self-explanatory - it is called when the class in instantiated (creating an object) and sets up the instance variables of the new object
-    def __init__(self, initial_money, new_piece, new_pos, new_name, new_in_jail=False, new_active=True):
+    def __init__(self, initial_money, new_piece_num, new_pos, new_name, new_in_jail=False, new_active=True):
         #Last 2 parameters are optional so they can be changed when loading in data, for example
         self.player_pos = new_pos
-        self.player_piece_num = new_piece
+        self.player_piece_num = new_piece_num
         self.player_name = new_name
         self.player_money = initial_money
         self.player_inJail = new_in_jail
