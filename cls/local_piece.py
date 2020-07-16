@@ -1,6 +1,6 @@
 #------------------------------Player Piece Class------------------------------
 #Data etc. for interacting with the player's graphical token.
-class Player_Piece:
+class LocalPlayer_Piece:
     def __init__(self, new_x, new_y, new_img, new_num):
         self.piece_x = new_x
         self.piece_y = new_y
