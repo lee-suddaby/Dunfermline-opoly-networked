@@ -5,16 +5,12 @@ from .property import Prop_Type
 #------------------------------Game Class------------------------------
 #Brings all the game data together into one cohesive object that can be controlled more easily than all other data/objects independently
 class Game:
-    def __init__(self, new_players, new_dice, new_board, new_save, new_auto=True):
+    def __init__(self, new_players, new_dice, new_board):
         self.players = np.array(new_players) #The 2-6 players of the game
         self.dice = np.array(new_dice) #Game's two dice
         self.cur_player = 0 #Index of current player in he players array
-        self.prop_thumbs = None #Will become an image object showing all properties owned by one player
         self.board = new_board
-        self.save_path = new_save #location of the game's save file
         self.controller = Game_Controller()
-        self.autosave = new_auto
-        self.pause = False #Whether the background music is paused of not
 
     def getCurPlayer(self):
         return self.players[self.cur_player]
@@ -27,8 +23,6 @@ class Game:
         self.controller.reset()
         if self.cur_player > len(self.players)-1:
             self.cur_player = 0 #Restart from first player
-            if self.autosave: #If game is set to autosave, it does so every time the player loop back to the first player
-                self.saveGame()
         if self.players[self.cur_player].player_turnsToMiss > 0 or self.players[self.cur_player].player_active == False:
             if self.players[self.cur_player].player_turnsToMiss > 0:
                 self.players[self.cur_player].setMissTurns(self.players[self.cur_player].player_turnsToMiss - 1) #Player is skipped; the number of turns still to be missed decrements
@@ -44,37 +38,11 @@ class Game:
                 ret_count += 1
         return ret_count
 
-    def getDie(self, num):
-        return self.dice[num]
+    def getDieScore(self, num):
+        return self.dice[num].cur_score
 
     def getDiceTotal(self): #Sum score on both dice
         return self.dice[0].cur_score + self.dice[1].cur_score
-
-    #Save all data required to restart the game at a later date to the game's save file
-    def saveGame(self):
-        #',' is used to separate data within lines
-        #'\n' is used to identify the end of a line, so that the next lot of data written to the file will be on a new line
-        #Booleans are saved as a 0 or 1, where 0 is false and 1 true. This is because bool('False') returns True, meaning that saving them as strings does not allow for them to be read in with any real amount of ease.
-        fh = open(self.save_path, 'w')
-        fh.write(str(self.cur_player) + ',' + str(len(self.players)) + ',' + str(int(self.autosave)) + '\n') #Save the game class data
-
-        for counter in range(len(self.players)):
-            cur_player = self.players[counter]
-            #Write all volatile data for the current player to a new line in the file
-            fh.write(cur_player.player_name + ',' + str(cur_player.player_money) + ',' + str(cur_player.player_pos) + ',' + str(cur_player.player_piece.piece_num) + ',' + str(int(cur_player.player_hasBogMap)) + ',' + str(cur_player.player_nextRollMod) + ',' + str(cur_player.player_turnsToMiss) + ',' + str(int(cur_player.player_active)) + ',' + str(int(cur_player.player_inJail)) + '\n')
-
-        for counter in range(self.board.max_pos+1):
-            if self.board.getProp(counter).prop_type == Prop_Type.NORMAL: #NORMAL properties have different attributes that change in-game
-                if self.board.getProp(counter).prop_owner != -1: #Nothing will have changed of the property is not owned
-                    #Write all important/changing data for a NORMAL property on a new line
-                    fh.write(str(counter) + ',' + str(self.board.getProp(counter).prop_owner) + ',' + str(self.board.getProp(counter).C_Houses) + ',' + str(self.board.getProp(counter).T_Blocks) + ',' + str(int(self.board.getProp(counter).mortgage_status)) + '\n')
-                    
-            if self.board.getProp(counter).prop_type == Prop_Type.SCHOOL or self.board.getProp(counter).prop_type == Prop_Type.STATION: #SCHOOL and STATION properties have slightly different changing attributes than NORMAL ones
-                if self.board.getProp(counter).prop_owner != -1: #Nothing will have changed of the property is not owned
-                    #Write all important/changing data for a SCHOOL or STATION property on a new line
-                    fh.write(str(counter) + ',' + str(self.board.getProp(counter).prop_owner) + ',' + str(int(self.board.getProp(counter).mortgage_status)) + '\n')
-                    
-        fh.close() #Close file
 
     def determineRent(self):
         ret_rent = 0
@@ -195,10 +163,11 @@ class Game_Controller:
         self.card_used = True #Is only false if a card is available for use. True even if a card has not been drawn during a particular turn
         self.may_buy = False #True is player can buy a buyable property if they are on it
         self.turn_rent = 0
-        self.cur_card = None #Pot Luck or Council Chest card drawn on a particular turn
+        self.cur_card_num = 0 #Pot Luck or Council Chest card drawn on a particular turn
+        self.cur_card_deck = None #PL for Pot Luck and CC for Council Chest
         self.cur_doubles = 0
-        self.roll_img1 = None #First dice image
-        self.roll_img2 = None #Second dice image
+        self.roll_num1 = 0 #First dice num
+        self.roll_num2 = 0 #Second dice num
         self.card_effs = [] #Integer effects of cur_card
         self.card_texts = [] #pygame-rendered texts telling the user the effects
 
@@ -207,9 +176,10 @@ class Game_Controller:
         self.card_used = True
         self.may_buy = False
         self.turn_rent = 0
-        self.cur_card = None
+        self.cur_card_num = 0
+        self.cur_card_deck = None
         self.cur_doubles = 0
-        self.roll_img1 = None
-        self.roll_img2 = None
+        self.roll_num1 = 0
+        self.roll_num2 = 0
         self.card_effs = []
         self.card_texts = []
