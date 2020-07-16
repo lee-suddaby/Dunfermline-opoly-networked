@@ -1,5 +1,3 @@
-from .player_piece import Player_Piece
-
 #------------------------------Game Player Class------------------------------
 #All data for a game player and its associated piece
 class Player:
@@ -8,7 +6,7 @@ class Player:
     def __init__(self, initial_money, new_piece, new_pos, new_name, new_in_jail=False, new_active=True):
         #Last 2 parameters are optional so they can be changed when loading in data, for example
         self.player_pos = new_pos
-        self.player_piece = new_piece
+        self.player_piece_num = new_piece
         self.player_name = new_name
         self.player_money = initial_money
         self.player_inJail = new_in_jail
@@ -16,6 +14,8 @@ class Player:
         self.player_nextRollMod = 1 #The reciprocal of this is used if a Card decreases the movement value of this player's next roll of the dice
         self.player_turnsToMiss = 0 #Number of turns they still have to come that they may not move for
         self.player_hasBogMap = False #Will become true if they collect a 'Map out of Bogside'
+        self.player_x = self.calcPieceX(self.player_pos)
+        self.player_y = self.calcPieceY(self.player_pos)
     
     def spendMoney(self, amount):
         self.player_money = self.player_money - amount
@@ -38,9 +38,6 @@ class Player:
         if self.player_pos > board.max_pos:
             self.player_pos = self.player_pos - (board.max_pos + 1)
             self.player_money = self.player_money + board.JC_Money #If player passes Job Centre, the collect the requisite amount of money
-        
-        self.player_piece.piece_x = self.calcPieceX(self.player_pos, board.board_sf)
-        self.player_piece.piece_y = self.calcPieceY(self.player_pos, board.board_sf)
 
     def setMissTurns(self, num):
         self.player_turnsToMiss = num
