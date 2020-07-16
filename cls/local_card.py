@@ -2,7 +2,7 @@ import numpy as np
 
 #------------------------------Card Class------------------------------
 #Used for storing the individual Pot Luck and Council Chest cards
-class Card:
+class LocalCard:
     def __init__(self, new_name, new_img, new_effects, new_nums): #Constructor
         self.card_name = new_name #Pot Luck or Council Chest card
         self.card_img = new_img #Pygame surface object (i.e. image)
