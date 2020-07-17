@@ -8,24 +8,24 @@ class Game:
     def __init__(self, new_players, new_dice, new_board):
         self.players = np.array(new_players) #The 2-6 players of the game
         self.dice = np.array(new_dice) #Game's two dice
-        self.cur_player = 0 #Index of current player in he players array
+        self.cur_player_num = 0 #Index of current player in he players array
         self.board = new_board
         self.controller = Game_Controller()
 
-    def getCurPlayer(self):
-        return self.players[self.cur_player]
+    def getCurPlayerNum(self):
+        return self.cur_player_num
     
     def getCurProp(self):
         return self.board.getProp(self.getCurPlayer().player_pos)
 
     def advancePlayer(self): #Next player's turn
-        self.cur_player += 1
+        self.cur_player_num += 1
         self.controller.reset()
-        if self.cur_player > len(self.players)-1:
-            self.cur_player = 0 #Restart from first player
-        if self.players[self.cur_player].player_turnsToMiss > 0 or self.players[self.cur_player].player_active == False:
-            if self.players[self.cur_player].player_turnsToMiss > 0:
-                self.players[self.cur_player].setMissTurns(self.players[self.cur_player].player_turnsToMiss - 1) #Player is skipped; the number of turns still to be missed decrements
+        if self.cur_player_num > len(self.players)-1:
+            self.cur_player_num = 0 #Restart from first player
+        if self.players[self.cur_player_num].player_turnsToMiss > 0 or self.players[self.cur_player_num].player_active == False:
+            if self.players[self.cur_player_num].player_turnsToMiss > 0:
+                self.players[self.cur_player_num].setMissTurns(self.players[self.cur_player_num].player_turnsToMiss - 1) #Player is skipped; the number of turns still to be missed decrements
             self.advancePlayer() #Recursively call function to try and advance to the player after the one missing a turn
 
     def getPlayer(self, p_num): #Return a specific player
@@ -47,7 +47,7 @@ class Game:
     def determineRent(self):
         ret_rent = 0
         if self.board.getProp(self.getCurPlayer().player_pos).prop_type == Prop_Type.NORMAL or self.board.getProp(self.getCurPlayer().player_pos).prop_type == Prop_Type.SCHOOL or self.board.getProp(self.getCurPlayer().player_pos).prop_type == Prop_Type.STATION: #If property actually has a rent attrubite(s)
-            if self.board.getProp(self.getCurPlayer().player_pos).prop_owner != -1 and self.board.getProp(self.getCurPlayer().player_pos).prop_owner != self.cur_player: #If the property is not unowned (i.e. owned) and not owned by current player
+            if self.board.getProp(self.getCurPlayer().player_pos).prop_owner != -1 and self.board.getProp(self.getCurPlayer().player_pos).prop_owner != self.cur_player_num: #If the property is not unowned (i.e. owned) and not owned by current player
                 if self.board.getProp(self.getCurPlayer().player_pos).prop_type == Prop_Type.NORMAL: #Normal Property
                     ret_rent = self.board.getProp(self.getCurPlayer().player_pos).getRent()
                     if self.board.wholeGroupOwned(self.board.getProp(self.getCurPlayer().player_pos).prop_owner, self.getCurPlayer().player_pos) and self.board.getProp(self.getCurPlayer().player_pos).C_Houses == 0:
@@ -77,7 +77,7 @@ class Game:
         if card_effects[2] != -1: #Player gets money from each other player
             pay_counter = 0 #No of players who have individually paid
             for counter in range(6):
-                if counter != self.cur_player: #Player cannot pay themselves
+                if counter != self.cur_player_num: #Player cannot pay themselves
                     try:
                         self.getPlayer(counter).spendMoney(card_effects[2])
                         pay_counter += 1
@@ -133,7 +133,7 @@ class Game:
             to_pay = 0
             for counter in range(self.board.max_pos+1):
                 if self.board.getProp(counter).prop_type == Prop_Type.NORMAL: #Only NORMAL properties acutually possess these upgrades
-                    if self.board.getProp(counter).prop_owner == self.cur_player: #The current property is owned by this player
+                    if self.board.getProp(counter).prop_owner == self.cur_player_num: #The current property is owned by this player
                         to_pay += card_effects[9] * (self.board.getProp(counter).C_Houses + self.board.getProp(counter).T_Blocks) #Sum the number of CH and TB
             self.getCurPlayer().spendMoney(to_pay)
         if card_effects[10] != -1: #Next dice roll's value is decreased
@@ -142,16 +142,51 @@ class Game:
             to_pay = 0
             for counter in range(self.board.max_pos+1):
                 if self.board.getProp(counter).prop_type == Prop_Type.NORMAL: #Only NORMAL properties acutually possess these upgrades
-                    if self.board.getProp(counter).prop_owner == self.cur_player: #The current property is owned by this player
+                    if self.board.getProp(counter).prop_owner == self.cur_player_num: #The current property is owned by this player
                         to_pay += card_effects[11] * self.board.getProp(counter).C_Houses #Sum the number of CH
             self.getCurPlayer().spendMoney(to_pay)
         if card_effects[12] != -1: #Pay a certain amount of money for each Tower Block only
             to_pay = 0
             for counter in range(self.board.max_pos+1):
                 if self.board.getProp(counter).prop_type == Prop_Type.NORMAL: #Only NORMAL properties acutually possess these upgrades
-                    if self.board.getProp(counter).prop_owner == self.cur_player: #The current property is owned by this player
+                    if self.board.getProp(counter).prop_owner == self.cur_player_num: #The current property is owned by this player
                         to_pay += card_effects[12] * self.board.getProp(counter).T_Blocks #Sum the number of TB
             self.getCurPlayer().spendMoney(to_pay)
+    
+
+    #--------------------Controller Returns--------------------
+    def getPlayer_rolled(self):
+        return self.controller.player_rolled
+    
+    def getCard_used(self):
+        return self.controller.card_used
+
+    def getMay_buy(self):
+        return self.controller.may_buy
+    
+    def getTurn_rent(self):
+        return self.controller.turn_rent
+
+    def getCur_card_num(self):
+        return self.controller.cur_card_num
+
+    def getCur_card_deck(self):
+        return self.controller.cur_card_deck
+
+    def getCur_doubles(self):
+        return self.controller.cur_doubles
+
+    def getRoll_num2(self):
+        return self.controller.roll_num1
+
+    def getRoll_num2(self):
+        return self.controller.roll_num2
+
+    def getCard_effs(self):
+        return self.controller.card_effs
+
+    def getCard_texts(self):
+        return self.controller.card_texts
 
 
 #------------------------------Game_Controller Class------------------------------
