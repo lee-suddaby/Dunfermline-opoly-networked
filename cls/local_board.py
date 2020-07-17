@@ -1,6 +1,6 @@
 import pygame
 import numpy as np
-from .property import Prop_Type
+from .local_property import Prop_Type
 
 #------------------------------Board Class------------------------------
 #Used for storing all data for properties, the two decks of cards, as well as a few other pieces of information such as money collected on passing the Job Centre
@@ -17,17 +17,6 @@ class LocalBoard:
         return self.properties[b_pos]
         #Checks if the group to which a certain property belongs 
 
-    def wholeGroupOwned(self, player_num, prop_num):
-        if self.getProp(prop_num).prop_type != Prop_Type.NORMAL:
-            return False
-        find_col = self.getProp(prop_num).group_col #Colour of the group whose coalescence of ownership is being investigated
-        for counter in range(self.max_pos + 1):
-            if self.getProp(counter).prop_type == Prop_Type.NORMAL: #Prevents errors as no other types have a Group Colour
-                if self.getProp(counter).group_col == find_col and self.getProp(counter).prop_owner != player_num:
-                    #This property is the same colour as the one that is being examined, however, the owner is different so this player cannot own the entire group
-                    return False
-        return True
-
     #Counts the number of properties that are a memeber of a certain property's 'colour group'
     def countGroupSize(self, player_num, prop_num):
         if self.getProp(prop_num).prop_type != Prop_Type.NORMAL: #Only NORMAL properties have a colour group
@@ -39,3 +28,9 @@ class LocalBoard:
                 if self.getProp(counter).group_col == find_col and self.getProp(counter).prop_owner == player_num:
                     group_count += 1
         return group_count
+
+    def getPLImg(self, card_num):
+        return self.PL_Deck[card_num]
+    
+    def getCCImg(self, card_num):
+        return self.CC_Deck[card_num]

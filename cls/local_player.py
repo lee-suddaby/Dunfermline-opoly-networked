@@ -7,6 +7,3 @@ class LocalPlayer:
     #I'm going to guess this is relatively self-explanatory - it is called when the class in instantiated (creating an object) and sets up the instance variables of the new object
     def __init__(self, new_piece):
         self.local_piece = new_piece
-    
-    def getPiece(self):
-        return self.local_piece

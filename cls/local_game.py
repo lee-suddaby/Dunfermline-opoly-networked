@@ -1,5 +1,10 @@
 import numpy as np
 
+from .local_board import LocalBoard
+from .local_die import LocalDie
+from .local_card_deck import LocalCard_Deck
+from .local_player import LocalPlayer
+
 #------------------------------Local Class------------------------------
 #Stores images and other objects that cannot be passed over a network via Pyro4.
 class LocalGame:
@@ -12,10 +17,4 @@ class LocalGame:
 
     def getDieImg(self, score, die_num):
         return self.local_die[die_num].getImg(score)
-    
-    def getPLImg(self, card_num):
-        return self.local_PL[card_num]
-    
-    def getCCImg(self, card_num):
-        return self.local_CC[card_num]
         
