@@ -50,6 +50,12 @@ class Normal_Property(Property): #Create as subclass of Property
         self.T_Blocks = 0
         self.prop_owner = -1 #Numerical identifier of the player who owns it. -1 if unowned
         self.mortgage_status = False #Boolean for whether the property is mortgaged or not. False = not mortgaged
+        self.group_R = int(vals[11])
+        self.group_G = int(vals[12])
+        self.group_B = int(vals[13])
+
+    def getGroupCol(self):
+        return pygame.Color(int(vals[11]), int(vals[12]), int(vals[13]), 0)
 
     #Determine how much rent should be paid based on CH and TB owned
     def getRent(self):

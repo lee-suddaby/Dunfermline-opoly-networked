@@ -57,8 +57,8 @@ class Game:
 
     def sendCurPlayerToBog(self, player_num):
         self.players[player_num].player_pos = self.board.bogside_pos #Move the player
-        self.players[player_num].player_piece.piece_x = self.players[0].calcPieceX(self.board.bogside_pos, self.board.board_sf)
-        self.players[player_num].player_piece.piece_y = self.players[0].calcPieceY(self.board.bogside_pos, self.board.board_sf)
+        self.players[player_num].player_x = self.players[0].calcPieceX(self.board.bogside_pos, self.board.board_sf)
+        self.players[player_num].player_y = self.players[0].calcPieceY(self.board.bogside_pos, self.board.board_sf)
         self.players[player_num].enterJail()
 
     #Apply the effects of a certain card
@@ -83,8 +83,8 @@ class Game:
             self.players[player_num].setMissTurns(card_effects[3])
         if card_effects[4] != -1: #Move a number of spaces
             self.players[player_num].movePlayer(card_effects[4], self.board)
-            self.players[player_num].player_piece.piece_x = self.players[player_num].calcPieceX(self.players[player_num].player_pos, self.board.board_sf)
-            self.players[player_num].player_piece.piece_y = self.players[player_num].calcPieceY(self.players[player_num].player_pos, self.board.board_sf)
+            self.players[player_num].player_x = self.players[player_num].calcPieceX(self.players[player_num].player_pos, self.board.board_sf)
+            self.players[player_num].player_y = self.players[player_num].calcPieceY(self.players[player_num].player_pos, self.board.board_sf)
 
             #Determine rent if applicable
             self.controller.turn_rent = self.determineRent()
@@ -96,8 +96,8 @@ class Game:
         if card_effects[5] != -1: #Move to a certain spot (and collect money if passing Job Centre)
             orig_pos = self.players[player_num].player_pos
             self.players[player_num].player_pos = card_effects[5]
-            self.players[player_num].player_piece.piece_x = self.players[player_num].calcPieceX(self.players[player_num].player_pos, self.board.board_sf)
-            self.players[player_num].player_piece.piece_y = self.players[player_num].calcPieceY(self.players[player_num].player_pos, self.board.board_sf)
+            self.players[player_num].player_x = self.players[player_num].calcPieceX(self.players[player_num].player_pos, self.board.board_sf)
+            self.players[player_num].player_y = self.players[player_num].calcPieceY(self.players[player_num].player_pos, self.board.board_sf)
             if self.players[player_num].player_pos < orig_pos: #Means player must have 'passed' the Job Centre
                 self.players[player_num].addMoney(self.board.JC_Money)
 
@@ -110,8 +110,8 @@ class Game:
                     self.getPlayer(self.board.getProp(self.players[player_num].player_pos).prop_owner).addMoney(self.controller.turn_rent)
         if card_effects[6] != -1: #Move to a certain spot (but do not collect money if passing Job Centre)
             self.players[player_num].player_pos = card_effects[6]
-            self.players[player_num].player_piece.piece_x = self.players[player_num].calcPieceX(self.players[player_num].player_pos, self.board.board_sf)
-            self.players[player_num].player_piece.piece_y = self.players[player_num].calcPieceY(self.players[player_num].player_pos, self.board.board_sf)
+            self.players[player_num].player_x = self.players[player_num].calcPieceX(self.players[player_num].player_pos, self.board.board_sf)
+            self.players[player_num].player_y = self.players[player_num].calcPieceY(self.players[player_num].player_pos, self.board.board_sf)
 
             #Determine rent if applicable
             self.controller.turn_rent = self.determineRent()
@@ -148,6 +148,33 @@ class Game:
                         to_pay += card_effects[12] * self.board.getProp(counter).T_Blocks #Sum the number of TB
             self.players[player_num].spendMoney(to_pay)
     
+    # Since all access to this class will be via the Pyro4 interface,
+    # objects cannot be returned, so all access to the methods of the subclasses must be defined here.
+    #--------------------Board Access--------------------
+    def boardBuyCHGroup(self, player_num, prop_num):
+        self.board.buyCHGroup(player_num, prop_num)
+    
+    def boardBuyTBGroup(self, player_num, prop_num):
+        self.board.buTBGroup(player_num, prop_num)
+
+    def boardSellCHGroup(self, player_num, prop_num):
+        self.board.sellCHGroup(player_num, prop_num)
+
+    def boardSellTBGroup(self, player_num, prop_num):
+        self.board.sellTBGroup(player_num, prop_num)
+    
+    def boardWholeGroupOwned(self, player_num, prop_num):
+        return self.board.wholeGroupOwned(player_num, prop_num)
+    
+    def boardGetMaxPos(self):
+        return self.board.max_pos
+
+    def boardGetBogsidePos(self):
+        return self.board.bogside_pos
+
+    def boardGetJCMoney(self):
+        return self.board.JC_Money
+
     #--------------------Card_Deck Access--------------------
     def shufflePLCards(self):
         self.board.PL_Deck.shuffleCards()
@@ -254,3 +281,20 @@ class Game:
     
     def playerGetMoney(self, player_num):
         return self.players[player_num].player_money
+
+    def playerGetInJail(self, player_num):
+        return self.players[player_num].player_inJail
+    
+    def playerGetActive(self, player_num):
+        return self.players[player_num].player_active
+    
+    def playerGetNextRollMod(self, player_num):
+        return self.players[player_num].player_nextRollMod
+    
+    def playerGetTurnsToMiss(self, player_num):
+        return self.players[player_num].player_turnsToMiss
+    
+    def playerGetHasBogMap(self, player_num):
+        return self.players[player_num].player_hasBogMap
+
+    #--------------------Player Access--------------------
