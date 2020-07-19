@@ -196,6 +196,22 @@ class Game:
                     pos_counter += 1
         return ret_arr
 
+    #Determine how much a certain player has spent on all of their properties, upgrades etc.
+    def getAssetsVal(self, player_num):
+        ret_val = 0
+
+        for counter in range(self.board.max_pos + 1):
+            if self.board.getProp(counter).prop_type == Prop_Type.NORMAL:
+                if self.board.getProp(counter).prop_owner == player_num:
+                    ret_val += self.board.getProp(counter).cost
+                    ret_val += (self.board.getProp(counter).CH_cost * self.board.getProp(counter).C_Houses)
+                    ret_val += (self.board.getProp(counter).TB_cost * self.board.getProp(counter).T_Blocks)
+
+            if self.board.getProp(counter).prop_type == Prop_Type.SCHOOL or self.board.getProp(counter).prop_type == Prop_Type.STATION:
+                if self.board.getProp(counter).prop_owner == player_num:
+                    ret_val += self.board.getProp(counter).cost
+        return ret_val
+
     # Since all access to this class will be via the Pyro4 interface,
     # objects cannot be returned, so all access to the methods of the subclasses must be defined here.
     #--------------------Board Access--------------------
