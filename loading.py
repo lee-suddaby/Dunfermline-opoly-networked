@@ -7,7 +7,7 @@ import ctypes #For getting screen dimensions
 
 from anigif import AnimatedGif
 from button import Button
-from lib import getFileLines
+from offline_lib import getFileLines
 
 #------------------------------Loading Screen functions------------------------------ 
 #Load tips from text file and populate an array with them

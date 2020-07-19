@@ -9,7 +9,7 @@ from textbox import TextBox
 from msgbox import MessageBox
 from cls_offline import *
 from button import Button
-from lib import getFileLines
+from offline_lib import getFileLines
 
 #------------------------------New Game Functions------------------------------
 def countNames(boxes): #Counts how many of the available 6 boxes have had something entered into them

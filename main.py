@@ -3,14 +3,15 @@ import os #Used for creating directories
 import ctypes #For getting screen dimensions
 
 from cls_offline import * #All game classes
-from cls_net import *
+#from cls_net import *
 
 from offline_details import OfflinePropDetails
 from offline_leaderboard import OfflineLeaderboards
-from loading import LoadScreen
 from offline_maingame import OfflineMainScreen
-from new import NewGame
 from offline_pause import OfflinePauseMenu
+
+from loading import LoadScreen
+from new import NewGame
 from newonoff import NewOnOff
 from newnet import NewNet
 
