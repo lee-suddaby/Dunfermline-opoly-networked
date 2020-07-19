@@ -75,7 +75,7 @@ def quickSort(sort_arr, first, last, sort_col, asc):
 
 
 #------------------------------Leaderboards Method------------------------------
-def Leaderboards(mainGame, screen, clock):
+def OfflineLeaderboards(mainGame, screen, clock):
     font_48 = pygame.font.SysFont('Arial', 48) #Font for title and name
     font_40 = pygame.font.SysFont('Arial', 40) #Font for the "?" and Exit buttons
     font_28 = pygame.font.SysFont('Arial', 28) #Font for actual leaderboards and attributes

@@ -8,7 +8,7 @@ from cls import *
 from button import Button
 
 #------------------------------Pause Menu Method------------------------------ 
-def PauseMenu(mainGame, screen, clock):
+def OfflinePauseMenu(mainGame, screen, clock):
     save_file_box = TextBox((340, 300, 560, 50), clear_on_enter=False, inactive_on_enter=False, active=False, active_color=pygame.Color("red")) #Create text box for storing save file path
     save_file_box.buffer = list(mainGame.save_path) #list() is used to convert string into array of characters
 

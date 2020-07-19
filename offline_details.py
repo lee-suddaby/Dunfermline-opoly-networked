@@ -36,7 +36,7 @@ def setupBoardPoses(board, player_num, num_owned):
 
 
 #------------------------------Property Details Method------------------------------
-def PropDetails(mainGame, screen, clock):
+def OfflinePropDetails(mainGame, screen, clock):
     font_40 = pygame.font.SysFont('Arial', 40) #Font for title, money and exit button
     font_20 = pygame.font.SysFont('Arial', 20) #Font for actual property details
     font_20b = pygame.font.SysFont('Arial', 20, True) #Font for column headings

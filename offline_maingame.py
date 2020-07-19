@@ -176,7 +176,7 @@ def displayPieces(screen, gameObj):
                     
 
 #------------------------------Main Game Code------------------------------         
-def MainScreen(mainGame, screen, clock):
+def OfflineMainScreen(mainGame, screen, clock):
     mainGame.prop_thumbs = pygame.transform.smoothscale(CreateThumbs(mainGame.board, mainGame.cur_player), [385,170])
 
     roll_dice_button = pygame.Rect(180,610,150,70) #Create rectangle for roll dice/end turn button

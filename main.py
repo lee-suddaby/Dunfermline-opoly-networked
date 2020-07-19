@@ -2,14 +2,15 @@ import pygame #Used for the creation of the GUI
 import os #Used for creating directories
 import ctypes #For getting screen dimensions
 
-from cls import * #All game classes
+from cls_offline import * #All game classes
+from cls_net import *
 
-from details import PropDetails
-from leaderboard import Leaderboards
+from offline_details import OfflinePropDetails
+from offline_leaderboard import OfflineLeaderboards
 from loading import LoadScreen
-from maingame import MainScreen
+from offline_maingame import OfflineMainScreen
 from new import NewGame
-from pause import PauseMenu
+from offline_pause import OfflinePauseMenu
 from newonoff import NewOnOff
 from newnet import NewNet
 
@@ -35,13 +36,13 @@ while nextScreen != -1: #Main Game Loop
     if nextScreen == 0: #New Game Screen
         mGame, nextScreen = NewGame(screen, clock)
     elif nextScreen == 1: #Main Game Screen
-        mGame, nextScreen = MainScreen(mGame, screen, clock)
+        mGame, nextScreen = OfflineMainScreen(mGame, screen, clock)
     elif nextScreen == 2: #Property Details Screen
-        mGame, nextScreen = PropDetails(mGame, screen, clock)
+        mGame, nextScreen = OfflinePropDetails(mGame, screen, clock)
     elif nextScreen == 3: #Leaderboards Screen
-        mGame, nextScreen = Leaderboards(mGame, screen, clock)
+        mGame, nextScreen = OfflineLeaderboards(mGame, screen, clock)
     elif nextScreen == 4: #Pause Menu
-        mGame, nextScreen = PauseMenu(mGame, screen, clock)
+        mGame, nextScreen = OfflinePauseMenu(mGame, screen, clock)
     elif nextScreen == 5: #Menu for starting a multiplayer game, currently in development
         nextScreen = NewNet(screen, clock)
     
