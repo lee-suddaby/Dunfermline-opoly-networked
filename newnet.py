@@ -4,7 +4,7 @@ import socket
 import Pyro4
 import numpy as np
 
-from cls import Button
+from button import Button
 from textbox import TextBox
 
 #------------------------------New Networked Game Functions------------------------------ 

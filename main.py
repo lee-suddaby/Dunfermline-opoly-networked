@@ -44,7 +44,5 @@ while nextScreen != -1: #Main Game Loop
         mGame, nextScreen = PauseMenu(mGame, screen, clock)
     elif nextScreen == 5: #Menu for starting a multiplayer game, currently in development
         nextScreen = NewNet(screen, clock)
-    """elif nextScreen == 6: #Choose whether a new game is offline or networked (online)
-        nextScreen = NewOnOff(clock)"""
     
 pygame.quit() #Quits the pygame module and hence the GUI

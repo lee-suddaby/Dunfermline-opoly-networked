@@ -3,6 +3,7 @@ from pygame.locals import *
 import numpy as np
 
 from cls import *
+from button import Button
 from lib import displayButtonRect
 
 #------------------------------Property Details Functions------------------------------

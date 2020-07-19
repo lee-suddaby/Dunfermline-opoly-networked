@@ -5,6 +5,7 @@ import numpy as np
 from msgbox import MessageBox
 from lib import getObtainMon, displayButtonRect
 from cls import *
+from button import Button
 
 #------------------------------Main Game Functions------------------------------
 #Create the thumbnails showing all the properties on the board
