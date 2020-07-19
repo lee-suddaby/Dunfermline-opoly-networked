@@ -297,4 +297,24 @@ class Game:
     def playerGetHasBogMap(self, player_num):
         return self.players[player_num].player_hasBogMap
 
-    #--------------------Player Access--------------------
+    #--------------------Property Access--------------------
+    def propertyGetRent(self, prop_num):
+        return self.board.properties[prop_num].getRent()
+    
+    def propertyGetMortVal(self, prop_num):
+        return self.board.properties[prop_num].mortgage_val
+
+    def propertyGetCH(self, prop_num):
+        return self.board.properties[prop_num].C_Houses
+
+    def propertyGetTB(self, prop_num):
+        return self.board.properties[prop_num].T_Blocks
+
+    def propertyGetOwner(self, prop_num):
+        return self.board.properties[prop_num].prop_owner
+
+    def propertyGetMortStat(self, prop_num):
+        return self.board.properties[prop_num].mortgage_status
+
+    def propertyGetCharge(self, prop_num):
+        return self.board.properties[prop_num].getCharge()

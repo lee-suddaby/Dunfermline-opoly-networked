@@ -172,6 +172,3 @@ class Go_To_Bogside(Property):
     def __init__(self, new_title, new_pos):
         Property.__init__(self, new_title, Prop_Type.GO_TO_BOGSIDE) #Initialise superclass first
         self.bogside_pos = new_pos
-    
-    def getBogsidePos(self):
-        return self.bogside_pos
