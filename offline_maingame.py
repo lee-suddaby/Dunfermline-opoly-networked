@@ -4,7 +4,7 @@ import numpy as np
 
 from msgbox import MessageBox
 from lib import getObtainMon, displayButtonRect
-from cls import *
+from cls_offline import *
 from button import Button
 
 #------------------------------Main Game Functions------------------------------

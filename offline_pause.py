@@ -4,7 +4,7 @@ import os
 
 from textbox import TextBox
 from msgbox import MessageBox
-from cls import *
+from cls_offline import *
 from button import Button
 
 #------------------------------Pause Menu Method------------------------------ 

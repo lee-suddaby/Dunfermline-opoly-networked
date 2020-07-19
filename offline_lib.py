@@ -1,5 +1,5 @@
 #Functions used in multiple screens, stored here to prevent duplication of code
-from cls import *
+from cls_offline import *
 
 #Determine how many lines are in a text file
 #Used when loading the tips file so the number of tips need not be counted

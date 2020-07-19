@@ -3,7 +3,7 @@ from pygame.locals import *
 from copy import copy #Used when swapping and copy objects in arrays (e.g. the 2D array quicksort algorithm)
 import numpy as np
 
-from cls import *
+from cls_offline import *
 from button import Button
 from lib import getObtainMon, displayButtonRect
 from msgbox import MessageBox

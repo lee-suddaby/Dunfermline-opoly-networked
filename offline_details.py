@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 import numpy as np
 
-from cls import *
+from cls_offline import *
 from button import Button
 from lib import displayButtonRect
 

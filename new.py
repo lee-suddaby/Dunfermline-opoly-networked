@@ -7,7 +7,7 @@ from datetime import datetime #Getting the current date and time as understood b
 
 from textbox import TextBox
 from msgbox import MessageBox
-from cls import *
+from cls_offline import *
 from button import Button
 from lib import getFileLines
 
