@@ -3,7 +3,7 @@ import os #Used for creating directories
 import ctypes #For getting screen dimensions
 
 from cls_offline import * #All game classes
-#from cls_net import *
+from cls_net import *
 
 from offline_details import OfflinePropDetails
 from offline_leaderboard import OfflineLeaderboards

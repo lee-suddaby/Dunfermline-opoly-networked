@@ -10,7 +10,7 @@ from .local_player import LocalPlayer
 class LocalGame:
     def __init__(self, new_die, new_PL, new_CC, new_board, new_players):
         self.local_die = np.array(new_die) #Array of loaded pygame images
-        self.local PL = np.array(new_PL)
+        self.local_PL = np.array(new_PL)
         self.local_CC = np.array(new_CC)
         self.local_board = new_board
         self.local_players = new_players

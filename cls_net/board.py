@@ -43,7 +43,7 @@ class Board:
             find_col = self.getProp(prop_num).getGroupCol() #Colour of the group which we are concerned with
             for counter in range(self.max_pos + 1):
                 if self.getProp(counter).prop_type == Prop_Type.NORMAL: #Prevents errors as no other types have a Group Colour
-                    if self.getProp(counter).group_getGroupCol()col == find_col and self.getProp(counter).prop_owner == player_num:
+                    if self.getProp(counter).group_getGroupCol() == find_col and self.getProp(counter).prop_owner == player_num:
                         self.getProp(counter).buyTB()
 
     #Remove 1 Council House upgrade from every property in a certain group

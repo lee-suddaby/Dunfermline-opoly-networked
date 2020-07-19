@@ -32,11 +32,11 @@ class Prop_Type(Enum):
 #Can have upgrades purchased for it, and is part of a colour grouping
 #Common Abbreviation: CH = Council House
 #                       TB = Tower Block
-class LocalNormal_Property(Property): #Create as subclass of Property
+class LocalNormal_Property(LocalProperty): #Create as subclass of Property
     #Constructor
     #Vals is an array where each element is one of the comma-separated values read on from the data file (where each property was stored on one line)
     def __init__(self, vals, new_deed, new_mdeed):
-        Property.__init__(self, vals[0], Prop_Type.NORMAL) #Initialise superclass first with the two values it takes in its constructor
+        LocalProperty.__init__(self, vals[0], Prop_Type.NORMAL) #Initialise superclass first with the two values it takes in its constructor
         self.title_deed = new_deed #Image storing the title deed for the property
         self.mortgage_deed = new_mdeed  #Image for the title deed to be shown when the property is mortgaged
         #Pygame colour linked to the group. 2 or 3 properties on the board will share one
@@ -52,10 +52,10 @@ class LocalNormal_Property(Property): #Create as subclass of Property
 #------------------------------School Property Subclass------------------------------
 #Another subclass of the Property superclass
 #Schools determine rent based off of how many of them are owned by the one player
-class LocalSchool_Property(Property):
+class LocalSchool_Property(LocalProperty):
     #Constructor - vals array works in the same way as it does for the NormalProperty class
     def __init__(self, vals, new_deed, new_mdeed):
-        Property.__init__(self, vals[0], Prop_Type.SCHOOL) #Initialise superclass first
+        LocalProperty.__init__(self, vals[0], Prop_Type.SCHOOL) #Initialise superclass first
         self.title_deed = new_deed
         self.mortgage_deed = new_mdeed
 
@@ -69,10 +69,10 @@ class LocalSchool_Property(Property):
 #------------------------------Station Property Subclass------------------------------
 #Another subclass of the property superclass
 #This time, rents are determined based on the current score on the dice, and whether one or both stations are owned
-class LocalStation_Property(Property):
+class LocalStation_Property(LocalProperty):
     #Constructor - vals array works in the same way as it does for the NormalProperty class
     def __init__(self, vals, new_deed, new_mdeed):
-        Property.__init__(self, vals[0], Prop_Type.STATION) #Initialise superclass first
+        LocalProperty.__init__(self, vals[0], Prop_Type.STATION) #Initialise superclass first
         self.title_deed = new_deed
         self.mortgage_deed = new_mdeed
 
