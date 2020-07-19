@@ -165,6 +165,37 @@ class Game:
                         ret_val += self.board.getProp(counter).mortgage_val
         return ret_val
     
+    #Return an integer representing the number of ownable properties on the board that are actually owned by the current player
+    def countPropsOwned(self, player_num):
+        prop_count = 0
+        for counter in range(self.board.max_pos + 1): #Loop through entire board
+            if self.board.getProp(counter).prop_type == Prop_Type.NORMAL or self.board.getProp(counter).prop_type == Prop_Type.SCHOOL or self.board.getProp(counter).prop_type == Prop_Type.STATION:
+                if self.board.getProp(counter).prop_owner == player_num: #If ownable and owner then increment counter
+                    prop_count += 1
+        return prop_count
+
+    #Create an array containing the board positions of the properties owned by the current player.
+    #Used in Property Details screen
+    #Assumed to be for current player
+    def setupBoardPoses(self):
+        player_num = self.cur_player_num
+        num_owned = self.countPropsOwned(player_num)
+        ret_arr = list([0] * num_owned) #Initialise integer array
+        pos_counter = 0
+        for counter in range(self.board.max_pos + 1): #Loop through entire board
+            if self.board.getProp(counter).prop_type == Prop_Type.NORMAL:
+                if self.board.getProp(counter).prop_owner == player_num:
+                    ret_arr[pos_counter] = counter #Set next empty array element to this property's position on the board
+                    pos_counter += 1
+
+        #SCHOOL and STATION properties are displayed after all NORMAL ones, as it gives the screen a better aesthetic as a whole
+        for counter in range(self.board.max_pos + 1): #Loop through entire board
+            if self.board.getProp(counter).prop_type == Prop_Type.SCHOOL or self.board.getProp(counter).prop_type == Prop_Type.STATION:
+                if self.board.getProp(counter).prop_owner == player_num:
+                    ret_arr[pos_counter] = counter
+                    pos_counter += 1
+        return ret_arr
+
     # Since all access to this class will be via the Pyro4 interface,
     # objects cannot be returned, so all access to the methods of the subclasses must be defined here.
     #--------------------Board Access--------------------
@@ -191,6 +222,9 @@ class Game:
 
     def boardGetJCMoney(self):
         return self.board.JC_Money
+    
+    def boardCountGroupSize(self, player_num, prop_num):
+        self.board.countGroupSize(player_num, prop_num)
 
     #--------------------Card_Deck Access--------------------
     def shufflePLCards(self):
@@ -327,11 +361,20 @@ class Game:
     def propertyGetTB(self, prop_num):
         return self.board.properties[prop_num].T_Blocks
 
+    def propertyGetCHCost(self, prop_num):
+        return self.board.properties[prop_num].CH_Cost
+
+    def propertyGetTBCost(self, prop_num):
+        return self.board.properties[prop_num].TB_Cost
+
     def propertyGetOwner(self, prop_num):
         return self.board.properties[prop_num].prop_owner
 
     def propertyGetMortStat(self, prop_num):
         return self.board.properties[prop_num].mortgage_status
+    
+    def propertySetMortStat(self, prop_num, new_stat):
+        self.board.properties[prop_num].mortgage_status = new_stat
 
     def propertyGetCharge(self, prop_num):
         return self.board.properties[prop_num].getCharge()

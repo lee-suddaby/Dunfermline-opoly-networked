@@ -10,6 +10,8 @@ from offline_leaderboard import OfflineLeaderboards
 from offline_maingame import OfflineMainScreen
 from offline_pause import OfflinePauseMenu
 
+from network_details import NetworkPropDetails
+
 from loading import LoadScreen
 from new import NewGame
 from newonoff import NewOnOff
@@ -46,5 +48,11 @@ while nextScreen != -1: #Main Game Loop
         mGame, nextScreen = OfflinePauseMenu(mGame, screen, clock)
     elif nextScreen == 5: #Menu for starting a multiplayer game, currently in development
         nextScreen = NewNet(screen, clock)
+    """elif nextScreen == 6: #Networked main game screen
+        netGame, localGame, nextScreen = NetworkMainScreen(mGame, localGame, screen, clock)
+    elif nextScreen == 7: #Networked property details screen
+        netGame, localGame, nextScreen = NetworkPropDetails(mGame, localGame, screen, clock)
+    elif nextScreen == 9: #Networked leaderboards screen
+        netGame, localGame, nextScreen = NetworkLeaderboards(mGame, localGame, screen, clock)"""
     
 pygame.quit() #Quits the pygame module and hence the GUI
