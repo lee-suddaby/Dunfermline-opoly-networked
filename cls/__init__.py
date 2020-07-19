@@ -1,7 +1,8 @@
 from .board import Board
 from .card_deck import Card_Deck
 from .die import Die
-from .game import Game, Game_Controller
+from .game import Game
+from .game_controller import Game_Controller
 from .player import Player
 from .property import *
 
