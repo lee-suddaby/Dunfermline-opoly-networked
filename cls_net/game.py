@@ -147,6 +147,23 @@ class Game:
                     if self.board.getProp(counter).prop_owner == self.cur_player_num: #The current property is owned by this player
                         to_pay += card_effects[12] * self.board.getProp(counter).T_Blocks #Sum the number of TB
             self.players[player_num].spendMoney(to_pay)
+        
+    #Determine how much money a player could obtain from selling/mortgaging all of their properties and upgrades
+    def getObtainMon(self, player_num):
+        ret_val = 0
+
+        for counter in range(self.board.max_pos + 1):
+            if self.board.getProp(counter).prop_type == Prop_Type.NORMAL:
+                if self.board.getProp(counter).prop_owner == player_num:
+                    ret_val += int(self.board.getProp(counter).CH_cost * self.board.getProp(counter).C_Houses / 2)
+                    ret_val += int(self.board.getProp(counter).TB_cost * self.board.getProp(counter).T_Blocks / 2)
+                    if board.getProp(counter).mortgage_status == False:
+                        ret_val += board.getProp(counter).mortgage_val
+
+            if self.board.getProp(counter).prop_type == Prop_Type.SCHOOL or self.board.getProp(counter).prop_type == Prop_Type.STATION:
+                if self.board.getProp(counter).prop_owner == player_num and self.board.getProp(counter).mortgage_status == False:
+                        ret_val += self.board.getProp(counter).mortgage_val
+        return ret_val
     
     # Since all access to this class will be via the Pyro4 interface,
     # objects cannot be returned, so all access to the methods of the subclasses must be defined here.
@@ -318,3 +335,9 @@ class Game:
 
     def propertyGetCharge(self, prop_num):
         return self.board.properties[prop_num].getCharge()
+    
+    def propertyGetTitle(self, prop_num):
+        return self.board.properties[prop_num].prop_title
+
+    def propertyGetType(self, prop_num):
+        return self.board.properties[prop_num].prop_type
