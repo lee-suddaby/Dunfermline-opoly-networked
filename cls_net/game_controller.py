@@ -12,8 +12,6 @@ class Game_Controller:
         self.cur_doubles = 0
         self.roll_num1 = 0 #First dice num
         self.roll_num2 = 0 #Second dice num
-        self.card_effs = [] #Integer effects of cur_card
-        self.card_texts = [] #pygame-rendered texts telling the user the effects
 
     def reset(self):
         self.player_rolled = False
@@ -25,5 +23,3 @@ class Game_Controller:
         self.cur_doubles = 0
         self.roll_num1 = 0
         self.roll_num2 = 0
-        self.card_effs = []
-        self.card_texts = []

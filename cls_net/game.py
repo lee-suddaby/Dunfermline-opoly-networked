@@ -19,6 +19,15 @@ class Game:
     def getCurProp(self):
         return self.board.getProp(self.players[self.cur_player_num].player_pos)
 
+    def getCurPropNum(self):
+        return self.players[self.cur_player_num].player_pos
+
+    def getCurPropOwner(self):
+        return self.board.properties[self.players[self.cur_player_num].player_pos].prop_owner
+
+    def getCurPropType(self):
+        return self.board.properties[self.players[self.cur_player_num].player_pos].prop_type
+
     def advancePlayer(self): #Next player's turn
         self.cur_player_num += 1
         self.controller.reset()
@@ -55,11 +64,11 @@ class Game:
             ret_rent = self.board.getProp(self.players[player_num].player_pos).surcharge
         return ret_rent
 
-    def sendCurPlayerToBog(self, player_num):
-        self.players[player_num].player_pos = self.board.bogside_pos #Move the player
-        self.players[player_num].player_x = self.players[0].calcPieceX(self.board.bogside_pos, self.board.board_sf)
-        self.players[player_num].player_y = self.players[0].calcPieceY(self.board.bogside_pos, self.board.board_sf)
-        self.players[player_num].enterJail()
+    def sendCurPlayerToBog(self):
+        self.players[self.getCurPlayerNum()].player_pos = self.board.bogside_pos #Move the player
+        self.players[self.getCurPlayerNum()].player_x = self.players[0].calcPieceX(self.board.bogside_pos, self.board.board_sf)
+        self.players[self.getCurPlayerNum()].player_y = self.players[0].calcPieceY(self.board.bogside_pos, self.board.board_sf)
+        self.players[self.getCurPlayerNum()].enterJail()
 
     #Apply the effects of a certain card
     def applyCardEffects(self, player_num):
@@ -289,6 +298,27 @@ class Game:
     def getCard_texts(self):
         return self.controller.card_texts
     
+    def setPlayer_rolled(self, new_val):
+        self.controller.player_rolled = new_val
+
+    def setMay_buy(self, new_val):
+        self.controller.may_buy = new_val
+
+    def setTurn_rent(self, new_val):
+        self.controller.turn_rent = new_val
+
+    def setCur_doubles(self, new_val):
+        self.controller.cur_doubles = new_val
+
+    def setCur_card_num(self, new_val):
+        self.controller.cur_card_num = new_val
+
+    def setCur_card_deck(self, new_val):
+        self.controller.cur_card_deck = new_val
+
+    def setCard_used(self, new_val):
+        self.controller.card_used = new_val
+    
     #--------------------Die Access--------------------
     def getDieScore(self, num):
         return self.dice[num].cur_score
@@ -316,8 +346,8 @@ class Game:
     def playerLeaveJail(self, player_num):
         self.players[player_num].player_inJail = False
     
-    def movePlayer(self, movePos, board, player_num):
-        self.players[player_num].movePlayer(movePos, board)
+    def movePlayer(self, movePos, player_num):
+        self.players[player_num].movePlayer(movePos, self.board)
 
     def playerSetMissTurns(self, num, player_num):
         self.players[player_num].player_turnsToMiss = num
