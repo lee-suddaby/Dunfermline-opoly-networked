@@ -11,7 +11,7 @@ from button import Button
 #Create the thumbnails showing all the properties on the board
 #highlighting all the ones owned by a certain player
 #Graphic returned is always the same size; its size on screen must be chosen when it is actually displayed if it needs to be different
-def CreateThumbs(board, player):
+def CreateThumbs(netGame, localGame, player):
     colour_on = pygame.Color(0,0,0)
     t_width = 45
     t_height = 70
@@ -23,8 +23,8 @@ def CreateThumbs(board, player):
     thumbnails.fill((255,255,255)) #Screen starts white
     
     for counter in range(board.max_pos+1): #For each property
-        if board.getProp(counter).prop_type == Prop_Type.NORMAL: #Most common property, so one with a 'normal' title deed
-            if board.getProp(counter).group_col != colour_on: #If we have reached a new group, reset the counter and note the new current group colour
+        if netGame.propertyGetType(counter) == Prop_Type.NORMAL: #Most common property, so one with a 'normal' title deed
+            if localGame.board.getProp(counter).group_col != colour_on: #If we have reached a new group, reset the counter and note the new current group colour
                 colour_on = board.getProp(counter).group_col #Set new current group colour
                 colour_counter = 0 #Reset colour
                 groups_done = groups_done + 1 #New group, so that's another one completed
@@ -33,13 +33,13 @@ def CreateThumbs(board, player):
 
             #Create thumbnail using separate function
             #Second argument is a condition which evaluates to a boolean, hence becoming the value of this actual parameter passed into the CreatePropThumb function
-            cur_thumb = CreatePropThumb(board.getProp(counter).group_col, board.getProp(counter).prop_owner == player) 
+            cur_thumb = CreatePropThumb(localGame.board.getProp(counter).group_col, netGame.propertyGetOwner(counter) == player) 
             #Complicated mathematical calculations to determine the exact position of the current thumbnail.
             #If in the same group, there is 5 pixels of movement to the right for each property, and vertical movement is one third of each thumbnails's height
             thumbnails.blit(cur_thumb, [(groups_done-1)*(t_width+int(t_width/5)) + colour_counter*int(t_width/5), colour_counter*int(t_height/3)])
-        elif board.getProp(counter).prop_type == Prop_Type.SCHOOL or board.getProp(counter).prop_type == Prop_Type.STATION: #School and station properties
+        elif netGame.propertyGetType(counter) == Prop_Type.SCHOOL or netGame.propertyGetType(counter) == Prop_Type.STATION: #School and station properties
             specials = specials + 1
-            cur_thumb = CreateThumbImg("img/Thumbs/" + board.getProp(counter).prop_title + ".png", board.getProp(counter).prop_owner == player)
+            cur_thumb = CreateThumbImg("img/Thumbs/" + netGame.propertyGetTitle(counter) + ".png", netGame.propertyGetOwner(counter) == player)
             thumbnails.blit(cur_thumb, [(specials-1)*t_width + (specials-1)*int(t_width/5), 120]) #All these thumbnails are displayed in one horizontal line; therefore the same y-coordinate each time
     return thumbnails #pygame.Surface object that can be displayed on the screen as an image
             #441 x117
@@ -119,9 +119,9 @@ def displayUpgrades(screen, ch_img, tb_img, prop, font):
     screen.blit(tb_num, [530, 630])
 
 #For an owned property, display the player (Player 1, etc.) that actually is the owner
-def displayOwner(screen, font, prop_owner):
-    own_text = font.render('Owned By: ' + prop_owner.player_name, True, (0,0,0)) #+1 because first player is indexed zero, and humans don't start counting at zero.
-    f_width, f_height = font.size('Owned By: ' + prop_owner.player_name)
+def displayOwner(screen, font, owner_name):
+    own_text = font.render('Owned By: ' + owner_name, True, (0,0,0))
+    f_width, f_height = font.size('Owned By: ' + owner_name)
     screen.blit(own_text, ((400-f_width)/2 + 600, 630))
 
 #Display a properties rent from the point of view of it having been paid
@@ -164,20 +164,20 @@ def displayDiceScore(screen, img_1, img_2):
         screen.blit(img_2, [255, 690])
 
 #Display the tokens of every player on the relevant property on the board
-def displayPieces(screen, gameObj):
+def displayPieces(screen, netGame, localGame):
     for counter in range(6):
         try:
-            if gameObj.getPlayer(counter).player_active: #Only show the pieces of active players
-                screen.blit(gameObj.getPlayer(counter).player_piece.piece_img, [gameObj.getPlayer(counter).player_piece.piece_x, gameObj.getPlayer(counter).player_piece.piece_y])
-                if counter == gameObj.cur_player: #Draw red circle around the current player's token to highlight it to them
-                    pygame.draw.circle(screen, (255,0,0), [int(gameObj.getPlayer(counter).player_piece.piece_x + 16), int(gameObj.getPlayer(counter).player_piece.piece_y + 16)], 20, 5)
+            if netGame.playerGetActive(counter): #Only show the pieces of active players
+                screen.blit(localGame.getPlayer(counter).player_piece.piece_img, [netGame.playerGetX(counter), netGame.playerGetY(counter)])
+                if counter == netGame.getCurPlayerNum(): #Draw red circle around the current player's token to highlight it to them
+                    pygame.draw.circle(screen, (255,0,0), [int(netGame.playerGetX(counter) + 16), int(netGame.playerGetY(counter) + 16)], 20, 5)
         except IndexError: #If index does not exist in the game's Players array, no more players are left to show, thus the break
             break
                     
 
 #------------------------------Main Game Code------------------------------         
-def OfflineMainScreen(mainGame, screen, clock):
-    mainGame.prop_thumbs = pygame.transform.smoothscale(CreateThumbs(mainGame.board, mainGame.cur_player), [385,170])
+def OfflineMainScreen(netGame, localGame, screen, clock):
+    localGame.prop_thumbs = pygame.transform.smoothscale(CreateThumbs(netGame, localGame, netGame.getCurPlayerNum()), [385,170])
 
     roll_dice_button = pygame.Rect(180,610,150,70) #Create rectangle for roll dice/end turn button
     buy_prop_button = pygame.Rect(675,690,250,70) #Create rectangle for property buying button (also used for mortgaging and unmortgaging
@@ -193,7 +193,6 @@ def OfflineMainScreen(mainGame, screen, clock):
     font_20 = pygame.font.SysFont('Arial', 20) #Font for the upgrade buttons
     
     main_buts = [Button(10, 690, 150, 70, "Leaderboards", font_28),
-               Button(10, 610, 150, 70, "Pause", font_40),
                Button(900, 160, 100, 50, "Details", font_28)]
 
     dice_but_click = False #Booleans tracking whether the roll dice, end turn and but property buttons have been clicked yet this turn
@@ -222,8 +221,8 @@ def OfflineMainScreen(mainGame, screen, clock):
                     main_screen_running = False
                     gotoScreen = -1
                 if advanceOnBoxClose and msgBox.should_exit:
-                    mainGame.advancePlayer()
-                    mainGame.prop_thumbs = pygame.transform.smoothscale(CreateThumbs(mainGame.board, mainGame.cur_player), [385,170]) #Generate thumbnails for new player (here so it is only done when the player changes, not every frame change)
+                    netGame.advancePlayer()
+                    localGame.prop_thumbs = pygame.transform.smoothscale(CreateThumbs(netGame, localGame, netGame.getCurPlayerNum()), [385,170]) #Generate thumbnails for new player (here so it is only done when the player changes, not every frame change)
                     advanceOnBoxClose = False
                 if msgBox.should_exit == False:
                     break
@@ -238,14 +237,14 @@ def OfflineMainScreen(mainGame, screen, clock):
                 if event.button == 1: #Left mouse button
                     mouse_pos = event.pos #Position of the cursor when nouse was clicked
                     if buy_prop_button.collidepoint(mouse_pos):
-                        if mainGame.getCurProp().prop_owner == -1: #Property is unowned
+                        if netGame.getCurPropOwner() == -1: #Property is unowned
                             buy_but_click = True
-                        elif mainGame.getCurProp().prop_owner == mainGame.cur_player: #If owned by current player, it may be mortgaged
+                        elif netGame.getCurPropOwner() == netGame.getCurPlayerNum(): #If owned by current player, it may be mortgaged
                             mort_but_click = True
                     if roll_dice_button.collidepoint(mouse_pos):
-                        if mainGame.controller.card_used == False:
+                        if netGame.getCard_used() == False:
                             use_card_but_click = True #Roll dice button was clicked
-                        elif mainGame.controller.player_rolled == False:
+                        elif netGame.getPlayer_rolled() == False:
                             dice_but_click = True #End turn button was clicked
                         else:
                             turn_but_click = True #Button to apply card effects was clicked
@@ -258,70 +257,75 @@ def OfflineMainScreen(mainGame, screen, clock):
                     
                     
         #Clear screen and display main board
-        displayScreenAndBoard(screen, mainGame.board.board_img)
+        displayScreenAndBoard(screen, localGame.board.board_img)
         
         if dice_but_click: #If Roll Dice button was clicked
             #Roll dice, move the piece accordingly, and display the dice rolls
-            mainGame.getDie(0).roll()
-            mainGame.getDie(1).roll()
+            netGame.rollDice()
 
-            dice_total = mainGame.getDiceTotal()
+            dice_total = netGame.getDiceTotal()
             
-            if mainGame.getCurPlayer().player_inJail == False:
-                mainGame.getCurPlayer().movePlayer(dice_total, mainGame.board)
-            elif mainGame.getDie(0).cur_score == mainGame.getDie(1).cur_score: #Doubles rolled, so player gets out of bogside
-                mainGame.getCurPlayer().leaveJail()
-                mainGame.getCurPlayer().movePlayer(dice_total, mainGame.board)
+            if netGame.playerGetInJail(netGame.getCurPlayerNum()) == False:
+                netGame.movePlayer(dice_total, netGame.getCurPlayerNum())
+            elif netGame.getDieScore(0) == netGame.getDieScore(1): #Doubles rolled, so player gets out of bogside
+                netGame.playerGetLeaveJail(netGame.getCurPlayerNum())
+                netGame.movePlayer(dice_total, netGame.getCurPlayerNum())
             #Player does not move otherwise, as they must be lost in bogside
 
             #Generate the dice images
-            mainGame.controller.roll_img1 = pygame.transform.smoothscale(mainGame.getDie(0).getImg(), [70, 70])
-            mainGame.controller.roll_img2 = pygame.transform.smoothscale(mainGame.getDie(1).getImg(), [70, 70])
+            localGame.controller.roll_img1 = pygame.transform.smoothscale(localGame.die[0].getImg(), [70, 70])
+            localGame.controller.roll_img2 = pygame.transform.smoothscale(localGame.die[1].getImg(), [70, 70])
 
-            if mainGame.getDie(0).cur_score != mainGame.getDie(1).cur_score: #If a double has not been rolled (rolling a double gives the player another turn)
-                mainGame.controller.player_rolled = True #So player only gets another turn if they rolled doubles
-            mainGame.controller.may_buy = True
+            if netGame.getDieScore(0) != netGame.getDieScore(1): #If a double has not been rolled (rolling a double gives the player another turn)
+               netGame.setPlayer_rolled(True) #So player only gets another turn if they rolled doubles
+            netGame.setMay_buy(True)
 
-            if mainGame.getDie(0).cur_score == mainGame.getDie(1).cur_score:
-                mainGame.controller.cur_doubles += 1
+            if netGame.getDieScore(0) == netGame.getDieScore(1):
+                netGame.setCur_doubles(netGame.getCur_doubles() + 1)
                 
-            if mainGame.controller.cur_doubles >= 3: #If player rolls 3 consecutive doubles, they go to Bogside
-                mainGame.sendCurPlayerToBog()
-                mainGame.controller.player_rolled = True #Will not get to roll again
+            if netGame.getCur_doubles() >= 3: #If player rolls 3 consecutive doubles, they go to Bogside
+                netGame.sendCurPlayerToBog()
+                netGame.setPlayer_rolled(True) #Will not get to roll again
             
             #Determine rent if applicable
-            mainGame.controller.turn_rent = mainGame.determineRent()
+            netGame.setTurn_rent(netGame.determineRent(netGame.getCurPlayerNum()))
 
-            if mainGame.controller.turn_rent != 0:
-                mainGame.getCurPlayer().spendMoney(mainGame.controller.turn_rent) #Decrease the player's money and credit the owner of the property that amount
-                if mainGame.getCurProp().prop_type != Prop_Type.PAYMENT:
-                    mainGame.getPlayer(mainGame.getCurProp().prop_owner).addMoney(mainGame.controller.turn_rent)
+            if netGame.getTurn_rent() != 0:
+                netGame.playerSpendMoney(netGame.getTurn_rent(), netGame.getCurPlayerNum()) #Decrease the player's money and credit the owner of the property that amount
+                if netGame.getCurPropType() != Prop_Type.PAYMENT:
+                    netGame.playerAddMoney(netGame.getTurn_rent(), netGame.getCurPropOwner())
 
             #If the current space returns a card
-            if mainGame.getCurProp().prop_type == Prop_Type.POT_LUCK:
-                mainGame.controller.cur_card = mainGame.board.PL_Deck.getNextCard()
-            elif mainGame.getCurProp().prop_type == Prop_Type.COUNCIL_CHEST:
-                mainGame.controller.cur_card = mainGame.board.CC_Deck.getNextCard()
+            if netGame.getCurPropType() == Prop_Type.POT_LUCK:
+                netGame.setCur_card_num(netGame.getNextPLCardNum())
+                netGame.setCur_card_deck("PL")
+            elif netGame.getCurPropType() == Prop_Type.COUNCIL_CHEST:
+                netGame.setCur_card_num(netGame.getNextCCCardNum())
+                netGame.setCur_card_deck("CC")
 
             #If card will have just been returned, render the text that will show its effects
-            if mainGame.getCurProp().prop_type == Prop_Type.POT_LUCK or mainGame.getCurProp().prop_type == Prop_Type.COUNCIL_CHEST: #Card will have been returned
-                mainGame.controller.card_effs, mainGame.controller.card_texts = renderCardTexts(font_28, mainGame.controller.cur_card)
-                mainGame.controller.card_used = False
+            if netGame.getCurPropType() == Prop_Type.POT_LUCK or netGame.getCurPropType() == Prop_Type.COUNCIL_CHEST: #Card will have been returned
+                if netGame.getCur_card_deck() == "PL":
+                    localGame.controller.card_effs, localGame.controller.card_texts = renderCardTexts(font_28, localGame.board.PL_Deck.getCard(netGame.getCur_card_num()))
+                elif netGame.getCur_card_deck() == "CC":
+                    localGame.controller.card_effs, localGame.controller.card_texts = renderCardTexts(font_28, localGame.board.CC_Deck.getCard(netGame.getCur_card_num()))
+                
+                netGame.setCard_used(False)
                                 
             #If the player lands on the 'Go To Bogside' space
-            if mainGame.getCurProp().prop_type == Prop_Type.GO_TO_BOGSIDE:
-                mainGame.sendCurPlayerToBog()
+            if netGame.getCurPropType() == Prop_Type.GO_TO_BOGSIDE:
+                netGame.sendCurPlayerToBog()
 
             
         #Display whose turn it is, how much money this player has, and show their property overview
         displayWhoseTurn(screen, font_28, mainGame.getCurPlayer())
         displayPlayerMoney(screen, font_28, mainGame.getCurPlayer().player_money)
         displayPlayerToken(screen, mainGame.getCurPlayer())
-        displayPropThumbs(screen, mainGame.prop_thumbs, 610, 50)
-        displayDiceScore(screen, mainGame.controller.roll_img1, mainGame.controller.roll_img2)
+        displayPropThumbs(screen, localGame.prop_thumbs, 610, 50)
+        displayDiceScore(screen, localGame.controller.roll_img1, localGame.controller.roll_img2)
         
         #Show each of the player's pieces at its requisite position on the board
-        displayPieces(screen, mainGame)
+        displayPieces(screen, netGame, localGame)
 
         #Show the Roll Dice/End Turn button, and the appropriate caption
         if mainGame.controller.card_used == False:
@@ -337,11 +341,11 @@ def OfflineMainScreen(mainGame, screen, clock):
             displayButtonRect(screen, in_jail_button, (100, 100, 100), font_28, 'Buy Map (£50)', (0, 0, 0))
 
         #Display title deed for property currently on
-        if mainGame.getCurProp().prop_type == Prop_Type.NORMAL or mainGame.getCurProp().prop_type == Prop_Type.SCHOOL or mainGame.getCurProp().prop_type == Prop_Type.STATION: #If property actually will have a title deed to display
+        if netGame.getCurPropType() == Prop_Type.NORMAL or netGame.getCurPropType() == Prop_Type.SCHOOL or netGame.getCurPropType() == Prop_Type.STATION: #If property actually will have a title deed to display
             title_deed = pygame.transform.smoothscale(mainGame.getCurProp().getTitleDeed(), [270,400])
             screen.blit(title_deed, [665, 230])
 
-            if mainGame.getCurProp().prop_type == Prop_Type.NORMAL:
+            if netGame.getCurPropType() == Prop_Type.NORMAL:
                 #Normal properties are the only ones that can have Council Houses and Tower Blocks on them
                 displayUpgrades(screen, CH_img, TB_img, mainGame.getCurProp(), font_40)
 
@@ -358,7 +362,7 @@ def OfflineMainScreen(mainGame, screen, clock):
                         elif mainGame.getCurProp().C_Houses > 0:
                             displayButtonRect(screen, sell_upgrade_button, (100, 100, 100), font_20, 'Sell Council House', (0, 0, 0))
             
-            if mainGame.getCurProp().prop_type == Prop_Type.NORMAL or mainGame.getCurProp().prop_type == Prop_Type.SCHOOL or mainGame.getCurProp().prop_type == Prop_Type.STATION:
+            if netGame.getCurPropType() == Prop_Type.NORMAL or netGame.getCurPropType() == Prop_Type.SCHOOL or netGame.getCurPropType() == Prop_Type.STATION:
                 if mainGame.getCurProp().prop_owner == mainGame.cur_player:
                     #Display relevant button for mortgaging or unmortgaging a property
                     if mainGame.getCurProp().mortgage_status: #Property is mortgaged
@@ -371,9 +375,9 @@ def OfflineMainScreen(mainGame, screen, clock):
                 displayButtonRect(screen, buy_prop_button, (100, 100, 100), font_40, 'Buy Property', (0, 0, 0))
             elif mainGame.getCurProp().prop_owner != -1:
                 #Property is owned by a player so display information pertaining to the owning of said property by this aforementioned player
-                displayOwner(screen, font_28, mainGame.getPlayer(mainGame.getCurProp().prop_owner))
+                displayOwner(screen, font_28, netGame.playerGetName(netGame.propertyGetOwner(netGame.getCurPropNum())))
         else:
-            if mainGame.getCurProp().prop_type != Prop_Type.LOST_IN_BOGSIDE: #Will work perfectly normally for all properties but the Lost In Bogside square
+            if netGame.getCurPropType() != Prop_Type.LOST_IN_BOGSIDE: #Will work perfectly normally for all properties but the Lost In Bogside square
                 tit_str = mainGame.getCurProp().prop_title
             elif mainGame.getCurPlayer().player_inJail: #If Player is actually 'in jail'
                 tit_str = "Lost In Bogside"
@@ -384,11 +388,11 @@ def OfflineMainScreen(mainGame, screen, clock):
             t_width, t_height = font_40.size(tit_str)
             screen.blit(tit_text, [(400-t_width)/2 + 600, 220])
 
-        if mainGame.getCurProp().prop_type == Prop_Type.NORMAL or mainGame.getCurProp().prop_type == Prop_Type.SCHOOL or mainGame.getCurProp().prop_type == Prop_Type.STATION or mainGame.getCurProp().prop_type == Prop_Type.PAYMENT: #If incurs a charge
+        if netGame.getCurPropType() == Prop_Type.NORMAL or netGame.getCurPropType() == Prop_Type.SCHOOL or netGame.getCurPropType() == Prop_Type.STATION or netGame.getCurPropType() == Prop_Type.PAYMENT: #If incurs a charge
             try:
-                if mainGame.controller.turn_rent != 0: #If rent has actually been charged then the player is told they themselves have paid whatever amount
-                    displayPaidRent(screen, font_28, mainGame.controller.turn_rent)
-                elif mainGame.getCurProp().prop_owner == mainGame.cur_player and mainGame.getCurProp().prop_type == Prop_Type.NORMAL: #If property is owned by the current player and NORMAL (since other properties depend on those owned and dice rolls
+                if netGame.getTurn_rent() != 0: #If rent has actually been charged then the player is told they themselves have paid whatever amount
+                    displayPaidRent(screen, font_28, netGame.getTurn_rent())
+                elif mainGame.getCurProp().prop_owner == mainGame.cur_player and netGame.getCurPropType() == Prop_Type.NORMAL: #If property is owned by the current player and NORMAL (since other properties depend on those owned and dice rolls
                     if mainGame.board.wholeGroupOwned(mainGame.getCurProp().prop_owner, mainGame.getCurPlayer().player_pos) and mainGame.getCurProp().C_Houses == 0:
                         displayRent(screen, font_28, mainGame.getCurProp().getRent()*2)
                     else:
@@ -396,7 +400,7 @@ def OfflineMainScreen(mainGame, screen, clock):
             except AttributeError: #Prevents errors as PAYMENT property has no owner but changes variable turn_rent
                 pass
             
-        if mainGame.getCurProp().prop_type == Prop_Type.POT_LUCK or mainGame.getCurProp().prop_type == Prop_Type.COUNCIL_CHEST:
+        if netGame.getCurPropType() == Prop_Type.POT_LUCK or netGame.getCurPropType() == Prop_Type.COUNCIL_CHEST:
             if mainGame.controller.cur_card != None: #If player was already on one of these places when their turn begins, cur_card and card_texts will be None object; this condition prevents an error when the following code thinks that it is
                 displayCard(screen, mainGame.controller.cur_card)
                 t_count = 0
@@ -432,7 +436,7 @@ def OfflineMainScreen(mainGame, screen, clock):
             #Next player's turn now (if the previous player has no more to do
             if cont:
                 mainGame.advancePlayer()
-                mainGame.prop_thumbs = pygame.transform.smoothscale(CreateThumbs(mainGame.board, mainGame.cur_player), [385,170]) #Generate thumbnails for new player (here so it is only done when the player changes, not every frame change)
+                mainGame.prop_thumbs = pygame.transform.smoothscale(CreateThumbs(netGame, localGame, netGame.getCurPlayerNum()), [385,170]) #Generate thumbnails for new player (here so it is only done when the player changes, not every frame change)
 
             if mainGame.countActivePlayers() < 2:
                 mainGame.advancePlayer()
@@ -440,14 +444,14 @@ def OfflineMainScreen(mainGame, screen, clock):
                 exitOnBoxClose = True
             
         #Button for buying a property has been clicked
-        if buy_but_click and (mainGame.getCurProp().prop_type == Prop_Type.NORMAL or mainGame.getCurProp().prop_type == Prop_Type.SCHOOL or mainGame.getCurProp().prop_type == Prop_Type.STATION): #Final check that the property can actually be owned
+        if buy_but_click and (netGame.getCurPropType() == Prop_Type.NORMAL or netGame.getCurPropType() == Prop_Type.SCHOOL or netGame.getCurPropType() == Prop_Type.STATION): #Final check that the property can actually be owned
             #Player wished to buy property
             if mainGame.getCurProp().prop_owner == -1: #Property is unowned, hence can actually be bought
                 if mainGame.getCurPlayer().player_money >=  mainGame.getCurProp().cost:
                     #Player has enough money
                     mainGame.getCurPlayer().spendMoney(mainGame.getCurProp().cost) #Decrease the player's bank balance accordingly
                     mainGame.getCurProp().buyProperty(mainGame.cur_player) #Change the property's status to track the new ownership
-                    mainGame.prop_thumbs = pygame.transform.smoothscale(CreateThumbs(mainGame.board, mainGame.cur_player), [385,170]) #Update title deed thumbnails to reflect newly purchased properties
+                    mainGame.prop_thumbs = pygame.transform.smoothscale(CreateThumbs(netGame, localGame, netGame.getCurPlayerNum()), [385,170]) #Update title deed thumbnails to reflect newly purchased properties
         
         #Button to apply the effects of a Pot Luck or Council Chest card
         if use_card_but_click and mainGame.controller.cur_card != None: #Check there is a card to work with
@@ -456,7 +460,7 @@ def OfflineMainScreen(mainGame, screen, clock):
 
         #All of the following may only be done if the current player owns the property
         #Button for mortgaging or unmortgaging a property
-        if mort_but_click and (mainGame.getCurProp().prop_type == Prop_Type.NORMAL or mainGame.getCurProp().prop_type == Prop_Type.SCHOOL or mainGame.getCurProp().prop_type == Prop_Type.STATION): #Final check that the property is one that may be mortgaged
+        if mort_but_click and (netGame.getCurPropType() == Prop_Type.NORMAL or netGame.getCurPropType() == Prop_Type.SCHOOL or netGame.getCurPropType() == Prop_Type.STATION): #Final check that the property is one that may be mortgaged
             if mainGame.getCurProp().prop_owner == mainGame.cur_player and mainGame.getCurProp().mortgage_status == False: #Property must be owned by the current player and not already mortgaged
                 mainGame.getCurProp().mortgage_status = True #Property is now mortgaged
                 mainGame.getCurPlayer().addMoney(int(mainGame.getCurProp().mortgage_val))
@@ -466,7 +470,7 @@ def OfflineMainScreen(mainGame, screen, clock):
                     mainGame.getCurPlayer().spendMoney(int(mainGame.getCurProp().mortgage_val * 1.2)) #Decrease player's money by the cost of unmortgaging the property
         
         #Button for buying a Council House or Tower Block
-        if buy_upgrade_but_click and mainGame.getCurProp().prop_type == Prop_Type.NORMAL and mainGame.board.wholeGroupOwned(mainGame.cur_player, mainGame.getCurPlayer().player_pos): #Player wishes to upgrade the property and said upgrade can actually be purchaed
+        if buy_upgrade_but_click and netGame.getCurPropType() == Prop_Type.NORMAL and mainGame.board.wholeGroupOwned(mainGame.cur_player, mainGame.getCurPlayer().player_pos): #Player wishes to upgrade the property and said upgrade can actually be purchaed
             if mainGame.getCurProp().prop_owner == mainGame.cur_player: #May only be bought if the property is owned by the current player     
                 if mainGame.getCurProp().C_Houses < 4: #Fewer than 4  Council Houses, so these are the next upgrade to be bought 
                     if mainGame.getCurPlayer().player_money >= (mainGame.getCurProp().CH_cost * mainGame.board.countGroupSize(mainGame.cur_player, mainGame.getCurPlayer().player_pos)): #Player actually has enough money to buy the Council House upgrade
@@ -478,7 +482,7 @@ def OfflineMainScreen(mainGame, screen, clock):
                         mainGame.getCurPlayer().spendMoney(mainGame.getCurProp().TB_cost * mainGame.board.countGroupSize(mainGame.cur_player, mainGame.getCurPlayer().player_pos)) #Decrease the player's money by the cost of a Tower Block for however many properties are in the group
 
         #Button for selling a Council House or Tower Block
-        if sell_upgrade_but_click and mainGame.getCurProp().prop_type == Prop_Type.NORMAL and mainGame.board.wholeGroupOwned(mainGame.cur_player, mainGame.getCurPlayer().player_pos): #Player wishes to upgrade the property and said upgrade can actually be purchaed
+        if sell_upgrade_but_click and netGame.getCurPropType() == Prop_Type.NORMAL and mainGame.board.wholeGroupOwned(mainGame.cur_player, mainGame.getCurPlayer().player_pos): #Player wishes to upgrade the property and said upgrade can actually be purchaed
             if mainGame.getCurProp().prop_owner == mainGame.cur_player: #May only be bought if the property is owned by the current player     
                 if mainGame.getCurProp().T_Blocks > 0: #Property has a Tower Block that can be sold
                     mainGame.board.sellTBGroup(mainGame.cur_player, mainGame.getCurPlayer().player_pos) #Sell the Tower Blocks for the whole group
@@ -500,15 +504,12 @@ def OfflineMainScreen(mainGame, screen, clock):
             if msgBox.should_exit == False:
                 msgBox.draw(screen)
         
-        if main_buts[2].clicked(): #Details
+        if main_buts[1].clicked(): #Details
             main_screen_running = False
-            gotoScreen = 2
+            gotoScreen = 7
         if main_buts[0].clicked(): #Leaderboards
             main_screen_running = False
-            gotoScreen = 3
-        if main_buts[1].clicked(): #Pause
-            main_screen_running = False
-            gotoScreen = 4
+            gotoScreen = 8
 
         for but in main_buts:
             but.render(screen)
@@ -524,4 +525,4 @@ def OfflineMainScreen(mainGame, screen, clock):
         use_card_but_click = False
         clock.tick(fps) #10 fps currently, but could easily be changed to update more or less often
         pygame.display.flip() #Refresh display from a pygame perspective, to reflect the screen.blit()s
-    return mainGame, gotoScreen #Pass the Game object and the integer storing where the game will go to next back out to the main game loop
+    return netGame, localGame, gotoScreen #Pass the Game object and the integer storing where the game will go to next back out to the main game loop
