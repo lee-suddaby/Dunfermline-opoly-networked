@@ -7,7 +7,7 @@ class Game_Controller:
         self.card_used = True #Is only false if a card is available for use. True even if a card has not been drawn during a particular turn
         self.may_buy = False #True is player can buy a buyable property if they are on it
         self.turn_rent = 0
-        self.cur_card_num = 0 #Pot Luck or Council Chest card drawn on a particular turn
+        self.cur_card_num = -1 #Pot Luck or Council Chest card drawn on a particular turn
         self.cur_card_deck = None #PL for Pot Luck and CC for Council Chest
         self.cur_doubles = 0
         self.roll_num1 = 0 #First dice num
@@ -18,7 +18,7 @@ class Game_Controller:
         self.card_used = True
         self.may_buy = False
         self.turn_rent = 0
-        self.cur_card_num = 0
+        self.cur_card_num = -1
         self.cur_card_deck = None
         self.cur_doubles = 0
         self.roll_num1 = 0

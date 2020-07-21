@@ -71,9 +71,7 @@ class Game:
         self.players[self.getCurPlayerNum()].enterJail()
 
     #Apply the effects of a certain card
-    def applyCardEffects(self, player_num):
-        card_effects = self.controller.card_effs
-
+    def applyCardEffects(self, player_num, card_effects):
         if card_effects[0] != -1: #Player collects money
             self.players[player_num].addMoney(card_effects[0])
         if card_effects[1] != -1: #Player pays money
@@ -221,6 +219,19 @@ class Game:
                     ret_val += self.board.getProp(counter).cost
         return ret_val
 
+    def resetCurPlayerProperties(self):
+        for counter in range(self.board.max_pos):
+            if self.board.getProp(counter).prop_type == Prop_Type.NORMAL:
+                if self.board.getProp(counter).prop_owner == self.cur_player_num:
+                    self.board.getProp(counter).prop_owner = -1
+                    self.board.getProp(counter).mortgage_status = False
+                    self.board.getProp(counter).C_Houses = 0
+                    self.board.getProp(counter).T_Blocks = 0
+            if self.board.getProp(counter).prop_type == Prop_Type.SCHOOL or mainGame.board.getProp(counter).prop_type == Prop_Type.STATION:
+                if self.board.getProp(counter).prop_owner == self.cur_player_num:
+                    self.board.getProp(counter).prop_owner = -1
+                    self.board.getProp(counter).mortgage_status = False
+
     # Since all access to this class will be via the Pyro4 interface,
     # objects cannot be returned, so all access to the methods of the subclasses must be defined here.
     #--------------------Board Access--------------------
@@ -249,7 +260,7 @@ class Game:
         return self.board.JC_Money
     
     def boardCountGroupSize(self, player_num, prop_num):
-        self.board.countGroupSize(player_num, prop_num)
+        return self.board.countGroupSize(player_num, prop_num)
 
     #--------------------Card_Deck Access--------------------
     def shufflePLCards(self):
@@ -430,3 +441,9 @@ class Game:
 
     def propertyGetType(self, prop_num):
         return self.board.properties[prop_num].prop_type
+    
+    def propertyGetCost(self, prop_num):
+        return self.board.properties[prop_num].cost
+
+    def buyProperty(self, prop_num, new_owner):
+        self.board.properties[prop_num].buyProperty(new_owner)
