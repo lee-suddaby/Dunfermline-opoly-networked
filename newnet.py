@@ -7,6 +7,9 @@ import numpy as np
 from button import Button
 from textbox import TextBox
 
+from lib import CreateMortDeed, CreateTitleDeed, getCardEffects
+from cls_net import *
+
 #------------------------------New Networked Game Functions------------------------------ 
 def dim(a): #Function to determine the dimensions of a python list
     if not type(a) == list:
@@ -75,6 +78,90 @@ def renderPieces(screen, pieces, lobby, x, y, choose_text):
                 overlay = pygame.Surface((100,100), pygame.SRCALPHA)
                 overlay.fill((255,255,255,196))
                 screen.blit(overlay, [x + 110*(i%3), y + 110*int(i/3)]) #Semi-transparent overlay to indicate unavailable piece
+
+
+#------------------------------Functions for creating localGame------------------------------ 
+def createLocalPlayers(p_icons, lobby_arr): #Create Player objects using the names entered into text boxes and the corresponding icons
+    new_players = np.array([None] * dim(lobby_arr)[0])
+
+    for counter in range(dim(lobby_arr)[0]):
+        p_piece = LocalPlayer_Piece(lobby_arr[counter][2], pygame.transform.smoothscale(p_icons[lobby_arr[counter][2]-1], [32, 32])) #Create piece separately
+        new_players[p_counter] = LocalPlayer(counter, p_piece) #Now create player. 1500 is the money and 0 is the initial board position
+
+    return new_players
+
+#Create the decks of Pot Luck and Council Chest cards, based off of data and images loading in from external files
+def createLocalDeck(deck_name, card_base_path, card_texts_path, card_data_path, deck_size):
+    deck_cards = np.array([None] * deck_size) #Array of blank objects; will become array of individual Card objects
+    card_effects = getCardEffects(card_texts_path)
+    card_img = None #Blank object, later to become loaded-in pygame images
+    text_line = ""
+
+    fh = open(card_data_path, "r")
+    for counter in range(deck_size): #Iterate up to deck_size-1
+        card_img = pygame.transform.smoothscale(pygame.image.load(card_base_path + str(counter + 1) + ".png"), [330, 200]) #Images are named "Pot Luck 1.png", for example. N.B. Numbering starts at one, hence the +1
+        text_line = fh.readline()
+        data_array = np.array(text_line.split(",")) #Values are comma-separated in the external file
+        for d_count in range(len(data_array)): #Convert each of the elements in the array from String (as they will be coming from an external file) to numbers
+            data_array[d_count] = int(data_array[d_count])
+        
+        deck_cards[counter] = Card(counter+1, deck_name, card_img, card_effects, data_array)
+    fh.close()
+
+    ret_deck = Card_Deck(deck_cards)
+    return ret_deck
+
+#Creates an array of properties using data from a data file at the start of the game
+def createLocalProperties(file_path):
+    property_arr = np.array([None]*40) #Partition numpy array with 40 elements
+    fh = open(file_path, "r") #Opens the sequential file for reading
+    for counter in range(40): #40 properties
+        propType = int(fh.read(2)[:1]) #Reads in the first two characters in a line (one number and a separating comma) and then takes the first character. This leaves propType being an integer determining which type of property the line is for
+        line_text = fh.readline() #Read in the rest of the line, where all data is for a single property
+        prop_values = np.array(line_text.split(",")) #Transforms the string into an array where each comma-separated item is an indivual element
+
+        if propType == 0: #Most common property type
+            property_arr[counter] = LocalNormal_Property(prop_values, CreateTitleDeed(prop_values), CreateMortDeed(prop_values[0], int(prop_values[10])*1.2))
+        elif propType == 1: #School (requires crest image for title deed)
+            property_arr[counter] = LocalSchool_Property(prop_values, pygame.image.load("img/Deeds/" + str(prop_values[0]) + ".png"), CreateMortDeed(prop_values[0], int(prop_values[6])*1.2))
+        elif propType == 2: #Stations (requires crest image for title deed)
+            property_arr[counter] = LocalStation_Property(prop_values, pygame.image.load("img/Deeds/" + str(prop_values[0]) + ".png"), CreateMortDeed(prop_values[0], int(prop_values[4])*1.2))
+        elif propType == 3: #Pot Luck card spot
+            property_arr[counter] = LocalProperty(prop_values[0].strip(), Prop_Type.POT_LUCK)
+        elif propType == 4: #Council Chest card spot
+            property_arr[counter] = LocalProperty(prop_values[0].strip(), Prop_Type.COUNCIL_CHEST)
+        elif propType == 5: #Lost In Bogside spot
+            property_arr[counter] = LocalProperty(prop_values[0].strip(), Prop_Type.LOST_IN_BOGSIDE)
+        elif propType == 6: #Go To Bogside space
+            property_arr[counter] = LocalProperty(prop_values[0].strip(), Prop_Type.GO_TO_BOGSIDE)
+        elif propType == 7: #Property that incurs a charge when landed upon
+            property_arr[counter] = LocalProperty(prop_values[0].strip(), Prop_Type.PAYMENT)
+        elif propType == 8: #Job Centre where the player collects money when passing it
+            property_arr[counter] = LocalProperty(prop_values[0].strip(), Prop_Type.JOB_CENTRE)
+        elif propType == 9: #Disabled Parking - Does nothing as of yet (and it probably never will)
+            property_arr[counter] = LocalProperty(prop_values[0].strip(), Prop_Type.DISABLED_PARKING)
+    fh.close()
+    return property_arr #Array of 40 Property (or subclass) objects
+
+#Create the Board object that will become part of the Game class later
+def createLocalBoard(data_file_path, props_arr, Pot_Luck, Council_Chest, image_path, image_dim):
+    board_img = pygame.image.load(image_path) #Load and resize board image
+    board_img = pygame.transform.smoothscale(board_img, [image_dim, image_dim])
+    scale_f = image_dim/768 #Used in piece positioning - formulae were created for a 768x768 board
+
+    ret_board = Board(props_arr, Pot_Luck, Council_Chest, board_img, scale_f)
+    return ret_board
+
+#Create the final Game object - this is the main point of this screen
+def createLocalGame(game_players, game_board, dice_imgs_base_paths):
+    dice_imgs = np.array([None] * 6)
+    for d_count in range(6):
+        dice_imgs[d_count] = pygame.image.load(dice_imgs_base_paths + str(d_count+1) + ".png") #+1 as dice images are stored with numbers 1 to 6 in the file
+    dice_arr = np.array([LocalDie(dice_imgs), LocalDie(dice_imgs)])
+
+    ret_game = Game(dice_arr, game_board, game_players)
+    return ret_game
+
 
 #------------------------------New Networked Game Method------------------------------ 
 def NewNet(screen, clock):
@@ -197,7 +284,20 @@ def NewNet(screen, clock):
             if lobby.allReadyUp():
                 start_game_but.showBut()
 
+
+        if start_game and name_chosen and ready_up:
+            if lobby.allReadyToStart():
+                #Creation of localGame object first
+                players = createLocalPlayers(pieces_large, lobby.getLobby()) #Create array of LocalPlayer objects
+                prop_arr = createLocalProperties("data/Property Values.txt") #Create array of Property objects
+                Pot_Luck_Deck = createLocalDeck("Pot Luck", "img/PL/Pot Luck ", "data/Card_Texts.txt", "data/PL Master.txt", 16) #Create Card_Deck object
+                Council_Chest_Deck = createLocalDeck("Council Chest", "img/CC/Council Chest ", "data/Card_Texts.txt", "data/CC Master.txt", 16) #Create Card_Deck object
+                game_board = createLocalBoard("data/Board_Data.txt", prop_arr, Pot_Luck_Deck, Council_Chest_Deck, "img/Board.png", 600) #Create Board object
+
+                mainGame = createGame(players, game_board, save_path_box.getContents(), "img/Dice/") #Finally create the single, cohesive Game object that is the sole purpose of this screen/part of the game
+                
+
         clock.tick(10) #10 fps
         pygame.display.flip() #Refresh screen
 
-    return gotoScreen
+    return netGame, localGame, gotoScreen

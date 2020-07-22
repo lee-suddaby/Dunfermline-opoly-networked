@@ -36,6 +36,9 @@ screen.fill((255,255,255))
 pygame.mixer.music.play(-1)""" #Turned off while I'm developing this. Perhaps indefinitely if it turns out to be annoying enough.
 
 mGame = None #Create blank object that will store the Game object
+netGame = None
+localGame = None
+
 while nextScreen != -1: #Main Game Loop
     if nextScreen == 0: #New Game Screen
         mGame, nextScreen = NewGame(screen, clock)
@@ -48,7 +51,7 @@ while nextScreen != -1: #Main Game Loop
     elif nextScreen == 4: #Pause Menu
         mGame, nextScreen = OfflinePauseMenu(mGame, screen, clock)
     elif nextScreen == 5: #Menu for starting a multiplayer game, currently in development
-        nextScreen = NewNet(screen, clock)
+        netGame, localGame, nextScreen = NewNet(screen, clock)
     elif nextScreen == 6: #Networked main game screen
         netGame, localGame, nextScreen = NetworkMainScreen(netGame, localGame, screen, clock)
     elif nextScreen == 7: #Networked property details screen
