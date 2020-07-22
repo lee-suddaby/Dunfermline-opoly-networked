@@ -3,7 +3,7 @@ from pygame.locals import *
 import numpy as np
 
 from msgbox import MessageBox
-from offline_lib import displayButtonRect
+from lib import displayButtonRect
 from cls_offline import *
 from button import Button
 

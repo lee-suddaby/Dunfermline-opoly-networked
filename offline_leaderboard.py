@@ -5,7 +5,7 @@ import numpy as np
 
 from cls_offline import *
 from button import Button
-from offline_lib import getObtainMon, displayButtonRect
+from lib import getObtainMon, displayButtonRect
 from msgbox import MessageBox
 
 #------------------------------Leaderboards Functions------------------------------

@@ -4,7 +4,7 @@ import numpy as np
 
 from cls_offline import *
 from button import Button
-from offline_lib import displayButtonRect
+from lib import displayButtonRect
 
 #------------------------------Property Details Functions------------------------------
 #Return an integer representing the number of ownable properties on the board that are actually owned by the current player
