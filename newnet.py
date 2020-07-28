@@ -196,7 +196,7 @@ def NewNet(screen, clock):
     # Some setup code that was previously run while the screen was active.
     # Having it here instead streamlines things a bit.    
     ip_text = font_48.render("Your IP: " + socket.gethostbyname(socket.gethostname()), True, (0,0,0))
-    lobby = Pyro4.Proxy("PYRONAME:dfo.lobby")
+    lobby = Pyro4.Proxy("PYRONAME:dfo.game")
 
     waiting_texts = [font_48.render("Waiting to start.", True, (0,0,0)),
                      font_48.render("Waiting to start..", True, (0,0,0)),
@@ -300,4 +300,4 @@ def NewNet(screen, clock):
         clock.tick(10) #10 fps
         pygame.display.flip() #Refresh screen
 
-    return netGame, localGame, gotoScreen
+    return lobby, localGame, gotoScreen

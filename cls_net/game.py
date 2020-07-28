@@ -1,12 +1,19 @@
 import numpy as np
 import pygame
+import Pyro4
 from .property import Prop_Type
 from .game_controller import Game_Controller
+from .lobby import Lobby
 
 #------------------------------Game Class------------------------------
 #Brings all the game data together into one cohesive object that can be controlled more easily than all other data/objects independently
+@Pyro4.expose
+@Pyro4.behavior(instance_mode="single")
 class Game:
-    def __init__(self, new_players, new_dice, new_board):
+    def __init__(self):
+        self.lobby = Lobby()
+
+    def setupGame(self, new_players, new_dice, new_board):
         self.players = np.array(new_players) #The 2-6 players of the game
         self.dice = np.array(new_dice) #Game's two dice
         self.cur_player_num = 0 #Index of current player in he players array
@@ -447,3 +454,34 @@ class Game:
 
     def buyProperty(self, prop_num, new_owner):
         self.board.properties[prop_num].buyProperty(new_owner)
+
+    #--------------------Lobby Access--------------------
+    def getLobby(self):
+        return self.lobby.getLobby()
+
+    def getConns(self):
+        return self.lobby.getConns()
+
+    def getUsedPieces(self):
+        return self.lobby.getUsedPieces()
+
+    def connect(self, c_ip, c_name):
+        self.lobby.connect(c_ip, c_name)
+    
+    def disconnect(self, c_ip):
+        self.lobby.disconnect(c_ip)
+    
+    def setPiece(self, c_ip, c_piece):
+        self.lobby.setPiece(c_ip, c_piece)
+    
+    def readyUp(self, c_ip):
+        self.lobby.readyUp(c_ip)
+    
+    def readyToStart(self, c_ip):
+        self.lobby.readyToStart(c_ip)
+    
+    def allReadyUp(self):
+        return self.lobby.allReadyUp()
+    
+    def allReadyToStart(self):
+        return self.lobby.allReadyToStart()
