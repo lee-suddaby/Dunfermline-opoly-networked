@@ -198,6 +198,10 @@ def NewNet(screen, clock):
     ip_text = font_48.render("Your IP: " + socket.gethostbyname(socket.gethostname()), True, (0,0,0))
     lobby = Pyro4.Proxy("PYRONAME:dfo.game")
 
+    ready_up_texts = [font_48.render("Waiting for players to ready up.", True, (0,0,0)),
+                     font_48.render("Waiting for players to ready up..", True, (0,0,0)),
+                     font_48.render("Waiting for players to ready up...", True, (0,0,0))]
+
     waiting_texts = [font_48.render("Waiting to start.", True, (0,0,0)),
                      font_48.render("Waiting to start..", True, (0,0,0)),
                      font_48.render("Waiting to start...", True, (0,0,0))]
@@ -243,6 +247,9 @@ def NewNet(screen, clock):
             ready_up_but.render(screen)
             start_game_but.render(screen)
             
+            if ready_up and not start_game:
+                screen.blit(ready_up_texts[int(pygame.time.get_ticks()/500) % 3], [235, 460])
+
             if start_game:
                 screen.blit(waiting_texts[int(pygame.time.get_ticks()/500) % 3], [375, 460])
 
@@ -296,6 +303,8 @@ def NewNet(screen, clock):
 
                 mainGame = createGame(players, game_board, save_path_box.getContents(), "img/Dice/") #Finally create the single, cohesive Game object that is the sole purpose of this screen/part of the game
                 
+                newnet_running = False
+                gotoScreen = 6
 
         clock.tick(10) #10 fps
         pygame.display.flip() #Refresh screen
