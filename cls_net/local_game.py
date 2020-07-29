@@ -15,6 +15,9 @@ class LocalGame:
         self.players = new_players
         self.prop_thumbs = None
         self.controller = Local_Controller()
+        self.this_player_num = new_this_player #Each player will have their own LocalGame on their machine. 
+        # This attribute stores the number of their player (i.e. so their is some record of the player on this machine
+        # being player 2, for example).
 
     def getDieImg(self, score, die_num):
         return self.die[die_num].getImg(score)

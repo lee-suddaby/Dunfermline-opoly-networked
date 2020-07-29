@@ -162,6 +162,12 @@ def createLocalGame(game_players, game_board, dice_imgs_base_paths):
     ret_game = Game(dice_arr, game_board, game_players)
     return ret_game
 
+def findPlayerNum(lobby):
+    lobby_arr = lobby.getLobby()
+    for counter in range(dim(lobby_arr)[0]):
+        if lobby_arr[counter][0] == socket.gethostbyname(socket.gethostname()): # Matching of connected IPs
+            return counter
+    return -1 # If, somehow, the IP cannot be matched up.
 
 #------------------------------New Networked Game Method------------------------------ 
 def NewNet(screen, clock):
@@ -302,8 +308,9 @@ def NewNet(screen, clock):
                 Pot_Luck_Deck = createLocalDeck("Pot Luck", "img/PL/Pot Luck ", "data/Card_Texts.txt", "data/PL Master.txt", 16) #Create Card_Deck object
                 Council_Chest_Deck = createLocalDeck("Council Chest", "img/CC/Council Chest ", "data/Card_Texts.txt", "data/CC Master.txt", 16) #Create Card_Deck object
                 game_board = createLocalBoard("data/Board_Data.txt", prop_arr, Pot_Luck_Deck, Council_Chest_Deck, "img/Board.png", 600) #Create Board object
+                this_player_num = findPlayerNum(lobby)
 
-                mainGame = createGame(players, game_board, save_path_box.getContents(), "img/Dice/") #Finally create the single, cohesive Game object that is the sole purpose of this screen/part of the game
+                mainGame = createGame(players, game_board, save_path_box.getContents(), "img/Dice/", this_player_num) #Finally create the single, cohesive Game object that is the sole purpose of this screen/part of the game
                 
                 if lobby.getGameSetup() == False:
                     fh = open("data/Property Values.txt", "r")

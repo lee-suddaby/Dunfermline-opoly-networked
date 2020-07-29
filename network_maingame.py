@@ -176,8 +176,10 @@ def displayPieces(screen, netGame, localGame):
                     
 
 #------------------------------Main Game Code------------------------------         
-def OfflineMainScreen(netGame, localGame, screen, clock):
+def NetworkMainScreen(netGame, localGame, screen, clock):
     localGame.prop_thumbs = pygame.transform.smoothscale(CreateThumbs(netGame, localGame, netGame.getCurPlayerNum()), [385,170])
+    turn_overlay = pygame.Surface((1024, 768), pygame.SRCALPHA) #Semi-transparent overlay for when it is not the turn of the player playing on this machine
+    turn_overaly.fill((255, 255, 255, 127))
 
     roll_dice_button = pygame.Rect(180,610,150,70) #Create rectangle for roll dice/end turn button
     buy_prop_button = pygame.Rect(675,690,250,70) #Create rectangle for property buying button (also used for mortgaging and unmortgaging
@@ -237,26 +239,29 @@ def OfflineMainScreen(netGame, localGame, screen, clock):
                     main_screen_running = False
                     gotoScreen = -1
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1: #Left mouse button
-                    mouse_pos = event.pos #Position of the cursor when nouse was clicked
-                    if buy_prop_button.collidepoint(mouse_pos):
-                        if netGame.getCurPropOwner() == -1: #Property is unowned
-                            buy_but_click = True
-                        elif netGame.getCurPropOwner() == cur_player_num: #If owned by current player, it may be mortgaged
-                            mort_but_click = True
-                    if roll_dice_button.collidepoint(mouse_pos):
-                        if netGame.getCard_used() == False:
-                            use_card_but_click = True #Roll dice button was clicked
-                        elif netGame.getPlayer_rolled() == False:
-                            dice_but_click = True #End turn button was clicked
-                        else:
-                            turn_but_click = True #Button to apply card effects was clicked
-                    if in_jail_button.collidepoint(mouse_pos): #Button to pay £50 to get out of bogside was clicked
-                        leave_bogside_but_click = True
-                    if buy_upgrade_button.collidepoint(mouse_pos):
-                        buy_upgrade_but_click = True
-                    if sell_upgrade_button.collidepoint(mouse_pos):
-                        sell_upgrade_but_click = True
+                # Since this mode of the game is networked, the player on this machine should not be able to perform actions
+                # when it's someone else's turn (obviously!)
+                if netGame.getCurPlayerNum() == localGame.this_player_num:
+                    if event.button == 1: #Left mouse button
+                        mouse_pos = event.pos #Position of the cursor when nouse was clicked
+                        if buy_prop_button.collidepoint(mouse_pos):
+                            if netGame.getCurPropOwner() == -1: #Property is unowned
+                                buy_but_click = True
+                            elif netGame.getCurPropOwner() == cur_player_num: #If owned by current player, it may be mortgaged
+                                mort_but_click = True
+                        if roll_dice_button.collidepoint(mouse_pos):
+                            if netGame.getCard_used() == False:
+                                use_card_but_click = True #Roll dice button was clicked
+                            elif netGame.getPlayer_rolled() == False:
+                                dice_but_click = True #End turn button was clicked
+                            else:
+                                turn_but_click = True #Button to apply card effects was clicked
+                        if in_jail_button.collidepoint(mouse_pos): #Button to pay £50 to get out of bogside was clicked
+                            leave_bogside_but_click = True
+                        if buy_upgrade_button.collidepoint(mouse_pos):
+                            buy_upgrade_but_click = True
+                        if sell_upgrade_button.collidepoint(mouse_pos):
+                            sell_upgrade_but_click = True
                     
                     
         #Clear screen and display main board
@@ -348,7 +353,7 @@ def OfflineMainScreen(netGame, localGame, screen, clock):
 
         #Display title deed for property currently on
         if netGame.getCurPropType() == Prop_Type.NORMAL or netGame.getCurPropType() == Prop_Type.SCHOOL or netGame.getCurPropType() == Prop_Type.STATION: #If property actually will have a title deed to display
-            title_deed = pygame.transform.smoothscale(netGame.board.properties[].getTitleDeed(), [270,400])
+            title_deed = pygame.transform.smoothscale(localGame.board.properties[cur_pos].getTitleDeed(), [270,400])
             screen.blit(title_deed, [665, 230])
 
             if netGame.getCurPropType() == Prop_Type.NORMAL:
@@ -464,11 +469,11 @@ def OfflineMainScreen(netGame, localGame, screen, clock):
         #Button for mortgaging or unmortgaging a property
         if mort_but_click and (netGame.getCurPropType() == Prop_Type.NORMAL or netGame.getCurPropType() == Prop_Type.SCHOOL or netGame.getCurPropType() == Prop_Type.STATION): #Final check that the property is one that may be mortgaged
             if netGame.getCurPropOwner() == cur_player_num and netGame.propertyGetMortStat(cur_pos) == False: #Property must be owned by the current player and not already mortgaged
-                netGame.propertyGetMortStat(cur_pos) = True #Property is now mortgaged
+                netGame.propertyGetMortStat(cur_pos, True) #Property is now mortgaged
                 netGame.playerAddMoney(int(netGame.propertyGetMortVal(cur_pos)), cur_player_num)
             elif netGame.getCurPropOwner() == cur_player_num and netGame.propertyGetMortStat(cur_pos): #Property must be owned by the current player and is mortgaged
                 if netGame.playerGetMoney(cur_player_num) >= netGame.propertyGetMortVal(cur_pos) * 1.2: #Player has sufficient money to unmortgage the property (twice the money gotten by mortgaging it)
-                    netGame.propertyGetMortStat(cur_pos) = False #Property is no longer in a state of being mortgaged
+                    netGame.propertySetMortStat(cur_pos, False) #Property is no longer in a state of being mortgaged
                     netGame.playerAddMoney(int(netGame.propertyGetMortVal(cur_pos) * 1.2), cur_player_num) #Decrease player's money by the cost of unmortgaging the property
         
         #Button for buying a Council House or Tower Block
@@ -515,6 +520,10 @@ def OfflineMainScreen(netGame, localGame, screen, clock):
 
         for but in main_buts:
             but.render(screen)
+        
+        # Display the overlay for when it's not your turn, if necessary
+        if netGame.getCurPlayerNum() != localGame.this_player_num:
+            screen.blit(turn_overlay, [0,0])
 
         #Reset button booleans so that effects of clicking buttons do not happen more than once
         dice_but_click = False

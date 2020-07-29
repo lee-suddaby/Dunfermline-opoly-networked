@@ -12,6 +12,7 @@ from offline_pause import OfflinePauseMenu
 
 from network_details import NetworkPropDetails
 from network_leaderboard import NetworkLeaderboards
+from network_maingame import NetworkMainScreen
 
 from loading import LoadScreen
 from new import NewGame
