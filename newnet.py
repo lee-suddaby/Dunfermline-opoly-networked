@@ -196,7 +196,9 @@ def NewNet(screen, clock):
     # Some setup code that was previously run while the screen was active.
     # Having it here instead streamlines things a bit.    
     ip_text = font_48.render("Your IP: " + socket.gethostbyname(socket.gethostname()), True, (0,0,0))
-    lobby = Pyro4.Proxy("PYRONAME:dfo.game")
+    lobby = Pyro4.Proxy("PYRONAME:dfo.game") 
+    # Okay, this is actually a Game() class object, but the Lobby() part is the only part actually used here, 
+    # and I wrote everything here with lobby separate first, so why bother changing it?
 
     ready_up_texts = [font_48.render("Waiting for players to ready up.", True, (0,0,0)),
                      font_48.render("Waiting for players to ready up..", True, (0,0,0)),
@@ -303,6 +305,11 @@ def NewNet(screen, clock):
 
                 mainGame = createGame(players, game_board, save_path_box.getContents(), "img/Dice/") #Finally create the single, cohesive Game object that is the sole purpose of this screen/part of the game
                 
+                if lobby.getGameSetup() == False:
+                    fh = open("data/Property Values.txt", "r")
+                    prop_data = fh.read()
+                    lobby.setupGame(prop_data)
+
                 newnet_running = False
                 gotoScreen = 6
 

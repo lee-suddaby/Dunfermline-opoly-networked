@@ -1,7 +1,12 @@
 import numpy as np
 import pygame
 import Pyro4
-from .property import Prop_Type
+
+from .board import Board
+from .card_deck import Card_Deck
+from .die import Die
+from .player import Player
+from .property import *
 from .game_controller import Game_Controller
 from .lobby import Lobby
 
@@ -12,13 +17,65 @@ from .lobby import Lobby
 class Game:
     def __init__(self):
         self.lobby = Lobby()
+        self.game_setup = False
 
-    def setupGame(self, new_players, new_dice, new_board):
+    def createProperties(self, prop_data):
+        property_arr = np.array([None]*40) #Partition numpy array with 40 elements
+        prop_data_arr = prop_data.split("\n")
+
+        for counter in range(40): #40 properties
+            cur_prop_data = prop_data_arr[counter].split(",")
+            propType = cur_prop_data[0]
+            prop_values = cur_prop_data[1:] # All elements of the array except the first one
+
+            if propType == 0: #Most common property type
+                property_arr[counter] = Normal_Property(prop_values)
+            elif propType == 1: #School
+                property_arr[counter] = School_Property(prop_values)
+            elif propType == 2: #Stations
+                property_arr[counter] = Station_Property(prop_values)
+            elif propType == 3: #Pot Luck card spot
+                property_arr[counter] = Property(prop_values[0].strip(), Prop_Type.POT_LUCK)
+            elif propType == 4: #Council Chest card spot
+                property_arr[counter] = Property(prop_values[0].strip(), Prop_Type.COUNCIL_CHEST)
+            elif propType == 5: #Lost In Bogside spot
+                property_arr[counter] = Property(prop_values[0].strip(), Prop_Type.LOST_IN_BOGSIDE)
+            elif propType == 6: #Go To Bogside space
+                property_arr[counter] = Go_To_Bogside(prop_values[0].strip(), prop_values[1])
+            elif propType == 7: #Property that incurs a charge when landed upon
+                property_arr[counter] = Charge_Property(prop_values[0].strip(), prop_values[1])
+            elif propType == 8: #Job Centre where the player collects money when passing it
+                property_arr[counter] = Property(prop_values[0].strip(), Prop_Type.JOB_CENTRE)
+            elif propType == 9: #Disabled Parking - Does nothing as of yet (and it probably never will)
+                property_arr[counter] = Property(prop_values[0].strip(), Prop_Type.DISABLED_PARKING)
+        fh.close()
+        return property_arr
+
+    def setupGame(self, prop_data):
+        # Initial money will he hard-coded (*gasp*) because it's far easier. Fight me.
+        no_of_players = len(self.lobby.getConns())
+        new_players = np.array([None] * no_of_players)
+        lobby_arr = self.lobby.getLobby()
+        for counter in range(no_of_players):
+            new_players[counter] = Player(1500, lobby_arr[counter][2], lobby_arr[counter][1])
         self.players = np.array(new_players) #The 2-6 players of the game
-        self.dice = np.array(new_dice) #Game's two dice
+
+        die1 = Die()
+        die2 = Die()
+        self.dice = np.array(die1, die2) #Game's two dice
+
+        new_props = createProperties(prop_data)
+        PL_Deck = Card_Deck(16)
+        CC_Deck = Card_Deck(16)
+        self.board = Board(new_props, 10, 200, PL_Deck, CC_Deck)
+
         self.cur_player_num = 0 #Index of current player in he players array
-        self.board = new_board
         self.controller = Game_Controller()
+
+        self.game_setup = True
+    
+    def getGameSetup(self):
+        return self.game_setup
 
     def getCurPlayerNum(self):
         return self.cur_player_num

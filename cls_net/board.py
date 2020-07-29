@@ -5,14 +5,13 @@ from .property import Prop_Type
 #------------------------------Board Class------------------------------
 #Used for storing all data for properties, the two decks of cards, as well as a few other pieces of information such as money collected on passing the Job Centre
 class Board:
-    def __init__(self, new_props, new_jpos, new_JCmon, new_PL, new_CC, new_sf): #Constructor
+    def __init__(self, new_props, new_bogpos, new_JCmon, new_PL, new_CC): #Constructor
         self.properties = np.array(new_props) #Objects of various subclasses of the Property superclass
         self.max_pos = len(new_props) - 1 #Highest position (when zero-indexed) that a player can be on; also highest indexed element in properties array
-        self.bogside_pos = new_jpos
+        self.bogside_pos = new_bogpos
         self.JC_Money = new_JCmon
         self.PL_Deck = new_PL #Card_Deck object
         self.CC_Deck = new_CC #Card_Deck object
-        self.board_sf = new_sf
 
     def getProp(self,b_pos):
         return self.properties[b_pos]
