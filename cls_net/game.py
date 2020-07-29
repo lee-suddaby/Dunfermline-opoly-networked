@@ -1,5 +1,4 @@
 import numpy as np
-import pygame
 import Pyro4
 
 from .board import Board
@@ -130,8 +129,8 @@ class Game:
 
     def sendCurPlayerToBog(self):
         self.players[self.getCurPlayerNum()].player_pos = self.board.bogside_pos #Move the player
-        self.players[self.getCurPlayerNum()].player_x = self.players[0].calcPieceX(self.board.bogside_pos, self.board.board_sf)
-        self.players[self.getCurPlayerNum()].player_y = self.players[0].calcPieceY(self.board.bogside_pos, self.board.board_sf)
+        self.players[self.getCurPlayerNum()].player_x = self.players[0].calcPieceX(self.board.bogside_pos)
+        self.players[self.getCurPlayerNum()].player_y = self.players[0].calcPieceY(self.board.bogside_pos)
         self.players[self.getCurPlayerNum()].enterJail()
 
     #Apply the effects of a certain card
@@ -154,8 +153,8 @@ class Game:
             self.players[player_num].setMissTurns(card_effects[3])
         if card_effects[4] != -1: #Move a number of spaces
             self.players[player_num].movePlayer(card_effects[4], self.board)
-            self.players[player_num].player_x = self.players[player_num].calcPieceX(self.players[player_num].player_pos, self.board.board_sf)
-            self.players[player_num].player_y = self.players[player_num].calcPieceY(self.players[player_num].player_pos, self.board.board_sf)
+            self.players[player_num].player_x = self.players[player_num].calcPieceX(self.players[player_num].player_pos)
+            self.players[player_num].player_y = self.players[player_num].calcPieceY(self.players[player_num].player_pos)
 
             #Determine rent if applicable
             self.controller.turn_rent = self.determineRent()
@@ -167,8 +166,8 @@ class Game:
         if card_effects[5] != -1: #Move to a certain spot (and collect money if passing Job Centre)
             orig_pos = self.players[player_num].player_pos
             self.players[player_num].player_pos = card_effects[5]
-            self.players[player_num].player_x = self.players[player_num].calcPieceX(self.players[player_num].player_pos, self.board.board_sf)
-            self.players[player_num].player_y = self.players[player_num].calcPieceY(self.players[player_num].player_pos, self.board.board_sf)
+            self.players[player_num].player_x = self.players[player_num].calcPieceX(self.players[player_num].player_pos)
+            self.players[player_num].player_y = self.players[player_num].calcPieceY(self.players[player_num].player_pos)
             if self.players[player_num].player_pos < orig_pos: #Means player must have 'passed' the Job Centre
                 self.players[player_num].addMoney(self.board.JC_Money)
 
@@ -181,8 +180,8 @@ class Game:
                     self.getPlayer(self.board.getProp(self.players[player_num].player_pos).prop_owner).addMoney(self.controller.turn_rent)
         if card_effects[6] != -1: #Move to a certain spot (but do not collect money if passing Job Centre)
             self.players[player_num].player_pos = card_effects[6]
-            self.players[player_num].player_x = self.players[player_num].calcPieceX(self.players[player_num].player_pos, self.board.board_sf)
-            self.players[player_num].player_y = self.players[player_num].calcPieceY(self.players[player_num].player_pos, self.board.board_sf)
+            self.players[player_num].player_x = self.players[player_num].calcPieceX(self.players[player_num].player_pos)
+            self.players[player_num].player_y = self.players[player_num].calcPieceY(self.players[player_num].player_pos)
 
             #Determine rent if applicable
             self.controller.turn_rent = self.determineRent()

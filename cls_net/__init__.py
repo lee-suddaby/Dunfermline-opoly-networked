@@ -13,4 +13,4 @@ from .local_die import LocalDie
 from .local_game import LocalGame
 from .local_piece import LocalPlayer_Piece
 from .local_player import LocalPlayer
-from .local_property import LocalProperty
+from .local_property import *

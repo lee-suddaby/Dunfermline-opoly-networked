@@ -40,7 +40,7 @@ class LocalNormal_Property(LocalProperty): #Create as subclass of Property
         self.title_deed = new_deed #Image storing the title deed for the property
         self.mortgage_deed = new_mdeed  #Image for the title deed to be shown when the property is mortgaged
         #Pygame colour linked to the group. 2 or 3 properties on the board will share one
-        self.group_col = pygame.Color(int(vals[0]), int(vals[1]), int(vals[2]), 0) #Sets up the colour so that pygame recognises it as a RGB colour sequence, rather than an array of 3 numbers, as could potentially happen without
+        self.group_col = pygame.Color(int(vals[11]), int(vals[12]), int(vals[13]), 0) #Sets up the colour so that pygame recognises it as a RGB colour sequence, rather than an array of 3 numbers, as could potentially happen without
         
     def getTitleDeed(self):
         if self.mortgage_status:

@@ -53,8 +53,7 @@ class Player:
 
         #Determine the x and y coordinates of a player's token based on which property of the board it is occupying
     #The calculations were based off of testing that used linear regression to find an 'optimal' relationship between board position and coordinate positions
-    #Scale factor (sf) is used so board size can easily be changed, as calculations were created with a 768x768 board
-    def calcPieceX(self, pos, sf):
+    def calcPieceX(self, pos):
         p_x = 0
         if 10 <= pos <= 20:
             p_x = 10
@@ -64,9 +63,9 @@ class Player:
             p_x = 666 - 61*pos
         elif 20 < pos < 30:
             p_x = 61*pos - 1168
-        return p_x * sf
+        return p_x
 
-    def calcPieceY(self, pos, sf):
+    def calcPieceY(self, pos):
         p_y = 0
         if 0 <= pos <= 10:
             p_y = 710
@@ -76,4 +75,4 @@ class Player:
             p_y = 1281 - 61*pos
         elif 30 < pos:
             p_y = 61*pos - 1767
-        return p_y * sf
+        return p_y

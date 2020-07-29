@@ -9,7 +9,7 @@ from .local_player import LocalPlayer
 #------------------------------Local Class------------------------------
 #Stores images and other objects that cannot be passed over a network via Pyro4.
 class LocalGame:
-    def __init__(self, new_die, new_board, new_players):
+    def __init__(self, new_die, new_board, new_players, new_this_player):
         self.die = np.array(new_die) #Array of loaded pygame images
         self.board = new_board
         self.players = new_players

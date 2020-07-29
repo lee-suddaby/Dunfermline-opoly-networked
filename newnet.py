@@ -86,7 +86,7 @@ def createLocalPlayers(p_icons, lobby_arr): #Create Player objects using the nam
 
     for counter in range(dim(lobby_arr)[0]):
         p_piece = LocalPlayer_Piece(lobby_arr[counter][2], pygame.transform.smoothscale(p_icons[lobby_arr[counter][2]-1], [32, 32])) #Create piece separately
-        new_players[p_counter] = LocalPlayer(counter, p_piece) #Now create player. 1500 is the money and 0 is the initial board position
+        new_players[counter] = LocalPlayer(counter, p_piece) #Now create player. 1500 is the money and 0 is the initial board position
 
     return new_players
 
@@ -105,10 +105,10 @@ def createLocalDeck(deck_name, card_base_path, card_texts_path, card_data_path, 
         for d_count in range(len(data_array)): #Convert each of the elements in the array from String (as they will be coming from an external file) to numbers
             data_array[d_count] = int(data_array[d_count])
         
-        deck_cards[counter] = Card(counter+1, deck_name, card_img, card_effects, data_array)
+        deck_cards[counter] = LocalCard(counter+1, deck_name, card_img, card_effects, data_array)
     fh.close()
 
-    ret_deck = Card_Deck(deck_cards)
+    ret_deck = LocalCard_Deck(deck_cards)
     return ret_deck
 
 #Creates an array of properties using data from a data file at the start of the game
@@ -153,13 +153,13 @@ def createLocalBoard(data_file_path, props_arr, Pot_Luck, Council_Chest, image_p
     return ret_board
 
 #Create the final Game object - this is the main point of this screen
-def createLocalGame(game_players, game_board, dice_imgs_base_paths):
+def createLocalGame(game_players, game_board, dice_imgs_base_paths, this_player_num):
     dice_imgs = np.array([None] * 6)
     for d_count in range(6):
         dice_imgs[d_count] = pygame.image.load(dice_imgs_base_paths + str(d_count+1) + ".png") #+1 as dice images are stored with numbers 1 to 6 in the file
     dice_arr = np.array([LocalDie(dice_imgs), LocalDie(dice_imgs)])
 
-    ret_game = Game(dice_arr, game_board, game_players)
+    ret_game = LocalGame(dice_arr, game_board, game_players, this_player_num)
     return ret_game
 
 def findPlayerNum(lobby):
@@ -255,10 +255,10 @@ def NewNet(screen, clock):
             ready_up_but.render(screen)
             start_game_but.render(screen)
             
-            if ready_up and not start_game:
+            if ready_up and not start_game and not lobby.allReadyUp():
                 screen.blit(ready_up_texts[int(pygame.time.get_ticks()/500) % 3], [235, 460])
 
-            if start_game:
+            if start_game and not lobby.allReadyToStart():
                 screen.blit(waiting_texts[int(pygame.time.get_ticks()/500) % 3], [375, 460])
 
         if name_box.visible: #Player is entering name
@@ -310,7 +310,7 @@ def NewNet(screen, clock):
                 game_board = createLocalBoard("data/Board_Data.txt", prop_arr, Pot_Luck_Deck, Council_Chest_Deck, "img/Board.png", 600) #Create Board object
                 this_player_num = findPlayerNum(lobby)
 
-                mainGame = createGame(players, game_board, save_path_box.getContents(), "img/Dice/", this_player_num) #Finally create the single, cohesive Game object that is the sole purpose of this screen/part of the game
+                mainGame = createLocalGame(players, game_board, "img/Dice/", this_player_num) #Finally create the single, cohesive Game object that is the sole purpose of this screen/part of the game
                 
                 if lobby.getGameSetup() == False:
                     fh = open("data/Property Values.txt", "r")
