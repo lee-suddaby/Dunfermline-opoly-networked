@@ -149,7 +149,7 @@ def createLocalBoard(data_file_path, props_arr, Pot_Luck, Council_Chest, image_p
     board_img = pygame.transform.smoothscale(board_img, [image_dim, image_dim])
     scale_f = image_dim/768 #Used in piece positioning - formulae were created for a 768x768 board
 
-    ret_board = Board(props_arr, Pot_Luck, Council_Chest, board_img, scale_f)
+    ret_board = LocalBoard(props_arr, Pot_Luck, Council_Chest, board_img, scale_f)
     return ret_board
 
 #Create the final Game object - this is the main point of this screen
@@ -310,7 +310,7 @@ def NewNet(screen, clock):
                 game_board = createLocalBoard("data/Board_Data.txt", prop_arr, Pot_Luck_Deck, Council_Chest_Deck, "img/Board.png", 600) #Create Board object
                 this_player_num = findPlayerNum(lobby)
 
-                mainGame = createLocalGame(players, game_board, "img/Dice/", this_player_num) #Finally create the single, cohesive Game object that is the sole purpose of this screen/part of the game
+                localGame = createLocalGame(players, game_board, "img/Dice/", this_player_num) #Finally create the single, cohesive Game object that is the sole purpose of this screen/part of the game
                 
                 if lobby.getGameSetup() == False:
                     fh = open("data/Property Values.txt", "r")

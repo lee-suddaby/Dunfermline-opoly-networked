@@ -22,7 +22,7 @@ def CreateThumbs(netGame, localGame, player):
     thumbnails = pygame.Surface((450,200)) #Create new surface on which to blit title deed thumbnails as they are generated
     thumbnails.fill((255,255,255)) #Screen starts white
     
-    for counter in range(board.max_pos+1): #For each property
+    for counter in range(localGame.board.max_pos+1): #For each property
         if netGame.propertyGetType(counter) == Prop_Type.NORMAL: #Most common property, so one with a 'normal' title deed
             if localGame.board.getProp(counter).group_col != colour_on: #If we have reached a new group, reset the counter and note the new current group colour
                 colour_on = board.getProp(counter).group_col #Set new current group colour
@@ -179,7 +179,7 @@ def displayPieces(screen, netGame, localGame):
 def NetworkMainScreen(netGame, localGame, screen, clock):
     localGame.prop_thumbs = pygame.transform.smoothscale(CreateThumbs(netGame, localGame, netGame.getCurPlayerNum()), [385,170])
     turn_overlay = pygame.Surface((1024, 768), pygame.SRCALPHA) #Semi-transparent overlay for when it is not the turn of the player playing on this machine
-    turn_overaly.fill((255, 255, 255, 127))
+    turn_overlay.fill((255, 255, 255, 127))
 
     roll_dice_button = pygame.Rect(180,610,150,70) #Create rectangle for roll dice/end turn button
     buy_prop_button = pygame.Rect(675,690,250,70) #Create rectangle for property buying button (also used for mortgaging and unmortgaging

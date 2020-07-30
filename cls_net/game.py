@@ -24,7 +24,7 @@ class Game:
 
         for counter in range(40): #40 properties
             cur_prop_data = prop_data_arr[counter].split(",")
-            propType = cur_prop_data[0]
+            propType = int(cur_prop_data[0])
             prop_values = cur_prop_data[1:] # All elements of the array except the first one
 
             if propType == 0: #Most common property type
@@ -47,7 +47,6 @@ class Game:
                 property_arr[counter] = Property(prop_values[0].strip(), Prop_Type.JOB_CENTRE)
             elif propType == 9: #Disabled Parking - Does nothing as of yet (and it probably never will)
                 property_arr[counter] = Property(prop_values[0].strip(), Prop_Type.DISABLED_PARKING)
-        fh.close()
         return property_arr
 
     def setupGame(self, prop_data):
@@ -61,9 +60,9 @@ class Game:
 
         die1 = Die()
         die2 = Die()
-        self.dice = np.array(die1, die2) #Game's two dice
+        self.dice = np.array([die1, die2]) #Game's two dice
 
-        new_props = createProperties(prop_data)
+        new_props = self.createProperties(prop_data)
         PL_Deck = Card_Deck(16)
         CC_Deck = Card_Deck(16)
         self.board = Board(new_props, 10, 200, PL_Deck, CC_Deck)
