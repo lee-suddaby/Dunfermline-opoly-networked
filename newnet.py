@@ -101,7 +101,7 @@ def createLocalDeck(deck_name, card_base_path, card_texts_path, card_data_path, 
     for counter in range(deck_size): #Iterate up to deck_size-1
         card_img = pygame.transform.smoothscale(pygame.image.load(card_base_path + str(counter + 1) + ".png"), [330, 200]) #Images are named "Pot Luck 1.png", for example. N.B. Numbering starts at one, hence the +1
         text_line = fh.readline()
-        data_array = np.array(text_line.split(",")) #Values are comma-separated in the external file
+        data_array = text_line.split(",") #Values are comma-separated in the external file
         for d_count in range(len(data_array)): #Convert each of the elements in the array from String (as they will be coming from an external file) to numbers
             data_array[d_count] = int(data_array[d_count])
         

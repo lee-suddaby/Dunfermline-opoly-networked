@@ -55,7 +55,7 @@ class Normal_Property(Property): #Create as subclass of Property
         self.group_B = int(vals[13])
 
     def getGroupCol(self):
-        return pygame.Color(int(vals[11]), int(vals[12]), int(vals[13]), 0)
+        return pygame.Color(self.group_R, self.group_G, self.group_B, 0)
 
     #Determine how much rent should be paid based on CH and TB owned
     def getRent(self):

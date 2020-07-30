@@ -23,9 +23,9 @@ def CreateThumbs(netGame, localGame, player):
     thumbnails.fill((255,255,255)) #Screen starts white
     
     for counter in range(localGame.board.max_pos+1): #For each property
-        if netGame.propertyGetType(counter) == Prop_Type.NORMAL: #Most common property, so one with a 'normal' title deed
+        if netGame.propertyGetType(counter) == 1: #Most common property, so one with a 'normal' title deed
             if localGame.board.getProp(counter).group_col != colour_on: #If we have reached a new group, reset the counter and note the new current group colour
-                colour_on = board.getProp(counter).group_col #Set new current group colour
+                colour_on = localGame.board.getProp(counter).group_col #Set new current group colour
                 colour_counter = 0 #Reset colour
                 groups_done = groups_done + 1 #New group, so that's another one completed
             else: #Still on the same property group
@@ -37,7 +37,7 @@ def CreateThumbs(netGame, localGame, player):
             #Complicated mathematical calculations to determine the exact position of the current thumbnail.
             #If in the same group, there is 5 pixels of movement to the right for each property, and vertical movement is one third of each thumbnails's height
             thumbnails.blit(cur_thumb, [(groups_done-1)*(t_width+int(t_width/5)) + colour_counter*int(t_width/5), colour_counter*int(t_height/3)])
-        elif netGame.propertyGetType(counter) == Prop_Type.SCHOOL or netGame.propertyGetType(counter) == Prop_Type.STATION: #School and station properties
+        elif netGame.propertyGetType(counter) == 2 or netGame.propertyGetType(counter) == 3: #School and station properties
             specials = specials + 1
             cur_thumb = CreateThumbImg("img/Thumbs/" + netGame.propertyGetTitle(counter) + ".png", netGame.propertyGetOwner(counter) == player)
             thumbnails.blit(cur_thumb, [(specials-1)*t_width + (specials-1)*int(t_width/5), 120]) #All these thumbnails are displayed in one horizontal line; therefore the same y-coordinate each time
@@ -138,7 +138,7 @@ def displayRent(screen, font, rent):
 
 #Display a Council Chest or Pot Luck card (only called if applicable)
 def displayCard(screen, display_card):
-    screen.blit(display_card.card_img, [635, 270])
+    screen.blit(display_card, [635, 270])
 
 #Render the texts describing the effects of the cards. Also returns the array of numerical values
 def renderCardTexts(font, card):
@@ -303,19 +303,19 @@ def NetworkMainScreen(netGame, localGame, screen, clock):
 
             if netGame.getTurn_rent() != 0:
                 netGame.playerSpendMoney(netGame.getTurn_rent(), cur_player_num) #Decrease the player's money and credit the owner of the property that amount
-                if netGame.getCurPropType() != Prop_Type.PAYMENT:
+                if netGame.getCurPropType() != 8:
                     netGame.playerAddMoney(netGame.getTurn_rent(), netGame.getCurPropOwner())
 
             #If the current space returns a card
-            if netGame.getCurPropType() == Prop_Type.POT_LUCK:
+            if netGame.getCurPropType() == 4:
                 netGame.setCur_card_num(netGame.getNextPLCardNum())
                 netGame.setCur_card_deck("PL")
-            elif netGame.getCurPropType() == Prop_Type.COUNCIL_CHEST:
+            elif netGame.getCurPropType() == 5:
                 netGame.setCur_card_num(netGame.getNextCCCardNum())
                 netGame.setCur_card_deck("CC")
 
             #If card will have just been returned, render the text that will show its effects
-            if netGame.getCurPropType() == Prop_Type.POT_LUCK or netGame.getCurPropType() == Prop_Type.COUNCIL_CHEST: #Card will have been returned
+            if netGame.getCurPropType() == 4 or netGame.getCurPropType() == 5: #Card will have been returned
                 if netGame.getCur_card_deck() == "PL":
                     localGame.controller.card_effs, localGame.controller.card_texts = renderCardTexts(font_28, localGame.board.PL_Deck.getCard(netGame.getCur_card_num()))
                 elif netGame.getCur_card_deck() == "CC":
@@ -324,7 +324,7 @@ def NetworkMainScreen(netGame, localGame, screen, clock):
                 netGame.setCard_used(False)
                                 
             #If the player lands on the 'Go To Bogside' space
-            if netGame.getCurPropType() == Prop_Type.GO_TO_BOGSIDE:
+            if netGame.getCurPropType() == 7:
                 netGame.sendCurPlayerToBog()
 
             
@@ -352,11 +352,11 @@ def NetworkMainScreen(netGame, localGame, screen, clock):
             displayButtonRect(screen, in_jail_button, (100, 100, 100), font_28, 'Buy Map (£50)', (0, 0, 0))
 
         #Display title deed for property currently on
-        if netGame.getCurPropType() == Prop_Type.NORMAL or netGame.getCurPropType() == Prop_Type.SCHOOL or netGame.getCurPropType() == Prop_Type.STATION: #If property actually will have a title deed to display
-            title_deed = pygame.transform.smoothscale(localGame.board.properties[cur_pos].getTitleDeed(), [270,400])
+        if netGame.getCurPropType() == 1 or netGame.getCurPropType() == 2 or netGame.getCurPropType() == 3: #If property actually will have a title deed to display
+            title_deed = pygame.transform.smoothscale(localGame.board.properties[cur_pos].getTitleDeed(netGame.propertyGetMortStat(cur_pos)), [270,400])
             screen.blit(title_deed, [665, 230])
 
-            if netGame.getCurPropType() == Prop_Type.NORMAL:
+            if netGame.getCurPropType() == 1:
                 #Normal properties are the only ones that can have Council Houses and Tower Blocks on them
                 
                 displayUpgrades(screen, CH_img, TB_img, netGame.propertyGetCH(cur_pos), netGame.propertyGetTB(cur_pos), font_40)
@@ -374,7 +374,7 @@ def NetworkMainScreen(netGame, localGame, screen, clock):
                         elif netGame.propertyGetCH(cur_pos) > 0:
                             displayButtonRect(screen, sell_upgrade_button, (100, 100, 100), font_20, 'Sell Council House', (0, 0, 0))
             
-            if netGame.getCurPropType() == Prop_Type.NORMAL or netGame.getCurPropType() == Prop_Type.SCHOOL or netGame.getCurPropType() == Prop_Type.STATION:
+            if netGame.getCurPropType() == 1 or netGame.getCurPropType() == 2 or netGame.getCurPropType() == 3:
                 if netGame.propertyGetOwner(cur_pos) == cur_player_num:
                     #Display relevant button for mortgaging or unmortgaging a property
                     if netGame.propertyGetMortStat(cur_pos): #Property is mortgaged
@@ -382,14 +382,14 @@ def NetworkMainScreen(netGame, localGame, screen, clock):
                     else:
                         displayButtonRect(screen, buy_prop_button, (100, 100, 100), font_28, 'Mortgage Property', (0, 0, 0))
 
-            if netGame.getCurPropOwner() == -1 and netGame.getMayBuy():
+            if netGame.getCurPropOwner() == -1 and netGame.getMay_buy():
                 #Give player the opportunity to buy property (since it is available and they have began their turn by rolling the dice)
                 displayButtonRect(screen, buy_prop_button, (100, 100, 100), font_40, 'Buy Property', (0, 0, 0))
             elif netGame.getCurPropOwner() != -1:
                 #Property is owned by a player so display information pertaining to the owning of said property by this aforementioned player
                 displayOwner(screen, font_28, netGame.playerGetName(netGame.propertyGetOwner(cur_pos)))
         else:
-            if netGame.getCurPropType() != Prop_Type.LOST_IN_BOGSIDE: #Will work perfectly normally for all properties but the Lost In Bogside square
+            if netGame.getCurPropType() != 6: #Will work perfectly normally for all properties but the Lost In Bogside square
                 tit_str = netGame.propertyGetTitle(cur_pos)
             elif netGame.playerGetInJail(cur_player_num): #If Player is actually 'in jail'
                 tit_str = "Lost In Bogside"
@@ -400,11 +400,11 @@ def NetworkMainScreen(netGame, localGame, screen, clock):
             t_width, t_height = font_40.size(tit_str)
             screen.blit(tit_text, [(400-t_width)/2 + 600, 220])
 
-        if netGame.getCurPropType() == Prop_Type.NORMAL or netGame.getCurPropType() == Prop_Type.SCHOOL or netGame.getCurPropType() == Prop_Type.STATION or netGame.getCurPropType() == Prop_Type.PAYMENT: #If incurs a charge
+        if netGame.getCurPropType() == 1 or netGame.getCurPropType() == 2 or netGame.getCurPropType() == 3 or netGame.getCurPropType() == 8: #If incurs a charge
             try:
                 if netGame.getTurn_rent() != 0: #If rent has actually been charged then the player is told they themselves have paid whatever amount
                     displayPaidRent(screen, font_28, netGame.getTurn_rent())
-                elif netGame.propertyGetOwner(cur_pos) == cur_player_num and netGame.getCurPropType() == Prop_Type.NORMAL: #If property is owned by the current player and NORMAL (since other properties depend on those owned and dice rolls
+                elif netGame.propertyGetOwner(cur_pos) == cur_player_num and netGame.getCurPropType() == 1: #If property is owned by the current player and NORMAL (since other properties depend on those owned and dice rolls
                     if netGame.boardWholeGroupOwned(cur_player_num, cur_pos) and netGame.propertyGetCH(cur_pos) == 0:
                         displayRent(screen, font_28, netGame.propertyGetRent(cur_pos)*2)
                     else:
@@ -412,7 +412,7 @@ def NetworkMainScreen(netGame, localGame, screen, clock):
             except AttributeError: #Prevents errors as PAYMENT property has no owner but changes variable turn_rent
                 pass
             
-        if netGame.getCurPropType() == Prop_Type.POT_LUCK or netGame.getCurPropType() == Prop_Type.COUNCIL_CHEST:
+        if netGame.getCurPropType() == 4 or netGame.getCurPropType() == 5:
             if netGame.getCur_card_num() != -1: #If player was already on one of these places when their turn begins, cur_card and card_texts will be None object; this condition prevents an error when the following code thinks that it is
                 if netGame.getCur_card_deck() == "PL":
                     cur_card = localGame.board.PL_Deck.getCard(netGame.getCur_card_num()).card_img
@@ -451,7 +451,7 @@ def NetworkMainScreen(netGame, localGame, screen, clock):
                 exitOnBoxClose = True"""
             
         #Button for buying a property has been clicked
-        if buy_but_click and (netGame.getCurPropType() == Prop_Type.NORMAL or netGame.getCurPropType() == Prop_Type.SCHOOL or netGame.getCurPropType() == Prop_Type.STATION): #Final check that the property can actually be owned
+        if buy_but_click and (netGame.getCurPropType() == 1 or netGame.getCurPropType() == 2 or netGame.getCurPropType() == 3): #Final check that the property can actually be owned
             #Player wished to buy property
             if netGame.getCurPropOwner() == -1: #Property is unowned, hence can actually be bought
                 if netGame.playerGetMoney(cur_player_num) >=  netGame.propertyGetCost(cur_pos):
@@ -464,32 +464,33 @@ def NetworkMainScreen(netGame, localGame, screen, clock):
         if use_card_but_click and netGame.getCur_card_num != -1: #Check there is a card to work with
             netGame.setCard_used(True)
             netGame.applyCardEffects(cur_player_num, localGame.controller.card_effs) #Apply card effects
+            cur_pos = netGame.getCurPropNum()
 
         #All of the following may only be done if the current player owns the property
         #Button for mortgaging or unmortgaging a property
-        if mort_but_click and (netGame.getCurPropType() == Prop_Type.NORMAL or netGame.getCurPropType() == Prop_Type.SCHOOL or netGame.getCurPropType() == Prop_Type.STATION): #Final check that the property is one that may be mortgaged
+        if mort_but_click and (netGame.getCurPropType() == 1 or netGame.getCurPropType() == 2 or netGame.getCurPropType() == 3): #Final check that the property is one that may be mortgaged
             if netGame.getCurPropOwner() == cur_player_num and netGame.propertyGetMortStat(cur_pos) == False: #Property must be owned by the current player and not already mortgaged
-                netGame.propertyGetMortStat(cur_pos, True) #Property is now mortgaged
+                netGame.propertySetMortStat(cur_pos, True) #Property is now mortgaged
                 netGame.playerAddMoney(int(netGame.propertyGetMortVal(cur_pos)), cur_player_num)
             elif netGame.getCurPropOwner() == cur_player_num and netGame.propertyGetMortStat(cur_pos): #Property must be owned by the current player and is mortgaged
                 if netGame.playerGetMoney(cur_player_num) >= netGame.propertyGetMortVal(cur_pos) * 1.2: #Player has sufficient money to unmortgage the property (twice the money gotten by mortgaging it)
                     netGame.propertySetMortStat(cur_pos, False) #Property is no longer in a state of being mortgaged
-                    netGame.playerAddMoney(int(netGame.propertyGetMortVal(cur_pos) * 1.2), cur_player_num) #Decrease player's money by the cost of unmortgaging the property
+                    netGame.playerSpendMoney(int(netGame.propertyGetMortVal(cur_pos) * 1.2), cur_player_num) #Decrease player's money by the cost of unmortgaging the property
         
         #Button for buying a Council House or Tower Block
-        if buy_upgrade_but_click and netGame.getCurPropType() == Prop_Type.NORMAL and netGame.boardWholeGroupOwned(cur_player_num, cur_pos): #Player wishes to upgrade the property and said upgrade can actually be purchaed
+        if buy_upgrade_but_click and netGame.getCurPropType() == 1 and netGame.boardWholeGroupOwned(cur_player_num, cur_pos): #Player wishes to upgrade the property and said upgrade can actually be purchaed
             if netGame.getCurPropOwner() == cur_player_num: #May only be bought if the property is owned by the current player     
                 if netGame.propertyGetCH(cur_pos) < 4: #Fewer than 4  Council Houses, so these are the next upgrade to be bought 
                     if netGame.playerGetMoney(cur_player_num) >= (netGame.propertyGetCHCost(cur_pos) * netGame.boardCountGroupSize(cur_player_num, cur_pos)): #Player actually has enough money to buy the Council House upgrade
                         netGame.boardBuyCHGroup(cur_player_num, cur_pos) #Buy the Council Houses for the whole group
-                        netGame.playerAddMoney(netGame.propertyGetCHCost(cur_pos) * netGame.boardCountGroupSize(cur_player_num, cur_pos), cur_player_num) #Decrease the player's money by the cost of a Council House for however many properties are in the group
+                        netGame.playerSpendMoney(netGame.propertyGetCHCost(cur_pos) * netGame.boardCountGroupSize(cur_player_num, cur_pos), cur_player_num) #Decrease the player's money by the cost of a Council House for however many properties are in the group
                 elif netGame.propertyGetCH(cur_pos) == 4 and netGame.propertyGetTB(cur_pos) == 0: #4 Council Houses and no Tower Blocks, so Tower Block can be bought 
                     if netGame.playerGetMoney(cur_player_num) >= (netGame.propertyGetTBCost(cur_pos) * netGame.boardCountGroupSize(cur_player_num, cur_pos)): #Player actually has enough money to buy the Tower Block upgrade
                         netGame.boardBuyTBGroup(cur_player_num, cur_pos) #Buy the Council Houses for the whole group
-                        netGame.playerAddMoney(netGame.propertyGetTBCost(cur_pos) * netGame.boardCountGroupSize(cur_player_num, cur_pos), cur_player_num) #Decrease the player's money by the cost of a Tower Block for however many properties are in the group
+                        netGame.playerSpendMoney(netGame.propertyGetTBCost(cur_pos) * netGame.boardCountGroupSize(cur_player_num, cur_pos), cur_player_num) #Decrease the player's money by the cost of a Tower Block for however many properties are in the group
 
         #Button for selling a Council House or Tower Block
-        if sell_upgrade_but_click and netGame.getCurPropType() == Prop_Type.NORMAL and netGame.boardWholeGroupOwned(cur_player_num, cur_pos): #Player wishes to upgrade the property and said upgrade can actually be purchaed
+        if sell_upgrade_but_click and netGame.getCurPropType() == 1 and netGame.boardWholeGroupOwned(cur_player_num, cur_pos): #Player wishes to upgrade the property and said upgrade can actually be purchaed
             if netGame.getCurPropOwner() == cur_player_num: #May only be bought if the property is owned by the current player     
                 if netGame.propertyGetTB(cur_pos) > 0: #Property has a Tower Block that can be sold
                     netGame.boardSellTBGroup(cur_player_num, cur_pos) #Sell the Tower Blocks for the whole group

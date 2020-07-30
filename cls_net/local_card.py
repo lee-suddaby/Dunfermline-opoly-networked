@@ -7,5 +7,5 @@ class LocalCard:
         self.card_num = new_num
         self.card_name = new_name #Pot Luck or Council Chest card
         self.card_img = new_img #Pygame surface object (i.e. image)
-        self.card_effects = list(new_effects) #Array of strings storing textual descriptions of the effects of the cards. Will contain *'s which can be replaced with numbers from the following array
-        self.card_nums = list(np.array(new_nums).astype(np.int)) #Provides numerical values for the above effects. N.B. -1 will be used when an effect is not used
+        self.card_effects = new_effects #Array of strings storing textual descriptions of the effects of the cards. Will contain *'s which can be replaced with numbers from the following array
+        self.card_nums = new_nums #Provides numerical values for the above effects. N.B. -1 will be used when an effect is not used

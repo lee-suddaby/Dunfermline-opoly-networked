@@ -14,7 +14,7 @@ def getFileLines(filePath):
 #Loads text file describing the effects of the Pot Luck and Council Chest cards, e.g. "Pay £*", where the * will be replaced with a number later
 def getCardEffects(card_texts_path_eff):
     texts_num = getFileLines(card_texts_path_eff)
-    card_effects = np.array([None] * texts_num) #None used so length of string is not limited
+    card_effects = [None] * texts_num #None used so length of string is not limited
     fh = open(card_texts_path_eff, "r")
     for effects_counter in range(texts_num):
         card_effects[effects_counter] = fh.readline().strip()

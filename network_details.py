@@ -14,7 +14,7 @@ def NetworkPropDetails(netGame, localGame, screen, clock):
     font_20b = pygame.font.SysFont('Arial', 20, True) #Font for column headings
     font_16 = pygame.font.SysFont('Arial', 16) #Font for button captions
 
-    board_poses = setupBoardPoses() #Array containing the board positions of all of the current player's owned properties
+    board_poses = netGame.setupBoardPoses() #Array containing the board positions of all of the current player's owned properties
     props_owned = len(board_poses) #Number of properties owned by the player
 
     tit_text = font_40.render('Viewing Property Details:', True, (0,0,0)) #Render title at top left of screen

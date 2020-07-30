@@ -24,6 +24,3 @@ class LocalGame:
         
     def getPlayer(self, player_num):
         return self.players[player_num]
-
-    def propertyGetType(self, p_num):
-        return self.board.properties[p_num].prop_type
