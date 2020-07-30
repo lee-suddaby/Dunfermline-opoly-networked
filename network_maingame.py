@@ -194,7 +194,7 @@ def NetworkMainScreen(netGame, localGame, screen, clock):
     font_28 = pygame.font.SysFont('Arial', 28) #font object for displaying whose turn it is (among other things)
     font_20 = pygame.font.SysFont('Arial', 20) #Font for the upgrade buttons
     
-    main_buts = [Button(10, 690, 150, 70, "Leaderboards", font_28),
+    main_buts = [Button(10, 610, 150, 70, "Leaderboards", font_28),
                Button(900, 160, 100, 50, "Details", font_28)]
 
     dice_but_click = False #Booleans tracking whether the roll dice, end turn and but property buttons have been clicked yet this turn
@@ -284,8 +284,8 @@ def NetworkMainScreen(netGame, localGame, screen, clock):
             cur_pos = netGame.getCurPropNum()
 
             #Generate the dice images
-            localGame.controller.roll_img1 = pygame.transform.smoothscale(localGame.die[0].getImg(), [70, 70])
-            localGame.controller.roll_img2 = pygame.transform.smoothscale(localGame.die[1].getImg(), [70, 70])
+            localGame.controller.roll_img1 = pygame.transform.smoothscale(localGame.die[0].getImg(netGame.getDieScore(0)), [70, 70])
+            localGame.controller.roll_img2 = pygame.transform.smoothscale(localGame.die[1].getImg(netGame.getDieScore(1)), [70, 70])
 
             if netGame.getDieScore(0) != netGame.getDieScore(1): #If a double has not been rolled (rolling a double gives the player another turn)
                netGame.setPlayer_rolled(True) #So player only gets another turn if they rolled doubles
@@ -431,7 +431,7 @@ def NetworkMainScreen(netGame, localGame, screen, clock):
             if netGame.playerGetMoney(cur_player_num) < 0 and (netGame.getObtainMon(cur_player_num) + netGame.playerGetMoney(cur_player_num)) >= 0:
                 msgBox = MessageBox(screen, 'You need to ensure your money is 0 or above before you can finish your turn. Please sell or mortgage some assets to continue.', 'Not Enough Money')
                 cont = False
-            elif (netGame.getObtainMon(getCurPlayerNum()) + netGame.playerGetMoney(cur_player_num)) < 0: #If it is impossible for a player to not end up in debt, they go bankrupt
+            elif (netGame.getObtainMon(netGame.getCurPlayerNum()) + netGame.playerGetMoney(cur_player_num)) < 0: #If it is impossible for a player to not end up in debt, they go bankrupt
                 netGame.playerDeactivate(netGame.getCurPlayerNum()) #Remove player from the game
                 cont = False
                 netGame.resetCurPlayerProperties()
@@ -445,10 +445,10 @@ def NetworkMainScreen(netGame, localGame, screen, clock):
                 cur_player_num = netGame.getCurPlayerNum()
                 localGame.prop_thumbs = pygame.transform.smoothscale(CreateThumbs(netGame, localGame, cur_player_num), [385,170]) #Generate thumbnails for new player (here so it is only done when the player changes, not every frame change)
 
-            if netGame.countActivePlayers() < 2:
+            """if netGame.countActivePlayers() < 2:
                 netGame.advancePlayer()
                 msgBox = MessageBox(screen, netGame.playerGetName(netGame.getCurPlayerNum()) + ' has won the game.', 'Game Over')
-                exitOnBoxClose = True
+                exitOnBoxClose = True"""
             
         #Button for buying a property has been clicked
         if buy_but_click and (netGame.getCurPropType() == Prop_Type.NORMAL or netGame.getCurPropType() == Prop_Type.SCHOOL or netGame.getCurPropType() == Prop_Type.STATION): #Final check that the property can actually be owned

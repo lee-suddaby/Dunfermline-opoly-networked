@@ -34,6 +34,8 @@ class Player:
         
     def movePlayer(self, movePos, board):
         self.player_pos = self.player_pos + int(movePos/self.player_nextRollMod) #Same as movePos * (1/nextRollMod)
+        self.player_x = self.calcPieceX(self.player_pos)
+        self.player_y = self.calcPieceY(self.player_pos)
         self.player_nextRollMod = 1 #Effects are only ever valid for one turn
         if self.player_pos > board.max_pos:
             self.player_pos = self.player_pos - (board.max_pos + 1)
@@ -63,7 +65,8 @@ class Player:
             p_x = 666 - 61*pos
         elif 20 < pos < 30:
             p_x = 61*pos - 1168
-        return p_x
+        return p_x * 600/768 #Scaling factor for the fact that the board is 600 x 600, 
+                             #while the co-ordinates were calculated based on a 768 x 768 board
 
     def calcPieceY(self, pos):
         p_y = 0
@@ -75,4 +78,5 @@ class Player:
             p_y = 1281 - 61*pos
         elif 30 < pos:
             p_y = 61*pos - 1767
-        return p_y
+        return p_y * 600/768 #Scaling factor for the fact that the board is 600 x 600, 
+                             #while the co-ordinates were calculated based on a 768 x 768 board
