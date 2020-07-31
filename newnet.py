@@ -179,8 +179,8 @@ def NewNet(screen, clock):
     pieces_y = 450
 
     name_box = TextBox((320, 400, 380, 50), clear_on_enter=False, inactive_on_enter=True, active=True, active_color=pygame.Color("red"))
-    name_text = font_48.render("Enter your Name (max 12 chars, no commas):", True, (0,0,0))
-    n_width, n_height = font_48.size("Enter your Name (max 12 chars, no commas):")
+    name_text = font_48.render("Enter your Name (max 12 characters):", True, (0,0,0))
+    n_width, n_height = font_48.size("Enter your Name (max 12 characters):")
     name_button = Button(400, 460, 200, 80, "Confirm", font_48)
 
     ready_up_but = Button(400, 460, 200, 80, "Ready Up", font_48)
@@ -269,7 +269,7 @@ def NewNet(screen, clock):
         
         if name_button.clicked():
             #Determine if the name entered is valid. Will try and do something to prevent duplicate naming...
-            if not("," in name_box.getContents()) and len(name_box.getContents()) <=  12 and len(name_box.getContents()) != 0: #Name is valid
+            if len(name_box.getContents()) <=  12 and len(name_box.getContents()) != 0: #Name is valid
                 #Display your IP and name, and connect to server using Pyro4 module
                 host_text = font_48.render("Your Name: " + name_box.getContents(), True, (0,0,0))
                 lobby.connect(socket.gethostbyname(socket.gethostname()), name_box.getContents())
