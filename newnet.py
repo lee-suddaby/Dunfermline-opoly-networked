@@ -7,15 +7,10 @@ import numpy as np
 from button import Button
 from textbox import TextBox
 
-from lib import CreateMortDeed, CreateTitleDeed, getCardEffects
+from lib import CreateMortDeed, CreateTitleDeed, getCardEffects, dim
 from cls_net import *
 
 #------------------------------New Networked Game Functions------------------------------ 
-def dim(a): #Function to determine the dimensions of a python list
-    if not type(a) == list:
-        return []
-    return [len(a)] + dim(a[0])
-
 def drawCheck(screen, x, y, w, h):
     draw_screen = pygame.Surface((100, 100))
     draw_screen.fill((255,255,255))

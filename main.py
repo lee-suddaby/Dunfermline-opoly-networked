@@ -58,6 +58,6 @@ while nextScreen != -1: #Main Game Loop
     elif nextScreen == 7: #Networked property details screen
         netGame, localGame, nextScreen = NetworkPropDetails(netGame, localGame, screen, clock)
     elif nextScreen == 8: #Networked leaderboards screen
-        netGame, localGame, nextScreen = NetworkLeaderboards(netGame, screen, clock)
+        netGame, nextScreen = NetworkLeaderboards(netGame, screen, clock)
     
 pygame.quit() #Quits the pygame module and hence the GUI

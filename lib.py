@@ -1,6 +1,11 @@
 #Functions used in multiple screens, stored here to prevent duplication of code
 from cls_offline import *
 
+def dim(a): #Function to determine the dimensions of a python list
+    if not type(a) == list:
+        return []
+    return [len(a)] + dim(a[0])
+    
 #Determine how many lines are in a text file
 #Used when loading the tips file so the number of tips need not be counted
 def getFileLines(filePath):

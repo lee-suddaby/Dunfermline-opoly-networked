@@ -5,7 +5,7 @@ import numpy as np
 
 from cls_net import *
 from button import Button
-from lib import displayButtonRect
+from lib import displayButtonRect, dim
 from msgbox import MessageBox
 
 #------------------------------Leaderboards Functions------------------------------
@@ -13,10 +13,10 @@ from msgbox import MessageBox
 #One column for player numbers, one for total money, one for assets value (includes money) and one for obtainable money (also includes the player's money)
 def setup2DArray(netGame):
     no_of_players = netGame.countActivePlayers()
-    ret_2D = np.zeros((no_of_players, 4), int)
+    ret_2D = [[0 for x in range(4)] for y in range(no_of_players)]
     arr_count = 0
     for counter in range(no_of_players):
-        if netGame.getPlayer(counter).player_active: 
+        if netGame.playerGetActive(counter): 
             ret_2D[arr_count][0] = counter
             ret_2D[arr_count][1] = netGame.playerGetMoney(counter)
             ret_2D[arr_count][2] = netGame.getAssetsVal(counter)
@@ -96,7 +96,7 @@ def NetworkLeaderboards(netGame, screen, clock):
     sort_column = 1
     sort_asc = False
     sort_but_click = -1
-    lead_arr = quickSort(lead_arr, 0, lead_arr.shape[0]-1, sort_column, sort_asc)
+    lead_arr = quickSort(lead_arr, 0, dim(lead_arr)[0]-1, sort_column, sort_asc)
     leaderboards_running = True
     while leaderboards_running: #Main loop for this part of the program
         for event in pygame.event.get():
@@ -143,8 +143,8 @@ def NetworkLeaderboards(netGame, screen, clock):
                 screen.blit(arrow_both, [sort_buts[counter].x, sort_buts[counter].y])
 
         y_pos = y_top #Y co-ordinate of the first row of data
-        for counter in range(lead_arr.shape[0]):
-            text_1 = font_28.render(mainGame.playerGetName(lead_arr[counter][0]), True, (0,0,0)) #Property name/title
+        for counter in range(dim(lead_arr)[0]):
+            text_1 = font_28.render(netGame.playerGetName(lead_arr[counter][0]), True, (0,0,0)) #Property name/title
             screen.blit(text_1, [30, y_pos])
             text_2 = font_28.render(str(lead_arr[counter][1]), True, (0,0,0)) 
             screen.blit(text_2, [200, y_pos])
@@ -162,11 +162,11 @@ def NetworkLeaderboards(netGame, screen, clock):
                 sort_column = sort_but_click + 1
                 sort_asc = False
 
-            lead_arr = quickSort(lead_arr, 0, lead_arr.shape[0]-1, sort_column, sort_asc)
+            lead_arr = quickSort(lead_arr, 0, dim(lead_arr)[0]-1, sort_column, sort_asc)
 
         if leader_buts[0].clicked():
             leaderboards_running = False
-            gotoScreen = 1
+            gotoScreen = 6
 
         if leader_buts[1].clicked():
             msgBox.should_exit = False
