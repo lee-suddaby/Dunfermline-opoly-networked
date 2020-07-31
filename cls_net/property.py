@@ -39,7 +39,7 @@ class Normal_Property(Property): #Create as subclass of Property
         Property.__init__(self, vals[0], Prop_Type.NORMAL) #Initialise superclass first with the two values it takes in its constructor
         self.cost = int(vals[1])
         self.rentNo = int(vals[2])
-        self.rentCH = np.array([0] * 4)
+        self.rentCH = [0] * 4
         for counter in range(4): #Array to represent the rents with 1 to 4 Council Houses. Easier than 4 separate variables
             self.rentCH[counter] = int(vals[counter+3])
         self.rentTB = int(vals[7])

@@ -64,7 +64,9 @@ class Game:
 
         new_props = self.createProperties(prop_data)
         PL_Deck = Card_Deck(16)
+        PL_Deck.shuffleCards()
         CC_Deck = Card_Deck(16)
+        CC_Deck.shuffleCards()
         self.board = Board(new_props, 10, 200, PL_Deck, CC_Deck)
 
         self.cur_player_num = 0 #Index of current player in he players array
@@ -183,7 +185,7 @@ class Game:
             self.players[player_num].player_y = self.players[player_num].calcPieceY(self.players[player_num].player_pos)
 
             #Determine rent if applicable
-            self.controller.turn_rent = self.determineRent(self.cur_player_num())
+            self.controller.turn_rent = self.determineRent(self.cur_player_num)
 
             if self.controller.turn_rent != 0:
                 self.players[player_num].spendMoney(self.controller.turn_rent) #Decrease the player's money and credit the owner of the property that amount
@@ -301,7 +303,7 @@ class Game:
         self.board.buyCHGroup(player_num, prop_num)
     
     def boardBuyTBGroup(self, player_num, prop_num):
-        self.board.buTBGroup(player_num, prop_num)
+        self.board.buyTBGroup(player_num, prop_num)
 
     def boardSellCHGroup(self, player_num, prop_num):
         self.board.sellCHGroup(player_num, prop_num)
@@ -481,10 +483,10 @@ class Game:
         return self.board.properties[prop_num].T_Blocks
 
     def propertyGetCHCost(self, prop_num):
-        return self.board.properties[prop_num].CH_Cost
+        return self.board.properties[prop_num].CH_cost
 
     def propertyGetTBCost(self, prop_num):
-        return self.board.properties[prop_num].TB_Cost
+        return self.board.properties[prop_num].TB_cost
 
     def propertyGetOwner(self, prop_num):
         return self.board.properties[prop_num].prop_owner
