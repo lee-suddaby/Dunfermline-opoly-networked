@@ -173,13 +173,10 @@ def displayPieces(screen, netGame, localGame):
                     pygame.draw.circle(screen, (255,0,0), [int(netGame.playerGetX(counter) + 16), int(netGame.playerGetY(counter) + 16)], 20, 5)
         except IndexError: #If index does not exist in the game's Players array, no more players are left to show, thus the break
             break
-                    
 
 #------------------------------Main Game Code------------------------------         
 def NetworkMainScreen(netGame, localGame, screen, clock):
     localGame.prop_thumbs = pygame.transform.smoothscale(CreateThumbs(netGame, localGame, netGame.getCurPlayerNum()), [385,170])
-    turn_overlay = pygame.Surface((1024, 768), pygame.SRCALPHA) #Semi-transparent overlay for when it is not the turn of the player playing on this machine
-    turn_overlay.fill((255, 255, 255, 127))
 
     roll_dice_button = pygame.Rect(180,610,150,70) #Create rectangle for roll dice/end turn button
     buy_prop_button = pygame.Rect(675,690,250,70) #Create rectangle for property buying button (also used for mortgaging and unmortgaging
@@ -241,7 +238,7 @@ def NetworkMainScreen(netGame, localGame, screen, clock):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # Since this mode of the game is networked, the player on this machine should not be able to perform actions
                 # when it's someone else's turn (obviously!)
-                if netGame.getCurPlayerNum() == localGame.this_player_num:
+                if cur_player_num == localGame.this_player_num:
                     if event.button == 1: #Left mouse button
                         mouse_pos = event.pos #Position of the cursor when nouse was clicked
                         if buy_prop_button.collidepoint(mouse_pos):
@@ -340,16 +337,16 @@ def NetworkMainScreen(netGame, localGame, screen, clock):
 
         #Show the Roll Dice/End Turn button, and the appropriate caption
         if netGame.getCard_used() == False:
-            displayButtonRect(screen, roll_dice_button, (100, 100, 100), font_40, 'Use Card', (0, 0, 0))
+            displayButtonRect(screen, roll_dice_button, (100, 100, 100), font_40, 'Use Card', (0, 0, 0), cur_player_num == localGame.this_player_num)
         elif netGame.getPlayer_rolled() == False:
-            displayButtonRect(screen, roll_dice_button, (100, 100, 100), font_40, 'Roll Dice', (0, 0, 0))
+            displayButtonRect(screen, roll_dice_button, (100, 100, 100), font_40, 'Roll Dice', (0, 0, 0), cur_player_num == localGame.this_player_num)
         else:
-            displayButtonRect(screen, roll_dice_button, (100, 100, 100), font_40, 'End Turn', (0, 0, 0))
+            displayButtonRect(screen, roll_dice_button, (100, 100, 100), font_40, 'End Turn', (0, 0, 0), cur_player_num == localGame.this_player_num)
 
         if netGame.playerGetInJail(cur_player_num) and netGame.playerGetHasBogMap(cur_player_num): #If player is lost in bogside, but they have the equivelant of a "Get out of Jail Free" card
-            displayButtonRect(screen, in_jail_button, (100, 100, 100), font_28, 'Use Map', (0, 0, 0))
+            displayButtonRect(screen, in_jail_button, (100, 100, 100), font_28, 'Use Map', (0, 0, 0), cur_player_num == localGame.this_player_num)
         elif netGame.playerGetInJail(cur_player_num): #Don't have card (Map out of Bogside)
-            displayButtonRect(screen, in_jail_button, (100, 100, 100), font_28, 'Buy Map (£50)', (0, 0, 0))
+            displayButtonRect(screen, in_jail_button, (100, 100, 100), font_28, 'Buy Map (£50)', (0, 0, 0), cur_player_num == localGame.this_player_num)
 
         #Display title deed for property currently on
         if netGame.getCurPropType() == 1 or netGame.getCurPropType() == 2 or netGame.getCurPropType() == 3: #If property actually will have a title deed to display
@@ -365,26 +362,26 @@ def NetworkMainScreen(netGame, localGame, screen, clock):
                     if netGame.boardWholeGroupOwned(cur_player_num, cur_pos): #May only be bought if the property is owned by the current player and the entire colour group is owned
                     
                         if netGame.propertyGetCH(cur_pos) < 4:
-                            displayButtonRect(screen, buy_upgrade_button, (100, 100, 100), font_20, 'Buy Council House', (0, 0, 0))
+                            displayButtonRect(screen, buy_upgrade_button, (100, 100, 100), font_20, 'Buy Council House', (0, 0, 0), cur_player_num == localGame.this_player_num)
                         elif netGame.propertyGetTB(cur_pos) == 0:
-                            displayButtonRect(screen, buy_upgrade_button, (100, 100, 100), font_20, 'Buy Tower Block', (0, 0, 0))
+                            displayButtonRect(screen, buy_upgrade_button, (100, 100, 100), font_20, 'Buy Tower Block', (0, 0, 0), cur_player_num == localGame.this_player_num)
 
                         if netGame.propertyGetTB(cur_pos) > 0:
-                            displayButtonRect(screen, sell_upgrade_button, (100, 100, 100), font_20, 'Sell Tower Block', (0, 0, 0))
+                            displayButtonRect(screen, sell_upgrade_button, (100, 100, 100), font_20, 'Sell Tower Block', (0, 0, 0), cur_player_num == localGame.this_player_num)
                         elif netGame.propertyGetCH(cur_pos) > 0:
-                            displayButtonRect(screen, sell_upgrade_button, (100, 100, 100), font_20, 'Sell Council House', (0, 0, 0))
+                            displayButtonRect(screen, sell_upgrade_button, (100, 100, 100), font_20, 'Sell Council House', (0, 0, 0), cur_player_num == localGame.this_player_num)
             
             if netGame.getCurPropType() == 1 or netGame.getCurPropType() == 2 or netGame.getCurPropType() == 3:
                 if netGame.propertyGetOwner(cur_pos) == cur_player_num:
                     #Display relevant button for mortgaging or unmortgaging a property
                     if netGame.propertyGetMortStat(cur_pos): #Property is mortgaged
-                        displayButtonRect(screen, buy_prop_button, (100, 100, 100), font_28, 'Unmortgage Property', (0, 0, 0))
+                        displayButtonRect(screen, buy_prop_button, (100, 100, 100), font_28, 'Unmortgage Property', (0, 0, 0), cur_player_num == localGame.this_player_num)
                     else:
-                        displayButtonRect(screen, buy_prop_button, (100, 100, 100), font_28, 'Mortgage Property', (0, 0, 0))
+                        displayButtonRect(screen, buy_prop_button, (100, 100, 100), font_28, 'Mortgage Property', (0, 0, 0), cur_player_num == localGame.this_player_num)
 
             if netGame.getCurPropOwner() == -1 and netGame.getMay_buy():
                 #Give player the opportunity to buy property (since it is available and they have began their turn by rolling the dice)
-                displayButtonRect(screen, buy_prop_button, (100, 100, 100), font_40, 'Buy Property', (0, 0, 0))
+                displayButtonRect(screen, buy_prop_button, (100, 100, 100), font_40, 'Buy Property', (0, 0, 0), cur_player_num == localGame.this_player_num)
             elif netGame.getCurPropOwner() != -1:
                 #Property is owned by a player so display information pertaining to the owning of said property by this aforementioned player
                 displayOwner(screen, font_28, netGame.playerGetName(netGame.propertyGetOwner(cur_pos)))
@@ -444,6 +441,10 @@ def NetworkMainScreen(netGame, localGame, screen, clock):
                 netGame.advancePlayer()
                 cur_player_num = netGame.getCurPlayerNum()
                 localGame.prop_thumbs = pygame.transform.smoothscale(CreateThumbs(netGame, localGame, cur_player_num), [385,170]) #Generate thumbnails for new player (here so it is only done when the player changes, not every frame change)
+
+                if netGame.getCurPlayerNum() != localGame.this_player_num:
+                    main_buts[0].disableBut()
+                    main_buts[1].disableBut()
 
             """if netGame.countActivePlayers() < 2:
                 netGame.advancePlayer()
@@ -523,8 +524,10 @@ def NetworkMainScreen(netGame, localGame, screen, clock):
             but.render(screen)
         
         # Display the overlay for when it's not your turn, if necessary
-        if netGame.getCurPlayerNum() != localGame.this_player_num:
-            screen.blit(turn_overlay, [0,0])
+        if netGame.getCurPlayerNum() == localGame.this_player_num:
+            if main_buts[0].enabled == False:
+                main_buts[0].enableBut()
+                main_buts[1].enableBut()
 
         #Reset button booleans so that effects of clicking buttons do not happen more than once
         dice_but_click = False

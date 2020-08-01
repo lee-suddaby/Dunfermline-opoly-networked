@@ -44,12 +44,17 @@ def getObtainMon(board, player_num):
     return ret_val
 
 #Button drawing using a pygame.Rect object (which I also use for mouse click collision detection)
-def displayButtonRect(screen, rect, but_col, font, caption, txt_col):
+def displayButtonRect(screen, rect, but_col, font, caption, txt_col, enabled = True):
     pygame.draw.rect(screen, but_col, rect)
 
     f_width, f_height = font.size(caption)
     cap_text = font.render(caption, True, txt_col)
     screen.blit(cap_text, [(rect.width-f_width)/2 + rect.left,(rect.height-f_height)/2 + rect.top]) #Displays the text in the centre of the button - (button_width - text_width)/2
+
+    if not enabled:
+        overlay = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
+        overlay.fill((but_col.r, but_col.g, but_col.b, 196))
+        screen.blit(overlay, [rect.left, rect.top])
 
 #Render a title deed for a property (that can be mortgaged) for when it is actually mortgaged
 #Only shows the name, buy-back cost and a mnessage explaining that the property needs to be rebought for it to collect rent again
