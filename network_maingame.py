@@ -441,7 +441,8 @@ def NetworkMainScreen(netGame, localGame, screen, clock):
                 netGame.advancePlayer()
                 cur_player_num = netGame.getCurPlayerNum()
                 localGame.prop_thumbs = pygame.transform.smoothscale(CreateThumbs(netGame, localGame, cur_player_num), [385,170]) #Generate thumbnails for new player (here so it is only done when the player changes, not every frame change)
-
+                localGame.controller.reset()
+                
                 if netGame.getCurPlayerNum() != localGame.this_player_num:
                     main_buts[0].disableBut()
                     main_buts[1].disableBut()

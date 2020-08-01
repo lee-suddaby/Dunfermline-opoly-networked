@@ -197,7 +197,7 @@ def NewNet(screen, clock):
     # Some setup code that was previously run while the screen was active.
     # Having it here instead streamlines things a bit.    
     ip_text = font_48.render("Your IP: " + socket.gethostbyname(socket.gethostname()), True, (0,0,0))
-    lobby = Pyro4.Proxy("PYRONAME:dfo.game") 
+    lobby = Pyro4.Proxy("PYRO:dfo.game@192.168.1.74:9090") 
     # Okay, this is actually a Game() class object, but the Lobby() part is the only part actually used here, 
     # and I wrote everything here with lobby separate first, so why bother changing it?
 

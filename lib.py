@@ -53,7 +53,7 @@ def displayButtonRect(screen, rect, but_col, font, caption, txt_col, enabled = T
 
     if not enabled:
         overlay = pygame.Surface((rect.width, rect.height), pygame.SRCALPHA)
-        overlay.fill((but_col.r, but_col.g, but_col.b, 196))
+        overlay.fill((but_col[0], but_col[1], but_col[2], 196))
         screen.blit(overlay, [rect.left, rect.top])
 
 #Render a title deed for a property (that can be mortgaged) for when it is actually mortgaged

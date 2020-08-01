@@ -50,29 +50,30 @@ class Game:
         return property_arr
 
     def setupGame(self, prop_data):
-        # Initial money will he hard-coded (*gasp*) because it's far easier. Fight me.
-        no_of_players = len(self.lobby.getConns())
-        new_players = np.array([None] * no_of_players)
-        lobby_arr = self.lobby.getLobby()
-        for counter in range(no_of_players):
-            new_players[counter] = Player(1500, lobby_arr[counter][2], lobby_arr[counter][1])
-        self.players = np.array(new_players) #The 2-6 players of the game
+        if not self.game_setup:
+            # Initial money will he hard-coded (*gasp*) because it's far easier. Fight me.
+            no_of_players = len(self.lobby.getConns())
+            new_players = np.array([None] * no_of_players)
+            lobby_arr = self.lobby.getLobby()
+            for counter in range(no_of_players):
+                new_players[counter] = Player(1500, lobby_arr[counter][2], lobby_arr[counter][1])
+            self.players = np.array(new_players) #The 2-6 players of the game
 
-        die1 = Die()
-        die2 = Die()
-        self.dice = np.array([die1, die2]) #Game's two dice
+            die1 = Die()
+            die2 = Die()
+            self.dice = np.array([die1, die2]) #Game's two dice
 
-        new_props = self.createProperties(prop_data)
-        PL_Deck = Card_Deck(16)
-        PL_Deck.shuffleCards()
-        CC_Deck = Card_Deck(16)
-        CC_Deck.shuffleCards()
-        self.board = Board(new_props, 10, 200, PL_Deck, CC_Deck)
+            new_props = self.createProperties(prop_data)
+            PL_Deck = Card_Deck(16)
+            PL_Deck.shuffleCards()
+            CC_Deck = Card_Deck(16)
+            CC_Deck.shuffleCards()
+            self.board = Board(new_props, 10, 200, PL_Deck, CC_Deck)
 
-        self.cur_player_num = 0 #Index of current player in he players array
-        self.controller = Game_Controller()
+            self.cur_player_num = 0 #Index of current player in he players array
+            self.controller = Game_Controller()
 
-        self.game_setup = True
+            self.game_setup = True
     
     def getGameSetup(self):
         return self.game_setup
