@@ -53,6 +53,7 @@ def NetworkPropDetails(netGame, localGame, screen, clock):
     mort_but_click = -1 #Not -1 indicates the integer contents of the variable is the row of whatever of the four types of button was clicked (zero-indexed)
     deed_but_click = -1
 
+    cur_player = netGame.getCurPlayerNum()
     prop_details_running = True
     while prop_details_running: #Main loop for this part of the program
         for event in pygame.event.get():
@@ -82,7 +83,7 @@ def NetworkPropDetails(netGame, localGame, screen, clock):
         screen.blit(tit_text, [10, 0])
         pygame.draw.rect(screen, (0,0,0), pygame.Rect(10,50,770,700), 10) #Draw black rectangle surrounding the property data
 
-        player_mon = str(netGame.playerGetMoney()) #(One of many) temp variables to cut down on network accesses
+        player_mon = str(netGame.playerGetMoney(cur_player)) #(One of many) temp variables to cut down on network accesses
         mon_text = font_40.render('£' + player_mon, True, (0,0,0)) #Render player money on screen
         f_width, f_height = font_40.size('£' + player_mon)
         screen.blit(mon_text, [(770-f_width), 0])
@@ -142,25 +143,25 @@ def NetworkPropDetails(netGame, localGame, screen, clock):
                 netGame.propertySetMortStat(cur_pos, True) #Mortgage property
                 netGame.playerAddMoney(netGame.propertyGetMortVal(cur_pos), netGame.getCurPlayerNum()) #Increase the player's money by the mortgage value of the property
             else: #Mortgaged already
-                if netGame.playerGetMoney() >= netGame.propertyGetMortVal(cur_pos) * 1.2: #If the player has 120% of the mortgage value of the property (this is the buy-back cost)
-                    netGame.propertySetMortStat(cur_pos, True) #Unmortgage the property
+                if netGame.playerGetMoney(cur_player) >= netGame.propertyGetMortVal(cur_pos) * 1.2: #If the player has 120% of the mortgage value of the property (this is the buy-back cost)
+                    netGame.propertySetMortStat(cur_pos, False) #Unmortgage the property
                     netGame.playerSpendMoney(int(netGame.propertyGetMortVal(cur_pos) * 1.2), netGame.getCurPlayerNum()) #Debit the player's money by 120% of the mortgage value
             if deed_prop == cur_pos: #If title deed has changed 
-                cur_deed = pygame.transform.smoothscale(localGame.board.getProp(cur_pos).getTitleDeed(), [225,400])
+                cur_deed = pygame.transform.smoothscale(localGame.board.getProp(cur_pos).getTitleDeed(netGame.propertyGetMortStat(cur_pos)), [225,400])
 
         if deed_but_click != -1: #One of the buttons for viewing a title deed has been clicked
             cur_pos = board_poses[deed_but_click]
-            cur_deed = pygame.transform.smoothscale(localGame.board.getProp(cur_pos).getTitleDeed(), [225,400]) #Scale title deed so it fits in the narrow sidebar
+            cur_deed = pygame.transform.smoothscale(localGame.board.getProp(cur_pos).getTitleDeed(netGame.propertyGetMortStat(cur_pos)), [225,400]) #Scale title deed so it fits in the narrow sidebar
             deed_prop = cur_pos
 
         if buy_but_click != -1: #One of the buttons for buying CH or TB has been clicked
             cur_pos = board_poses[buy_but_click]
             if netGame.propertyGetCH(cur_pos) < 4: #Fewer than 4  Council Houses, so these are the next upgrade to be bought 
-                if netGame.playerGetMoney() >= (netGame.propertyGetCHCost(cur_pos) * netGame.boardCountGroupSize(netGame.getCurPlayerNum(), cur_pos)): #Player actually has enough money to buy the Council House upgrade
+                if netGame.playerGetMoney(cur_player) >= (netGame.propertyGetCHCost(cur_pos) * netGame.boardCountGroupSize(netGame.getCurPlayerNum(), cur_pos)): #Player actually has enough money to buy the Council House upgrade
                     netGame.boardBuyCHGroup(netGame.getCurPlayerNum(), cur_pos) #Buy the Council Houses for the whole group
                     netGame.playerSpendMoney(netGame.propertyGetCHCost(cur_pos) * netGame.boardCountGroupSize(netGame.getCurPlayerNum(), cur_pos), netGame.getCurPlayerNum()) #Decrease the player's money by the cost of a Council House for however many properties are in the group
             elif netGame.propertyGetCH(cur_pos) == 4 and netGame.propertyGetTB(cur_pos) == 0: #4 Council Houses and no Tower Blocks, so Tower Block can be bought 
-                if netGame.playerGetMoney() >= (netGame.propertyGetTBCost(cur_pos) * netGame.boardCountGroupSize(netGame.getCurPlayerNum(), cur_pos)): #Player actually has enough money to buy the Tower Block upgrade
+                if netGame.playerGetMoney(cur_player) >= (netGame.propertyGetTBCost(cur_pos) * netGame.boardCountGroupSize(netGame.getCurPlayerNum(), cur_pos)): #Player actually has enough money to buy the Tower Block upgrade
                     netGame.boardBuyCHGroup(netGame.getCurPlayerNum(), cur_pos) #Buy the Council Houses for the whole group
                     netGame.playerSpendMoney(netGame.propertyGetTBCost(cur_pos) * netGame.boardCountGroupSize(netGame.getCurPlayerNum(), cur_pos), netGame.getCurPlayerNum()) #Decrease the player's money by the cost of a Tower Block for however many properties are in the group
 
