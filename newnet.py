@@ -291,12 +291,12 @@ def NewNet(screen, clock):
             start_game_but.hideBut()
 
         if not start_game and name_chosen and not start_game_but.visible and ready_up:
-            if lobby.allReadyUp():
+            if lobby.allReadyUp() and dim(lobby.getLobby())[0] >= 2: #May not proceed until at least two players have joined
                 start_game_but.showBut()
 
 
         if start_game and name_chosen and ready_up:
-            if lobby.allReadyToStart():
+            if lobby.allReadyToStart() and dim(lobby.getLobby())[0] >= 2: #At least two players required for a game (duh!)
                 #Creation of localGame object first
                 players = createLocalPlayers(pieces_large, lobby.getLobby()) #Create array of LocalPlayer objects
                 prop_arr = createLocalProperties("data/Property Values.txt") #Create array of Property objects
