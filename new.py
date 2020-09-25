@@ -292,7 +292,7 @@ def NewGame(screen, clock):
                 data_arr = []
                 for line in f:
                     data_arr.append(line.strip().split(','))
-                data_arr = np.array(data_arr)
+                data_arr = np.array(data_arr, dtype=object)
                 
                 players = LoadPlayers(data_arr)    
                 prop_arr = LoadProperties("data/Property Values.txt") #Create array of Property objects
