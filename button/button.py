@@ -12,6 +12,7 @@ class Button:
         self.txt_col = txt_col
         self.visible = visible
         self.enabled = enabled
+        self.MOUSEPRESSED = False
         
         self.but_rect = pygame.Rect(x, y, w, h)
 
