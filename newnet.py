@@ -194,10 +194,14 @@ def NewNet(screen, clock):
     for p_counter in range(6):
         pieces_large[p_counter] = pygame.transform.smoothscale(pygame.image.load("img/Pieces/" + str(p_counter+1) + ".png"), [100, 100]) #Load image into pygame and resize
 
+    # Read in host (server) IP and port from file.
+    # This means that the server IP and port do not have to be hard-coded.
+    f = open("data/Host_Data.txt", "r")
+    host_dat = f.readline().split(",")
     # Some setup code that was previously run while the screen was active.
     # Having it here instead streamlines things a bit.    
     ip_text = font_48.render("Your IP: " + socket.gethostbyname(socket.gethostname()), True, (0,0,0))
-    lobby = Pyro4.Proxy("PYRO:dfo.game@192.168.1.74:9090") 
+    lobby = Pyro4.Proxy("PYRO:dfo.game@" + host_dat[0] + ":" + host_dat[1]) 
     # Okay, this is actually a Game() class object, but the Lobby() part is the only part actually used here, 
     # and I wrote everything here with lobby separate first, so why bother changing it?
 
