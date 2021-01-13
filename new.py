@@ -182,7 +182,10 @@ def NewGame(screen, clock):
     hour = '0' + str(now.hour)
     minute = '0' + str(now.minute)
     second = '0' + str(now.second)
-    save_initial = 'C:/Users/' + getpass.getuser() + '/Dunfermline-opoly/' + str(now.year) + month[-2:] + day[-2:] + '_' + hour[-2:] + minute[-2:] + second[-2:] + '.dfo'
+    
+    save_initial = os.path.dirname(os.path.abspath(__file__)) + '/saves/' + str(now.year) + month[-2:] + day[-2:] + '_' + hour[-2:] + minute[-2:] + second[-2:] + '.dfo'
+    
+    #save_initial = 'C:/Users/' + getpass.getuser() + '/Dunfermline-opoly/' + str(now.year) + month[-2:] + day[-2:] + '_' + hour[-2:] + minute[-2:] + second[-2:] + '.dfo'
     save_path_box.buffer = list(save_initial)
 
     font_48 = pygame.font.SysFont('Arial', 48) #Fonts used for texts
