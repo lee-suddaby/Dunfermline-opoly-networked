@@ -73,8 +73,19 @@ class Game:
             self.cur_player_num = 0 #Index of current player in he players array
             self.controller = Game_Controller()
 
+            self.update_thumb_stat = [False] * no_of_players
             self.game_setup = True
     
+    def getUpdateThumbs(self, p_num):
+        return self.update_thumb_stat[p_num]
+    
+    def setUpdateThumbs(self, p_num, stat):
+        self.update_thumb_stat[p_num] = stat
+
+    def setAllThumbs(self, stat):
+        for i in range(len(self.update_thumb_stat)):
+            self.update_thumb_stat[i] = stat
+
     def getGameSetup(self):
         return self.game_setup
 

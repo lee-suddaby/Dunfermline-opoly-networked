@@ -221,6 +221,7 @@ def NetworkMainScreen(netGame, localGame, screen, clock):
                     gotoScreen = -1
                 if advanceOnBoxClose and msgBox.should_exit:
                     netGame.advancePlayer()
+                    netGame.setAllThumbs(True)
                     localGame.prop_thumbs = pygame.transform.smoothscale(CreateThumbs(netGame, localGame, netGame.getCurPlayerNum()), [385,170]) #Generate thumbnails for new player (here so it is only done when the player changes, not every frame change)
                     advanceOnBoxClose = False
                 if msgBox.should_exit == False:
@@ -433,6 +434,7 @@ def NetworkMainScreen(netGame, localGame, screen, clock):
             #Next player's turn now (if the previous player has no more to do
             if cont:
                 netGame.advancePlayer()
+                netGame.setAllThumbs(True)
                 localGame.prop_thumbs = pygame.transform.smoothscale(CreateThumbs(netGame, localGame, netGame.getCurPlayerNum()), [385,170]) #Generate thumbnails for new player (here so it is only done when the player changes, not every frame change)
                 localGame.controller.reset()
                 
@@ -453,6 +455,7 @@ def NetworkMainScreen(netGame, localGame, screen, clock):
                     #Player has enough money
                     netGame.playerSpendMoney(netGame.propertyGetCost(netGame.getCurPropNum()), netGame.getCurPlayerNum()) #Decrease the player's bank balance accordingly
                     netGame.buyProperty(netGame.getCurPropNum(), netGame.getCurPlayerNum()) #Change the property's status to track the new ownership
+                    netGame.setAllThumbs(True)
                     localGame.prop_thumbs = pygame.transform.smoothscale(CreateThumbs(netGame, localGame, netGame.getCurPlayerNum()), [385,170]) #Update title deed thumbnails to reflect newly purchased properties
         
         #Button to apply the effects of a Pot Luck or Council Chest card
@@ -500,6 +503,10 @@ def NetworkMainScreen(netGame, localGame, screen, clock):
                 netGame.playerSpendMoney(50, netGame.getCurPlayerNum())
             else:
                 netGame.playerUseBogMap(netGame.getCurPlayerNum())
+
+        if netGame.getUpdateThumbs(localGame.this_player_num):
+            localGame.prop_thumbs = pygame.transform.smoothscale(CreateThumbs(netGame, localGame, netGame.getCurPlayerNum()), [385,170]) #Update title deed thumbnails to reflect newly purchased properties
+            netGame.setUpdateThumbs(localGame.this_player_num, False)
 
         if msgBox != None:
             msgBox.update()
